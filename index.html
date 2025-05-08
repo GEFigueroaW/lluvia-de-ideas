@@ -57,7 +57,7 @@
     firebase.initializeApp(firebaseConfig);
 
     const auth = firebase.auth();
-    const functions = firebase.functions("us-central1");
+    const functions = firebase.app().functions("us-central1");
 
     auth.onAuthStateChanged(user => {
       document.getElementById("auth").style.display = user ? "none" : "block";
