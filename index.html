@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lluvia de Ideas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Bulma CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+
+  <!-- Animate.css -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  
+
+  <!-- Firebase Initialization -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBo3Zp9IR2ux-rNTDK-lG8-n8z38d9cCe0",
+      authDomain: "lluvia-de-ideas-8024a.firebaseapp.com",
+      projectId: "lluvia-de-ideas-8024a"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <!-- html2pdf -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    html, body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fefefe;
+    }
+
+    .navbar, .footer {
+      background-color: #fafafa;
+      border-bottom: 1px solid #eaeaea;
+    }
+
+    .idea-card {
+      margin-bottom: 1.5rem;
+      border-left: 5px solid #f39c12;
+      background: #fffbea;
+    }
+
+    #loaderOverlay {
+      position: fixed;
+      z-index: 999;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255, 255, 255, 0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+  </style>
+</head>
+<!-- index_parte_2_autenticacion.html -->
+<section id="auth-section" class="section">
+  <div class="container" style="max-width: 480px;">
+    <h2 class="title is-4 has-text-centered">Inicia sesión</h2>
+
+    <div class="field">
+      <label class="label">Email</label>
+      <div class="control"><input id="input-email" class="input" type="email" placeholder="ejemplo@correo.com" /></div>
+    </div>
+
+    <div class="field">
+      <label class="label">Contraseña</label>
+      <div class="control"><input id="input-password" class="input" type="password" /></div>
+    </div>
+
+    <p id="auth-error" class="has-text-danger has-text-centered mt-2"></p>
+
+    <div class="buttons is-centered mt-4">
+      <button id="btn-login-email" class="button is-primary">Iniciar sesión</button>
+      <button id="btn-register-email" class="button is-light">Registrarse</button>
+      <button id="btn-login-google" class="button is-dark"><i class="fab fa-google mr-2"></i> Google</button>
+    </div>
+  </div>
+</section>
+<!-- index_parte_3_formulario_generacion.html -->
+<section id="app-section" class="section is-hidden">
+  <div class="container">
+    <h2 id="welcome-user" class="title is-4"></h2>
+
+    <div class="field">
+      <label class="label">Tema o palabra clave</label>
+      <div class="control">
+        <input id="input-topic" class="input" type="text" placeholder="Ej: estrategias de marketing para emprendedores" />
+      </div>
+      <p class="help">✨ ¡Sé nítido como un láser! Cuanto más preciso sea tu tema, más brillantes serán las ideas. ✨</p>
+    </div>
+
+    <div class="field">
+      <label class="label">Tono deseado</label>
+      <div class="control">
+        <div class="select is-fullwidth">
+          <select id="input-tone">
+            <option>Neutral</option>
+            <option>Formal</option>
+            <option>Informal</option>
+            <option>Alegre/Entusiasta</option>
+            <option>Empático</option>
+            <option>Asertivo</option>
+            <option>Persuasivo</option>
+            <option>Sarcástico/Irónico</option>
+            <option>Motivacional</option>
+            <option>Didáctico</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Máximo de palabras para el post</label>
+      <div class="control">
+        <input id="input-maxwords" class="input" type="number" min="50" max="500" value="100" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Audiencia objetivo (sección visual por integrar en JS)</label>
+      <p class="help">⚠️ Esta parte será gestionada dinámicamente con JavaScript.</p>
+    </div>
+
+    <div class="has-text-centered mt-4">
+      <button id="btn-generate" class="button is-primary is-large animate__animated animate__pulse animate__infinite">✨ ¡Generar 10 Inspiraciones! ✨</button>
+    </div>
+
+    <div id="ideas-results" class="mt-6"></div>
+
+    <div id="export-buttons" class="buttons mt-5 is-centered is-hidden">
+      <button id="btn-export-pdf" class="button is-success">📄 Exportar a PDF</button>
+      <button id="btn-export-csv" class="button is-warning">📊 Exportar a CSV</button>
+    </div>
+
+    <p id="final-phrase" class="mt-6 has-text-centered is-size-5 has-text-weight-semibold is-hidden"></p>
+  </div>
+</section>
+<!-- index_parte_4_logica_js.html (Corregida) -->
+<script>
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const functions = firebase.app().functions("us-central1");
+
+  const authSection = document.getElementById('auth-section');
+  const appSection = document.getElementById('app-section');
+  const loader = document.getElementById('loaderOverlay');
+  const emailInput = document.getElementById('input-email');
+  const passwordInput = document.getElementById('input-password');
+  const errorDisplay = document.getElementById('auth-error');
+  const welcomeUser = document.getElementById('welcome-user');
+
+  function showLoader(show) {
+  const loader = document.getElementById("loaderOverlay");
+  if (loader) {
+    loader.style.display = show ? "flex" : "none";
+  } else {
+    console.warn("⚠️ No se encontró el elemento #loaderOverlay");
+  }
+}
+
+
+  function showApp(user) {
+    appSection.classList.remove('is-hidden');
+    authSection.classList.add('is-hidden');
+    welcomeUser.textContent = `¡Hola, ${user.displayName || user.email}!`;
+  }
+
+  function showAuth() {
+    appSection.classList.add('is-hidden');
+    authSection.classList.remove('is-hidden');
+  }
+
+  auth.onAuthStateChanged((user) => {
+    if (user) {
+      showApp(user);
+    } else {
+      showAuth();
+    }
+  });
+
+  document.getElementById('btn-login-email').addEventListener('click', async () => {
+    try {
+      await auth.signInWithEmailAndPassword(emailInput.value, passwordInput.value);
+    } catch (e) {
+      errorDisplay.textContent = e.message;
+    }
+  });
+
+  document.getElementById('btn-register-email').addEventListener('click', async () => {
+    try {
+      await auth.createUserWithEmailAndPassword(emailInput.value, passwordInput.value);
+    } catch (e) {
+      errorDisplay.textContent = e.message;
+    }
+  });
+
+  document.getElementById('btn-login-google').addEventListener('click', async () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    try {
+      await auth.signInWithPopup(provider);
+    } catch (e) {
+      errorDisplay.textContent = e.message;
+    }
+  });
+
+  async function generateIdeas() {
+  const user = firebase.auth().currentUser;
+  if (!user) {
+    alert("Debes iniciar sesión para generar ideas.");
+    return;
+  }
+
+  const topic = document.getElementById("input-topic").value;
+  const tone = document.getElementById("input-tone").value;
+  const audience = ["General"];
+  const maxWords = parseInt(document.getElementById("input-maxwords").value)
+
+  showLoader(true);
+
+  try {
+    const generateIdeasFn = firebase.app().functions("us-central1").httpsCallable("generateIdeas");
+    const res = await generateIdeasFn({ topic, tone, audience, maxWords });
+
+    console.log("✅ Resultado:", res.data);
+    // Aquí haces el render de res.data.ideas y res.data.finalPhrase
+
+  } catch (err) {
+    console.error("❌ Error completo:", err);
+    alert("Error al generar ideas: " + (err.message || err));
+  }
+
+  showLoader(false);
+}
+
+  function renderIdeas(ideas, phrase) {
+    const container = document.getElementById('ideas-results');
+    container.innerHTML = "";
+    ideas.forEach((idea, idx) => {
+      const card = document.createElement("div");
+      card.className = "card idea-card";
+      card.innerHTML = `<div class="card-content"><p><strong>#${idx + 1}.</strong> ${idea["Post Relacionado"] || "Sin contenido"}</p></div>`;
+      container.appendChild(card);
+    });
+    document.getElementById('final-phrase').textContent = phrase;
+    document.getElementById('final-phrase').classList.remove("is-hidden");
+    document.getElementById('export-buttons').classList.remove("is-hidden");
+  }
+
+  document.getElementById('btn-generate').addEventListener('click', generateIdeas);
+
+  document.getElementById('btn-export-pdf').addEventListener('click', () => {
+    const element = document.getElementById("ideas-results");
+    const opt = {
+      margin:       0.5,
+      filename:     `Inspiraciones-${new Date().toISOString().slice(0,10)}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2 },
+      jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
+  });
+
+  document.getElementById('btn-export-csv').addEventListener('click', async () => {
+    try {
+      const sessionId = window.currentViewingSessionId;
+      if (!sessionId) return alert("No hay sesión cargada.");
+      const result = await functions.httpsCallable('exportCsv')({ sessionId });
+      const blob = new Blob([result.data.csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Inspiraciones-${new Date().toISOString().slice(0,10)}.csv`;
+      link.click();
+    } catch (e) {
+      alert("Error al exportar CSV.");
+    }
+  });
+</script>
+<!-- Loader Overlay -->
+<div id="loaderOverlay" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  display: none;
+">
+  <span class="has-text-weight-bold">Cargando ideas... 🧠💡</span>
+</div>
+  <!-- index_parte_5_footer_y_final.html -->
+<footer class="footer">
+  <div class="content has-text-centered">
+    <p><strong>Lluvia de Ideas</strong> — Este contenido es generado por IA y se basa en tendencias conocidas. El usuario es responsable de verificar y asegurar el uso apropiado y legal de cualquier contenido generado.</p>
+  </div>
+</footer>
+</body>
+</html>
