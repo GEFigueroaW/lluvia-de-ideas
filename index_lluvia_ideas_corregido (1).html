@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lluvia de Ideas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 2rem;
+    }
+    #loaderOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.8);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    #results {
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔐 Prueba Lluvia de Ideas</h1>
+
+  <div id="auth">
+    <button onclick="login()">Iniciar Sesión con Google</button>
+  </div>
+
+  <div id="app" style="display:none;">
+    <p>¡Hola, <span id="userName"></span>!</p>
+
+    <input type="text" id="input-topic" placeholder="Escribe tu tema aquí..." />
+    <button id="btn-generate">✨ Generar idea</button>
+
+    <div id="loaderOverlay">Cargando idea... 💡</div>
+
+    <div id="results"></div>
+    <button onclick="logout()">Cerrar sesión</button>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBo3Zp9IR2ux-rNTDK-lG8-n8z38d9cCe0",
+      authDomain: "lluvia-de-ideas-8024a.firebaseapp.com",
+      projectId: "lluvia-de-ideas-8024a"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const auth = firebase.auth();
+    const functions = firebase.app().functions("us-central1");
+
+    auth.onAuthStateChanged(user => {
+      document.getElementById("auth").style.display = user ? "none" : "block";
+      document.getElementById("app").style.display = user ? "block" : "none";
+      if (user) document.getElementById("userName").textContent = user.displayName || user.email;
+    });
+
+    function login() {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      auth.signInWithPopup(provider);
+    }
+
+    function logout() {
+      auth.signOut();
+    }
+
+    function showLoader(show) {
+      document.getElementById("loaderOverlay").style.display = show ? "flex" : "none";
+    }
+
+    async function generateIdeas() {
+      const topic = document.getElementById("input-topic").value.trim();
+      if (!topic) {
+        alert("⚠️ Debes ingresar un tema.");
+        return;
+      }
+
+      const user = auth.currentUser;
+      if (!user) {
+        alert("⚠️ Debes iniciar sesión.");
+        return;
+      }
+
+      showLoader(true);
+      try {
+        const generateIdeasFn = functions.httpsCallable("generateIdeas");
+        const res = await generateIdeasFn({
+          topic,
+          tone: "Motivacional",
+          audience: ["Freelancers"],
+          maxWords: 100
+        });
+
+        const idea = res.data.ideas?.[0] || {};
+        document.getElementById("results").innerHTML = `
+          <h2>🌟 Inspiración Generada</h2>
+          <p><strong>Ángulo Narrativo:</strong> ${idea["Ángulo Narrativo"] || "—"}</p>
+          <p><strong>Hashtags:</strong> ${idea["Hashtags"] || "—"}</p>
+          <p><strong>Formato Visual:</strong> ${idea["Formato Visual Sugerido"] || "—"}</p>
+          <p><strong>Gancho Verbal:</strong> ${idea["Gancho Verbal Impactante"] || "—"}</p>
+          <p><strong>Post:</strong> ${idea["Post Relacionado"] || "—"}</p>
+          <p><strong>Frase Final:</strong> ${res.data.finalPhrase}</p>
+        `;
+      } catch (err) {
+        console.error("❌ Error completo:", err);
+        alert("Error generando ideas: " + (err.message || err));
+      }
+      showLoader(false);
+    }
+
+    document.getElementById("btn-generate").addEventListener("click", generateIdeas);
+  </script>
+</body>
+</html>
