@@ -260,6 +260,34 @@
 
   document.getElementById('btn-generate').addEventListener('click', generateIdeas);
 
+
+// 🔁 Forzar solo una red social seleccionada si se elige el modo individual
+document.querySelectorAll('input[name="generationMode"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const selectedMode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (selectedMode === "single") {
+      const selectedCheckboxes = document.querySelectorAll('input[name="socialNetwork"]:checked');
+      if (selectedCheckboxes.length > 1) {
+        selectedCheckboxes.forEach((cb, index) => {
+          if (index > 0) cb.checked = false;
+        });
+      }
+    }
+  });
+});
+
+document.querySelectorAll('input[name="socialNetwork"]').forEach(checkbox => {
+  checkbox.addEventListener('change', () => {
+    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (mode === "single" && checkbox.checked) {
+      document.querySelectorAll('input[name="socialNetwork"]').forEach(cb => {
+        if (cb !== checkbox) cb.checked = false;
+      });
+    }
+  });
+});
+
+
   document.getElementById('btn-export-pdf').addEventListener('click', () => {
     const element = document.getElementById("ideas-results");
     const opt = {
