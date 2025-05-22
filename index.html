@@ -16,10 +16,134 @@
 
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
+document.addEventListener("DOMContentLoaded", function () {
+  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+  const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
+
+  function enforceSingleSelection() {
+    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (mode === "single") {
+      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", function () {
+      const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      if (mode === "single" && checkbox.checked) {
+        checkboxes.forEach(cb => {
+          if (cb !== checkbox) cb.checked = false;
+        });
+      }
+    });
+  });
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener("change", enforceSingleSelection);
+  });
+});
+
+</script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js">
+document.addEventListener("DOMContentLoaded", function () {
+  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+  const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
+
+  function enforceSingleSelection() {
+    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (mode === "single") {
+      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", function () {
+      const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      if (mode === "single" && checkbox.checked) {
+        checkboxes.forEach(cb => {
+          if (cb !== checkbox) cb.checked = false;
+        });
+      }
+    });
+  });
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener("change", enforceSingleSelection);
+  });
+});
+
+</script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js">
+document.addEventListener("DOMContentLoaded", function () {
+  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+  const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
+
+  function enforceSingleSelection() {
+    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (mode === "single") {
+      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", function () {
+      const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      if (mode === "single" && checkbox.checked) {
+        checkboxes.forEach(cb => {
+          if (cb !== checkbox) cb.checked = false;
+        });
+      }
+    });
+  });
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener("change", enforceSingleSelection);
+  });
+});
+
+</script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js">
+document.addEventListener("DOMContentLoaded", function () {
+  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+  const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
+
+  function enforceSingleSelection() {
+    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (mode === "single") {
+      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", function () {
+      const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      if (mode === "single" && checkbox.checked) {
+        checkboxes.forEach(cb => {
+          if (cb !== checkbox) cb.checked = false;
+        });
+      }
+    });
+  });
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener("change", enforceSingleSelection);
+  });
+});
+
+</script>
   
 
   <!-- Firebase Initialization -->
@@ -30,10 +154,72 @@
       projectId: "lluvia-de-ideas-8024a"
     };
     firebase.initializeApp(firebaseConfig);
-  </script>
+  
+document.addEventListener("DOMContentLoaded", function () {
+  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+  const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
+
+  function enforceSingleSelection() {
+    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (mode === "single") {
+      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", function () {
+      const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      if (mode === "single" && checkbox.checked) {
+        checkboxes.forEach(cb => {
+          if (cb !== checkbox) cb.checked = false;
+        });
+      }
+    });
+  });
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener("change", enforceSingleSelection);
+  });
+});
+
+</script>
 
   <!-- html2pdf -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+document.addEventListener("DOMContentLoaded", function () {
+  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+  const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
+
+  function enforceSingleSelection() {
+    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (mode === "single") {
+      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", function () {
+      const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      if (mode === "single" && checkbox.checked) {
+        checkboxes.forEach(cb => {
+          if (cb !== checkbox) cb.checked = false;
+        });
+      }
+    });
+  });
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener("change", enforceSingleSelection);
+  });
+});
+
+</script>
 
   <style>
     html, body {
@@ -118,6 +304,31 @@
             <option>Didáctico</option>
           </select>
         </div>
+      </div>
+    </div>
+
+    
+    <div class="field mt-5">
+      <label class="label">Modo de generación</label>
+      <div class="control">
+        <label class="radio">
+          <input type="radio" name="generationMode" value="multiple" checked> Una idea por red (mínimo 2)
+        </label>
+        <label class="radio ml-4">
+          <input type="radio" name="generationMode" value="single"> Tres ideas para una sola red
+        </label>
+      </div>
+    </div>
+
+    <div class="field mt-3">
+      <label class="label">Selecciona redes sociales</label>
+      <div id="socialNetworksContainer" class="control">
+        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Instagram"> Instagram</label>
+        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Facebook"> Facebook</label>
+        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Twitter"> Twitter</label>
+        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="LinkedIn"> LinkedIn</label>
+        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="YouTube"> YouTube</label>
+        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="TikTok"> TikTok</label>
       </div>
     </div>
 
@@ -260,34 +471,6 @@
 
   document.getElementById('btn-generate').addEventListener('click', generateIdeas);
 
-
-// 🔁 Forzar solo una red social seleccionada si se elige el modo individual
-document.querySelectorAll('input[name="generationMode"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    const selectedMode = document.querySelector('input[name="generationMode"]:checked')?.value;
-    if (selectedMode === "single") {
-      const selectedCheckboxes = document.querySelectorAll('input[name="socialNetwork"]:checked');
-      if (selectedCheckboxes.length > 1) {
-        selectedCheckboxes.forEach((cb, index) => {
-          if (index > 0) cb.checked = false;
-        });
-      }
-    }
-  });
-});
-
-document.querySelectorAll('input[name="socialNetwork"]').forEach(checkbox => {
-  checkbox.addEventListener('change', () => {
-    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
-    if (mode === "single" && checkbox.checked) {
-      document.querySelectorAll('input[name="socialNetwork"]').forEach(cb => {
-        if (cb !== checkbox) cb.checked = false;
-      });
-    }
-  });
-});
-
-
   document.getElementById('btn-export-pdf').addEventListener('click', () => {
     const element = document.getElementById("ideas-results");
     const opt = {
@@ -314,6 +497,37 @@ document.querySelectorAll('input[name="socialNetwork"]').forEach(checkbox => {
       alert("Error al exportar CSV.");
     }
   });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+  const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
+
+  function enforceSingleSelection() {
+    const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    if (mode === "single") {
+      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      if (checked.length > 1) {
+        checked.slice(1).forEach(cb => cb.checked = false);
+      }
+    }
+  }
+
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener("change", function () {
+      const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      if (mode === "single" && checkbox.checked) {
+        checkboxes.forEach(cb => {
+          if (cb !== checkbox) cb.checked = false;
+        });
+      }
+    });
+  });
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener("change", enforceSingleSelection);
+  });
+});
+
 </script>
 <!-- Loader Overlay -->
 <div id="loaderOverlay" style="
