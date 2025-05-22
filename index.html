@@ -17,14 +17,15 @@
 
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js">
-document.addEventListener("DOMContentLoaded", function () {
-  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+document.addEventListener("DOMContentLoaded", () => {
+  const radios = document.querySelectorAll('input[name="generationMode"]');
   const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
 
-  function enforceSingleSelection() {
+  function updateCheckboxes() {
     const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    console.log("🔁 Modo actual:", mode);
     if (mode === "single") {
-      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      let checked = Array.from(checkboxes).filter(cb => cb.checked);
       if (checked.length > 1) {
         checked.slice(1).forEach(cb => cb.checked = false);
       }
@@ -32,8 +33,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", function () {
+    checkbox.addEventListener("change", () => {
       const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      console.log("🟨 Checkbox cambiado. Modo:", mode);
       if (mode === "single" && checkbox.checked) {
         checkboxes.forEach(cb => {
           if (cb !== checkbox) cb.checked = false;
@@ -42,21 +44,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  radioButtons.forEach(radio => {
-    radio.addEventListener("change", enforceSingleSelection);
+  radios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      console.log("🔘 Modo cambiado:", radio.value);
+      updateCheckboxes();
+    });
   });
+
+  updateCheckboxes();
 });
 
 </script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js">
-document.addEventListener("DOMContentLoaded", function () {
-  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+document.addEventListener("DOMContentLoaded", () => {
+  const radios = document.querySelectorAll('input[name="generationMode"]');
   const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
 
-  function enforceSingleSelection() {
+  function updateCheckboxes() {
     const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    console.log("🔁 Modo actual:", mode);
     if (mode === "single") {
-      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      let checked = Array.from(checkboxes).filter(cb => cb.checked);
       if (checked.length > 1) {
         checked.slice(1).forEach(cb => cb.checked = false);
       }
@@ -64,8 +72,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", function () {
+    checkbox.addEventListener("change", () => {
       const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      console.log("🟨 Checkbox cambiado. Modo:", mode);
       if (mode === "single" && checkbox.checked) {
         checkboxes.forEach(cb => {
           if (cb !== checkbox) cb.checked = false;
@@ -74,21 +83,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  radioButtons.forEach(radio => {
-    radio.addEventListener("change", enforceSingleSelection);
+  radios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      console.log("🔘 Modo cambiado:", radio.value);
+      updateCheckboxes();
+    });
   });
+
+  updateCheckboxes();
 });
 
 </script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js">
-document.addEventListener("DOMContentLoaded", function () {
-  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+document.addEventListener("DOMContentLoaded", () => {
+  const radios = document.querySelectorAll('input[name="generationMode"]');
   const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
 
-  function enforceSingleSelection() {
+  function updateCheckboxes() {
     const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    console.log("🔁 Modo actual:", mode);
     if (mode === "single") {
-      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      let checked = Array.from(checkboxes).filter(cb => cb.checked);
       if (checked.length > 1) {
         checked.slice(1).forEach(cb => cb.checked = false);
       }
@@ -96,8 +111,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", function () {
+    checkbox.addEventListener("change", () => {
       const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      console.log("🟨 Checkbox cambiado. Modo:", mode);
       if (mode === "single" && checkbox.checked) {
         checkboxes.forEach(cb => {
           if (cb !== checkbox) cb.checked = false;
@@ -106,21 +122,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  radioButtons.forEach(radio => {
-    radio.addEventListener("change", enforceSingleSelection);
+  radios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      console.log("🔘 Modo cambiado:", radio.value);
+      updateCheckboxes();
+    });
   });
+
+  updateCheckboxes();
 });
 
 </script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js">
-document.addEventListener("DOMContentLoaded", function () {
-  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+document.addEventListener("DOMContentLoaded", () => {
+  const radios = document.querySelectorAll('input[name="generationMode"]');
   const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
 
-  function enforceSingleSelection() {
+  function updateCheckboxes() {
     const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    console.log("🔁 Modo actual:", mode);
     if (mode === "single") {
-      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      let checked = Array.from(checkboxes).filter(cb => cb.checked);
       if (checked.length > 1) {
         checked.slice(1).forEach(cb => cb.checked = false);
       }
@@ -128,8 +150,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", function () {
+    checkbox.addEventListener("change", () => {
       const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      console.log("🟨 Checkbox cambiado. Modo:", mode);
       if (mode === "single" && checkbox.checked) {
         checkboxes.forEach(cb => {
           if (cb !== checkbox) cb.checked = false;
@@ -138,9 +161,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  radioButtons.forEach(radio => {
-    radio.addEventListener("change", enforceSingleSelection);
+  radios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      console.log("🔘 Modo cambiado:", radio.value);
+      updateCheckboxes();
+    });
   });
+
+  updateCheckboxes();
 });
 
 </script>
@@ -155,14 +183,15 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     firebase.initializeApp(firebaseConfig);
   
-document.addEventListener("DOMContentLoaded", function () {
-  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+document.addEventListener("DOMContentLoaded", () => {
+  const radios = document.querySelectorAll('input[name="generationMode"]');
   const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
 
-  function enforceSingleSelection() {
+  function updateCheckboxes() {
     const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    console.log("🔁 Modo actual:", mode);
     if (mode === "single") {
-      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      let checked = Array.from(checkboxes).filter(cb => cb.checked);
       if (checked.length > 1) {
         checked.slice(1).forEach(cb => cb.checked = false);
       }
@@ -170,8 +199,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", function () {
+    checkbox.addEventListener("change", () => {
       const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      console.log("🟨 Checkbox cambiado. Modo:", mode);
       if (mode === "single" && checkbox.checked) {
         checkboxes.forEach(cb => {
           if (cb !== checkbox) cb.checked = false;
@@ -180,23 +210,29 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  radioButtons.forEach(radio => {
-    radio.addEventListener("change", enforceSingleSelection);
+  radios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      console.log("🔘 Modo cambiado:", radio.value);
+      updateCheckboxes();
+    });
   });
+
+  updateCheckboxes();
 });
 
 </script>
 
   <!-- html2pdf -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
-document.addEventListener("DOMContentLoaded", function () {
-  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+document.addEventListener("DOMContentLoaded", () => {
+  const radios = document.querySelectorAll('input[name="generationMode"]');
   const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
 
-  function enforceSingleSelection() {
+  function updateCheckboxes() {
     const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    console.log("🔁 Modo actual:", mode);
     if (mode === "single") {
-      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      let checked = Array.from(checkboxes).filter(cb => cb.checked);
       if (checked.length > 1) {
         checked.slice(1).forEach(cb => cb.checked = false);
       }
@@ -204,8 +240,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", function () {
+    checkbox.addEventListener("change", () => {
       const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      console.log("🟨 Checkbox cambiado. Modo:", mode);
       if (mode === "single" && checkbox.checked) {
         checkboxes.forEach(cb => {
           if (cb !== checkbox) cb.checked = false;
@@ -214,9 +251,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  radioButtons.forEach(radio => {
-    radio.addEventListener("change", enforceSingleSelection);
+  radios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      console.log("🔘 Modo cambiado:", radio.value);
+      updateCheckboxes();
+    });
   });
+
+  updateCheckboxes();
 });
 
 </script>
@@ -308,29 +350,29 @@ document.addEventListener("DOMContentLoaded", function () {
     </div>
 
     
-    <div class="field mt-5">
-      <label class="label">Modo de generación</label>
-      <div class="control">
-        <label class="radio">
-          <input type="radio" name="generationMode" value="multiple" checked> Una idea por red (mínimo 2)
-        </label>
-        <label class="radio ml-4">
-          <input type="radio" name="generationMode" value="single"> Tres ideas para una sola red
-        </label>
-      </div>
-    </div>
+<div class="field mt-5">
+  <label class="label">Modo de generación</label>
+  <div class="control">
+    <label class="radio">
+      <input type="radio" name="generationMode" value="multiple" checked> Una idea por red social (mínimo 2)
+    </label>
+    <label class="radio ml-4">
+      <input type="radio" name="generationMode" value="single"> Tres ideas para una sola red social
+    </label>
+  </div>
+</div>
 
-    <div class="field mt-3">
-      <label class="label">Selecciona redes sociales</label>
-      <div id="socialNetworksContainer" class="control">
-        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Instagram"> Instagram</label>
-        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Facebook"> Facebook</label>
-        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Twitter"> Twitter</label>
-        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="LinkedIn"> LinkedIn</label>
-        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="YouTube"> YouTube</label>
-        <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="TikTok"> TikTok</label>
-      </div>
-    </div>
+<div class="field mt-3">
+  <label class="label">Selecciona redes sociales</label>
+  <div id="socialNetworksContainer" class="control">
+    <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Instagram"> Instagram</label>
+    <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Facebook"> Facebook</label>
+    <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="Twitter"> Twitter</label>
+    <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="LinkedIn"> LinkedIn</label>
+    <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="YouTube"> YouTube</label>
+    <label class="checkbox mr-3"><input type="checkbox" name="socialNetwork" value="TikTok"> TikTok</label>
+  </div>
+</div>
 
     <div class="field">
       <label class="label">Máximo de palabras para el post</label>
@@ -498,14 +540,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 
-document.addEventListener("DOMContentLoaded", function () {
-  const radioButtons = document.querySelectorAll('input[name="generationMode"]');
+document.addEventListener("DOMContentLoaded", () => {
+  const radios = document.querySelectorAll('input[name="generationMode"]');
   const checkboxes = document.querySelectorAll('input[name="socialNetwork"]');
 
-  function enforceSingleSelection() {
+  function updateCheckboxes() {
     const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+    console.log("🔁 Modo actual:", mode);
     if (mode === "single") {
-      const checked = Array.from(checkboxes).filter(cb => cb.checked);
+      let checked = Array.from(checkboxes).filter(cb => cb.checked);
       if (checked.length > 1) {
         checked.slice(1).forEach(cb => cb.checked = false);
       }
@@ -513,8 +556,9 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   checkboxes.forEach(checkbox => {
-    checkbox.addEventListener("change", function () {
+    checkbox.addEventListener("change", () => {
       const mode = document.querySelector('input[name="generationMode"]:checked')?.value;
+      console.log("🟨 Checkbox cambiado. Modo:", mode);
       if (mode === "single" && checkbox.checked) {
         checkboxes.forEach(cb => {
           if (cb !== checkbox) cb.checked = false;
@@ -523,9 +567,14 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  radioButtons.forEach(radio => {
-    radio.addEventListener("change", enforceSingleSelection);
+  radios.forEach(radio => {
+    radio.addEventListener("change", () => {
+      console.log("🔘 Modo cambiado:", radio.value);
+      updateCheckboxes();
+    });
   });
+
+  updateCheckboxes();
 });
 
 </script>
