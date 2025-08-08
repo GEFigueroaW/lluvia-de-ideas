@@ -47,6 +47,8 @@ body {
     padding: 0;
     line-height: 1.6;
     overflow-x: hidden;
+    width: 100%;
+    min-width: 320px;
 }
 
 /* Hero moderno con glassmorphism */
@@ -333,6 +335,7 @@ body {
     border: 1px solid var(--border-light);
     transition: var(--transition-smooth);
     height: fit-content;
+    width: 100%;
 }
 
 .modern-content-card:hover {
@@ -348,6 +351,32 @@ body {
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* Mejoras para pantallas grandes en las cards */
+@media (min-width: 1200px) {
+    .modern-content-card {
+        padding: 2.5rem;
+        min-height: 400px;
+    }
+    
+    .modern-content-card h2 {
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Hacer que el panel de resultados use todo el espacio disponible */
+    #ideasContainer .modern-content-card {
+        min-height: 600px;
+        max-width: none;
+    }
+    
+    /* Grid mejorado para características */
+    [style*="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))"] {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 2rem !important;
+        max-width: none !important;
+    }
 }
 
 /* Efectos de entrada */
@@ -400,10 +429,115 @@ body {
     }
 }
 
-/* Override de Bulma para responsive design */
+/* Override agresivo de Bulma para responsive design */
 .container {
-    max-width: 100% !important;
+    max-width: 1400px !important;
+    width: 100% !important;
     padding: 0 1rem;
+    margin: 0 auto !important;
+}
+
+/* Asegurar que las secciones usen todo el ancho */
+section {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+#appSection {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Forzar que todas las columnas usen el espacio disponible */
+.columns {
+    margin: 0 !important;
+    width: 100% !important;
+    max-width: none !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+}
+
+.column {
+    padding: 0.75rem !important;
+    width: auto !important;
+    flex: 1 !important;
+}
+
+/* Eliminar restricciones de Bulma para columnas específicas */
+.column.is-4,
+.column.is-5-widescreen,
+.column.is-7-widescreen,
+.column.is-8 {
+    flex: 1 !important;
+    max-width: none !important;
+    width: auto !important;
+}
+
+/* Para pantallas muy grandes - Forzar uso completo del espacio */
+@media (min-width: 1400px) {
+    .container {
+        max-width: 1600px !important;
+        padding: 0 2rem;
+    }
+    
+    .column.is-5-widescreen {
+        flex: 0 0 35% !important;
+        max-width: 35% !important;
+    }
+    
+    .column.is-7-widescreen {
+        flex: 0 0 65% !important;
+        max-width: 65% !important;
+    }
+    
+    .modern-content-card {
+        padding: 3rem;
+        min-height: 500px;
+    }
+    
+    #ideasContainer .modern-content-card {
+        min-height: 700px;
+    }
+}
+
+/* Hacer que el layout use más espacio en pantallas grandes */
+@media (min-width: 1200px) {
+    .column.is-5-widescreen {
+        flex: 0 0 40%;
+        max-width: 40%;
+    }
+    
+    .column.is-7-widescreen {
+        flex: 0 0 60%;
+        max-width: 60%;
+    }
+    
+    .modern-content-card {
+        min-height: 300px;
+    }
+    
+    /* Forzar que los elementos usen todo el ancho disponible */
+    .modern-input,
+    .modern-textarea {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    
+    .modern-btn {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    
+    /* El contenedor de ideas debe usar todo el espacio */
+    #ideasContainer {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    
+    #ideasContainer > div {
+        width: 100% !important;
+        max-width: none !important;
+    }
 }
 
 .columns {
@@ -452,11 +586,41 @@ body {
 }
 
 .modern-hero-content {
-    max-width: 1200px;
+    max-width: 1400px;
     width: 100%;
     text-align: center;
     position: relative;
     z-index: 1;
+}
+
+/* Mejoras para pantallas grandes */
+@media (min-width: 1200px) {
+    .modern-hero {
+        padding: 6rem 4rem;
+    }
+    
+    .modern-hero-content {
+        max-width: 1600px;
+    }
+    
+    .modern-title {
+        font-size: 4rem;
+    }
+    
+    .modern-subtitle {
+        font-size: 1.4rem;
+    }
+    
+    .glass-card {
+        padding: 3rem;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .modern-form {
+        max-width: 500px;
+        margin: 0 auto;
+    }
 }
 
 @keyframes fadeInRight {
@@ -815,9 +979,34 @@ body {
 /* Ideas Display Components */
 .modern-ideas-container {
     margin-top: 2rem;
-    max-width: 800px;
+    max-width: 100%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
+}
+
+/* Para pantallas grandes, usar todo el ancho disponible */
+@media (min-width: 1200px) {
+    .modern-ideas-container {
+        max-width: none;
+    }
+    
+    .modern-ideas-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .modern-idea-item {
+        display: flex;
+        flex-direction: column;
+        min-height: 200px;
+    }
+    
+    .modern-idea-content {
+        flex: 1;
+    }
 }
 
 .modern-ideas-list {
