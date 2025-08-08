@@ -5,6 +5,14 @@ const { Configuration, OpenAIApi } = require('openai'); // Usaremos el cliente d
 admin.initializeApp();
 const db = admin.firestore();
 
+// Importar funciones de admin
+const { initializeAppConfig, getAdminStats, isUserAdmin } = require('./admin');
+
+// Exportar funciones de admin
+exports.initializeAppConfig = initializeAppConfig;
+exports.getAdminStats = getAdminStats;
+exports.isUserAdmin = isUserAdmin;
+
 // Configuración del cliente Deepseek
 const DEEPSEEK_API_KEY = functions.config().deepseek.key;
 const deepseekConfig = new Configuration({
