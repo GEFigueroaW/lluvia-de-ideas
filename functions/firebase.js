@@ -9,7 +9,7 @@ const firebaseConfig = {
   authDomain: "brain-storm-8f0d8.firebaseapp.com",
   databaseURL: "https://brain-storm-8f0d8-default-rtdb.firebaseio.com",
   projectId: "brain-storm-8f0d8",
-  storageBucket: "brain-storm-8f0d8.firebasestorage.app",
+  storageBucket: "brain-storm-8f0d8.appspot.com",
   messagingSenderId: "401208607043",
   appId: "1:401208607043:web:1ec3ea3dabacbe11beaff6"
 };

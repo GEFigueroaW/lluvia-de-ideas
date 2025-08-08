@@ -222,6 +222,30 @@
                                 <p class="mt-4 is-size-7 has-text-grey">
                                     Al ingresar, aceptas nuestros términos y condiciones.
                                 </p>
+                                <button id="show-email-form-btn" class="button is-link is-light is-large mb-2">Ingresar con correo</button>
+                                <form id="email-auth-form" class="box mt-3" style="display:none;">
+                                    <div class="field">
+                                        <label class="label">Correo electrónico</label>
+                                        <div class="control">
+                                            <input id="email-input" class="input" type="email" required autocomplete="username">
+                                        </div>
+                                    </div>
+                                    <div class="field">
+                                        <label class="label">Contraseña</label>
+                                        <div class="control">
+                                            <input id="password-input" class="input" type="password" required autocomplete="current-password">
+                                        </div>
+                                    </div>
+                                    <div class="field is-grouped is-grouped-centered">
+                                        <p class="control">
+                                            <button id="login-email-btn" type="button" class="button is-link">Ingresar</button>
+                                        </p>
+                                        <p class="control">
+                                            <button id="register-email-btn" type="button" class="button is-success">Crear cuenta</button>
+                                        </p>
+                                    </div>
+                                    <p id="email-auth-message" class="help has-text-danger"></p>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -366,6 +390,13 @@
 
         const loginGoogleBtn = document.getElementById('login-google-btn');
         const languageSelector = document.getElementById('language-selector');
+    const showEmailFormBtn = document.getElementById('show-email-form-btn');
+    const emailAuthForm = document.getElementById('email-auth-form');
+    const emailInput = document.getElementById('email-input');
+    const passwordInput = document.getElementById('password-input');
+    const loginEmailBtn = document.getElementById('login-email-btn');
+    const registerEmailBtn = document.getElementById('register-email-btn');
+    const emailAuthMessage = document.getElementById('email-auth-message');
         const logoutBtn = document.getElementById('logout-btn');
         const greetingText = document.getElementById('greeting-text');
         const creditsCounter = document.getElementById('credits-counter');
@@ -378,6 +409,55 @@
         const newGenerationBtn = document.getElementById('new-generation-btn');
         const adPanel = document.getElementById('ad-panel');
         const loadingSpinner = document.getElementById('loading-spinner');
+
+        // Mostrar/ocultar formulario de email
+        showEmailFormBtn.addEventListener('click', () => {
+            emailAuthForm.style.display = emailAuthForm.style.display === 'none' ? 'block' : 'none';
+            emailAuthMessage.textContent = '';
+        });
+
+        // Login con email
+        loginEmailBtn.addEventListener('click', async () => {
+            emailAuthMessage.textContent = '';
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            if (!email || !password) {
+                emailAuthMessage.textContent = 'Completa ambos campos.';
+                return;
+            }
+            try {
+                const { user } = await auth.signInWithEmailAndPassword(email, password);
+                if (!user.emailVerified) {
+                    emailAuthMessage.textContent = 'Debes verificar tu correo antes de ingresar.';
+                    await auth.signOut();
+                }
+            } catch (error) {
+                emailAuthMessage.textContent = error.message;
+            }
+        });
+
+        // Registro con email
+        registerEmailBtn.addEventListener('click', async () => {
+            emailAuthMessage.textContent = '';
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            if (!email || !password) {
+                emailAuthMessage.textContent = 'Completa ambos campos.';
+                return;
+            }
+            if (password.length < 6) {
+                emailAuthMessage.textContent = 'La contraseña debe tener al menos 6 caracteres.';
+                return;
+            }
+            try {
+                const { user } = await auth.createUserWithEmailAndPassword(email, password);
+                await user.sendEmailVerification();
+                emailAuthMessage.textContent = 'Registro exitoso. Revisa tu correo para verificar tu cuenta.';
+                await auth.signOut();
+            } catch (error) {
+                emailAuthMessage.textContent = error.message;
+            }
+        });
 
         // Datos de la aplicación
         const socialMediaOptions = ["Facebook", "LinkedIn", "X / Twitter", "WhatsApp", "Telegram", "Reddit", "Instagram", "TikTok", "YouTube"];
