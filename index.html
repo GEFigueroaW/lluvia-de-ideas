@@ -362,26 +362,30 @@
         </section>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-functions-compat.js"></script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
 
-    <script>
-        // Configuración de Firebase (rellenar con tus propias claves)
+        // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_AUTH_DOMAIN",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_STORAGE_BUCKET",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyCScJA-UGs3WcBnfAm-6K94ybZ4bzBahz8",
+            authDomain: "brain-storm-8f0d8.firebaseapp.com",
+            databaseURL: "https://brain-storm-8f0d8-default-rtdb.firebaseio.com",
+            projectId: "brain-storm-8f0d8",
+            storageBucket: "brain-storm-8f0d8.appspot.com",
+            messagingSenderId: "401208607043",
+            appId: "1:401208607043:web:1ec3ea3dabacbe11beaff6"
         };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const functions = firebase.functions();
-        const googleProvider = new firebase.auth.GoogleAuthProvider();
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const functions = getFunctions(app);
+        const googleProvider = new GoogleAuthProvider();
 
         // Referencias del DOM
         const loginView = document.getElementById('login-view');
@@ -426,10 +430,10 @@
                 return;
             }
             try {
-                const { user } = await auth.signInWithEmailAndPassword(email, password);
-                if (!user.emailVerified) {
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                if (!userCredential.user.emailVerified) {
                     emailAuthMessage.textContent = 'Debes verificar tu correo antes de ingresar.';
-                    await auth.signOut();
+                    await signOut(auth);
                 }
             } catch (error) {
                 emailAuthMessage.textContent = error.message;
@@ -450,10 +454,10 @@
                 return;
             }
             try {
-                const { user } = await auth.createUserWithEmailAndPassword(email, password);
-                await user.sendEmailVerification();
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await sendEmailVerification(userCredential.user);
                 emailAuthMessage.textContent = 'Registro exitoso. Revisa tu correo para verificar tu cuenta.';
-                await auth.signOut();
+                await signOut(auth);
             } catch (error) {
                 emailAuthMessage.textContent = error.message;
             }
@@ -490,7 +494,7 @@
         }
 
         // Lógica de autenticación
-        auth.onAuthStateChanged(async (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
                 await initializeUserSession(user);
@@ -503,27 +507,27 @@
 
         loginGoogleBtn.addEventListener('click', async () => {
             try {
-                await auth.signInWithPopup(googleProvider);
+                await signInWithPopup(auth, googleProvider);
             } catch (error) {
                 console.error("Error al iniciar sesión:", error);
             }
         });
 
         logoutBtn.addEventListener('click', async () => {
-            await auth.signOut();
+            await signOut(auth);
         });
 
         // Inicialización de la sesión del usuario
         async function initializeUserSession(user) {
-            const userDocRef = db.collection('users').doc(user.uid);
-            const userDoc = await userDocRef.get();
+            const userDocRef = doc(db, 'users', user.uid);
+            const userDoc = await getDoc(userDocRef);
 
             // Sincronizar idioma
             const lang = localStorage.getItem('feedflow-lang') || 'es';
             languageSelector.value = lang;
 
-            if (!userDoc.exists) {
-                await userDocRef.set({
+            if (!userDoc.exists()) {
+                await setDoc(userDocRef, {
                     email: user.email,
                     name: user.displayName,
                     isPremium: false,
@@ -532,7 +536,7 @@
                     languagePreference: lang
                 }, { merge: true });
             } else {
-                await userDocRef.update({ languagePreference: lang });
+                await updateDoc(userDocRef, { languagePreference: lang });
             }
 
             // Obtener configuración de la app y del usuario
@@ -542,16 +546,16 @@
 
         async function fetchUserAndAppConfig() {
             if (!currentUser) return;
-            const userDocRef = db.collection('users').doc(currentUser.uid);
-            const appConfigDocRef = db.collection('appConfig').doc('config');
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            const appConfigDocRef = doc(db, 'appConfig', 'config');
 
             const [userDoc, appConfigDoc] = await Promise.all([
-                userDocRef.get(),
-                appConfigDocRef.get()
+                getDoc(userDocRef),
+                getDoc(appConfigDocRef)
             ]);
 
             const userData = userDoc.data();
-            appConfig = appConfigDoc.exists ? appConfigDoc.data() : {};
+            appConfig = appConfigDoc.exists() ? appConfigDoc.data() : {};
 
             // Lógica de isEffectivePremium
             isPremium = userData.isPremium || appConfig.isPremiumGlobalActive || appConfig.isLaunchPromoActive;
@@ -571,7 +575,7 @@
             } else {
                 creditsCounter.classList.add('is-hidden');
                 // Mostrar publicidad solo si no es premium individual y hay promo
-                if (!db.collection('users').doc(currentUser.uid).get().then(doc => doc.data().isPremium) && (appConfig.isPremiumGlobalActive || appConfig.isLaunchPromoActive)) {
+                if (!getDoc(doc(db, 'users', currentUser.uid)).then(doc => doc.data().isPremium) && (appConfig.isPremiumGlobalActive || appConfig.isLaunchPromoActive)) {
                     adPanel.classList.remove('is-hidden');
                 } else {
                     adPanel.classList.add('is-hidden');
@@ -670,7 +674,7 @@
             resultsContainer.innerHTML = '';
 
             try {
-                const generateIdeasCallable = functions.httpsCallable('generateIdeas');
+                const generateIdeasCallable = httpsCallable(functions, 'generateIdeas');
                 const response = await generateIdeasCallable({
                     generationMode,
                     socialMedia: socialMediaSelected,
@@ -807,7 +811,7 @@
             localStorage.setItem('feedflow-lang', lang);
             // Si el usuario está autenticado, actualizar en Firestore
             if (currentUser) {
-                db.collection('users').doc(currentUser.uid).update({ languagePreference: lang });
+                updateDoc(doc(db, 'users', currentUser.uid), { languagePreference: lang });
             }
             // La UI se puede recargar si es necesario para los textos
             // Por simplicidad en este ejemplo, solo se guarda la preferencia.
