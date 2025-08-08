@@ -18,7 +18,7 @@ exports.initializeAppConfig = functions.https.onCall(async (data, context) => {
         }
 
         // Lista de emails de administradores autorizados
-        const ADMIN_EMAILS = ['gefigueroaw@gmail.com', 'admin@feedflow.com'];
+        const ADMIN_EMAILS = ['eugenfw@gmail.com', 'admin@feedflow.com'];
         
         // Verificar que el usuario sea administrador
         if (!ADMIN_EMAILS.includes(context.auth.token.email)) {
@@ -51,7 +51,7 @@ exports.getAdminStats = functions.https.onCall(async (data, context) => {
             throw new functions.https.HttpsError('unauthenticated', 'Usuario debe estar autenticado');
         }
 
-        const ADMIN_EMAILS = ['gefigueroaw@gmail.com', 'admin@feedflow.com'];
+        const ADMIN_EMAILS = ['eugenfw@gmail.com', 'admin@feedflow.com'];
         
         if (!ADMIN_EMAILS.includes(context.auth.token.email)) {
             throw new functions.https.HttpsError('permission-denied', 'Solo administradores pueden ver estadísticas');
@@ -100,7 +100,7 @@ exports.isUserAdmin = functions.https.onCall(async (data, context) => {
             return { isAdmin: false };
         }
 
-        const ADMIN_EMAILS = ['gefigueroaw@gmail.com', 'admin@feedflow.com'];
+        const ADMIN_EMAILS = ['eugenfw@gmail.com', 'admin@feedflow.com'];
         
         return { 
             isAdmin: ADMIN_EMAILS.includes(context.auth.token.email),

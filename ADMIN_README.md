@@ -5,7 +5,7 @@
 El panel de administración está disponible en: `admin.html`
 
 ### Usuarios Administradores Autorizados:
-- `gefigueroaw@gmail.com` (Admin principal)
+- `eugenfw@gmail.com` (Admin principal)
 - `admin@feedflow.com` (Admin secundario)
 
 ## Funcionalidades del Panel

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Status de Admin - FeedFlow</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #6a1a79, #4a0f5a);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .check-box {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .admin-status {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .user-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <section class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-half">
+                        <div class="check-box has-text-centered">
+                            <h1 class="title has-text-primary">
+                                <i class="fas fa-user-shield"></i> Verificar Status de Admin
+                            </h1>
+                            
+                            <div id="loading" class="content">
+                                <i class="fas fa-spinner fa-spin fa-2x has-text-primary"></i>
+                                <p>Verificando autenticación...</p>
+                            </div>
+
+                            <div id="not-logged-in" class="content is-hidden">
+                                <div class="notification is-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>No has iniciado sesión</strong>
+                                </div>
+                                <a href="index.html" class="button is-primary">
+                                    <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
+                                    <span>Ir a Iniciar Sesión</span>
+                                </a>
+                            </div>
+
+                            <div id="user-status" class="content is-hidden">
+                                <div class="user-info">
+                                    <p><strong>Email:</strong> <span id="user-email">-</span></p>
+                                    <p><strong>Nombre:</strong> <span id="user-name">-</span></p>
+                                    <p><strong>UID:</strong> <span id="user-uid">-</span></p>
+                                </div>
+
+                                <div id="admin-result"></div>
+
+                                <div class="buttons is-centered mt-4">
+                                    <a href="admin.html" id="admin-panel-btn" class="button is-success is-hidden">
+                                        <span class="icon"><i class="fas fa-cog"></i></span>
+                                        <span>Ir al Panel de Admin</span>
+                                    </a>
+                                    <a href="index.html" class="button is-link">
+                                        <span class="icon"><i class="fas fa-home"></i></span>
+                                        <span>Volver a la App</span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCScJA-UGs3WcBnfAm-6K94ybZ4bzBahz8",
+            authDomain: "brain-storm-8f0d8.firebaseapp.com",
+            databaseURL: "https://brain-storm-8f0d8-default-rtdb.firebaseio.com",
+            projectId: "brain-storm-8f0d8",
+            storageBucket: "brain-storm-8f0d8.appspot.com",
+            messagingSenderId: "401208607043",
+            appId: "1:401208607043:web:1ec3ea3dabacbe11beaff6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const functions = getFunctions(app);
+
+        // Lista local de emails admin (para verificación)
+        const ADMIN_EMAILS = ['eugenfw@gmail.com', 'admin@feedflow.com'];
+
+        // DOM elements
+        const loading = document.getElementById('loading');
+        const notLoggedIn = document.getElementById('not-logged-in');
+        const userStatus = document.getElementById('user-status');
+        const userEmail = document.getElementById('user-email');
+        const userName = document.getElementById('user-name');
+        const userUID = document.getElementById('user-uid');
+        const adminResult = document.getElementById('admin-result');
+        const adminPanelBtn = document.getElementById('admin-panel-btn');
+
+        onAuthStateChanged(auth, async (user) => {
+            loading.classList.add('is-hidden');
+            
+            if (!user) {
+                notLoggedIn.classList.remove('is-hidden');
+                return;
+            }
+
+            // Mostrar info del usuario
+            userEmail.textContent = user.email;
+            userName.textContent = user.displayName || 'No disponible';
+            userUID.textContent = user.uid;
+            userStatus.classList.remove('is-hidden');
+
+            // Verificar admin status (método local)
+            const isAdminLocal = ADMIN_EMAILS.includes(user.email);
+            
+            try {
+                // Verificar admin status (método servidor)
+                const isUserAdminCallable = httpsCallable(functions, 'isUserAdmin');
+                const result = await isUserAdminCallable();
+                const isAdminServer = result.data.isAdmin;
+
+                // Mostrar resultado
+                if (isAdminLocal && isAdminServer) {
+                    adminResult.innerHTML = `
+                        <div class="notification is-success">
+                            <h3 class="admin-status has-text-success">
+                                <i class="fas fa-crown"></i> ¡ERES ADMINISTRADOR!
+                            </h3>
+                            <p>✅ Verificación local: <strong>ADMIN</strong></p>
+                            <p>✅ Verificación servidor: <strong>ADMIN</strong></p>
+                            <p>🎉 Tienes acceso completo al panel de administración</p>
+                        </div>
+                    `;
+                    adminPanelBtn.classList.remove('is-hidden');
+                } else if (isAdminLocal && !isAdminServer) {
+                    adminResult.innerHTML = `
+                        <div class="notification is-warning">
+                            <h3 class="admin-status has-text-warning">
+                                <i class="fas fa-exclamation-triangle"></i> ADMIN PARCIAL
+                            </h3>
+                            <p>✅ Verificación local: <strong>ADMIN</strong></p>
+                            <p>❌ Verificación servidor: <strong>NO ADMIN</strong></p>
+                            <p>⚠️ Posible problema: Cloud Functions no desplegadas</p>
+                        </div>
+                    `;
+                } else {
+                    adminResult.innerHTML = `
+                        <div class="notification is-danger">
+                            <h3 class="admin-status has-text-danger">
+                                <i class="fas fa-user"></i> USUARIO NORMAL
+                            </h3>
+                            <p>❌ Verificación local: <strong>NO ADMIN</strong></p>
+                            <p>❌ Verificación servidor: <strong>NO ADMIN</strong></p>
+                            <p>📧 Tu email: <strong>${user.email}</strong></p>
+                            <p>🔒 No tienes permisos de administrador</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error verificando admin status:', error);
+                adminResult.innerHTML = `
+                    <div class="notification is-warning">
+                        <h3 class="admin-status has-text-warning">
+                            <i class="fas fa-exclamation-triangle"></i> ERROR DE VERIFICACIÓN
+                        </h3>
+                        <p>✅ Verificación local: <strong>${isAdminLocal ? 'ADMIN' : 'NO ADMIN'}</strong></p>
+                        <p>❌ Verificación servidor: <strong>ERROR</strong></p>
+                        <p>⚠️ Posible causa: Cloud Functions no disponibles</p>
+                        <p class="is-size-7">Error: ${error.message}</p>
+                    </div>
+                `;
+                
+                if (isAdminLocal) {
+                    adminPanelBtn.classList.remove('is-hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
