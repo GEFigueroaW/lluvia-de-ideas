@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedFlow - Generador de Ideas Inteligente</title>
+    <title>FeedFlow - Generador de Copywriting para Redes Sociales</title>
     
     <!-- Fuentes modernas -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <h1 class="modern-title mt-5">FeedFlow</h1>
-                <p class="modern-subtitle">Inicializando tu generador de ideas inteligente...</p>
+                <p class="modern-subtitle">Inicializando tu generador de copywriting...</p>
             </div>
         </div>
     </section>
@@ -65,7 +65,7 @@
                                     <i class="fas fa-lightbulb"></i>
                                 </div>
                                 <h1 class="modern-title">FeedFlow</h1>
-                                <p class="modern-subtitle">Tu generador de ideas inteligente</p>
+                                <p class="modern-subtitle">Tu generador de copywriting para redes sociales</p>
                             </div>
 
                             <form id="loginForm">
@@ -173,7 +173,7 @@
                             </div>
                             <div class="brand-text">
                                 <h1>FeedFlow</h1>
-                                <p>Generador de Ideas IA</p>
+                                <p>Copywriting para RRSS</p>
                             </div>
                         </div>
                     </div>
@@ -212,35 +212,93 @@
             <div class="columns is-gapless" style="min-height: calc(100vh - 200px);">
                 <!-- Panel izquierdo: Generación e Historial -->
                 <div class="column is-5-widescreen is-4-desktop is-full-tablet is-full-mobile" style="padding-right: 1.5rem;">
-                    <!-- Panel de generación de ideas -->
+                    <!-- Panel de generación de copywriting -->
                     <div class="modern-content-card fade-in-left mb-6">
                         <h2>
-                            <i class="fas fa-magic" style="color: #667eea;"></i>
-                            Generar Ideas
+                            <i class="fas fa-pen-fancy" style="color: #667eea;"></i>
+                            Generador de Copywriting
                         </h2>
                         
-                        <form id="ideaForm">
+                        <form id="copywritingForm">
+                            <!-- 1. Modo de generación -->
                             <div class="modern-field">
-                                <input id="ideaTopic" class="modern-input" type="text" 
-                                       placeholder="🎯 ¿Sobre qué necesitas ideas?" required>
-                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                    Ej: Marketing para una app móvil, Ideas para un blog tech...
+                                <label class="modern-label">
+                                    <i class="fas fa-cog mr-2"></i>
+                                    Modo de Generación
+                                </label>
+                                <div class="modern-radio-group">
+                                    <label class="modern-radio">
+                                        <input type="radio" name="generationMode" value="multi" checked>
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">1 idea por cada red social seleccionada</span>
+                                    </label>
+                                    <label class="modern-radio">
+                                        <input type="radio" name="generationMode" value="single">
+                                        <span class="radio-custom"></span>
+                                        <span class="radio-text">3 ideas para una sola red social</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- 2. Selección de redes sociales -->
+                            <div class="modern-field">
+                                <label class="modern-label">
+                                    <i class="fas fa-share-alt mr-2"></i>
+                                    Redes Sociales
+                                </label>
+                                <div id="socialNetworksContainer" class="social-networks-grid">
+                                    <!-- Se llena dinámicamente -->
+                                </div>
+                                <p id="socialNetworkNote" class="field-note">
+                                    👑 Usuarios premium pueden acceder a todas las redes sociales
                                 </p>
                             </div>
 
+                            <!-- 3. Palabra clave / tema central -->
                             <div class="modern-field">
-                                <textarea id="ideaContext" class="modern-input" rows="4" 
-                                          placeholder="📝 Contexto adicional (opcional)
-Audiencia objetivo, limitaciones, recursos disponibles..."></textarea>
-                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
-                                    Más contexto = ideas más específicas y útiles
+                                <label class="modern-label">
+                                    <i class="fas fa-key mr-2"></i>
+                                    Palabra Clave / Tema Central
+                                </label>
+                                <input id="copyKeyword" class="modern-input" type="text" 
+                                       placeholder="Ej: iPhone 15, curso de marketing digital, restaurante vegano..." required>
+                                <p class="field-note">
+                                    ¡Sé lo más preciso posible! Cuanto más claro el tema, mejores serán las ideas.
                                 </p>
                             </div>
 
+                            <!-- 4. Tipo de Copy -->
                             <div class="modern-field">
-                                <button id="generateBtn" type="submit" class="modern-btn is-primary">
-                                    <i class="fas fa-rocket mr-2"></i>
-                                    Generar Ideas con IA
+                                <label class="modern-label">
+                                    <i class="fas fa-edit mr-2"></i>
+                                    Tipo de Copy
+                                </label>
+                                <select id="copyType" class="modern-select" required>
+                                    <option value="">Selecciona el tipo de copy...</option>
+                                    <!-- Se llena dinámicamente -->
+                                </select>
+                                <div id="copyTypeDescription" class="copy-type-description">
+                                    Selecciona un tipo de copy para ver su descripción
+                                </div>
+                                <p id="copyTypeNote" class="field-note">
+                                    💎 Algunos tipos de copy están disponibles solo para usuarios premium
+                                </p>
+                            </div>
+
+                            <!-- 5. Contexto adicional -->
+                            <div class="modern-field">
+                                <label class="modern-label">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    Contexto Adicional (Opcional)
+                                </label>
+                                <textarea id="copyContext" class="modern-input" rows="3" 
+                                          placeholder="Audiencia objetivo, tono deseado, call-to-action específico..."></textarea>
+                            </div>
+
+                            <div class="modern-field">
+                                <button id="generateCopyBtn" type="submit" class="modern-btn is-primary">
+                                    <i class="fas fa-magic mr-2"></i>
+                                    Generar Copywriting
                                 </button>
                             </div>
                         </form>
@@ -292,48 +350,48 @@ Audiencia objetivo, limitaciones, recursos disponibles..."></textarea>
                             <!-- Icono animado -->
                             <div style="position: relative; margin-bottom: 2rem;">
                                 <div style="width: 100px; height: 100px; background: var(--accent-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite;">
-                                    <i class="fas fa-lightbulb" style="font-size: 2.5rem; color: white;"></i>
+                                    <i class="fas fa-pen-fancy" style="font-size: 2.5rem; color: white;"></i>
                                 </div>
                                 <div style="position: absolute; top: -10px; right: -10px; width: 30px; height: 30px; background: var(--secondary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: bounce 2s infinite;">
-                                    <i class="fas fa-plus" style="font-size: 0.875rem; color: white;"></i>
+                                    <i class="fas fa-share-alt" style="font-size: 0.875rem; color: white;"></i>
                                 </div>
                             </div>
                             
                             <!-- Texto motivacional -->
                             <h3 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                                ¡Desata tu Creatividad!
+                                ¡Crea Copywriting Persuasivo!
                             </h3>
                             
                             <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 400px; line-height: 1.6; margin-bottom: 2rem;">
                                 Completa el formulario de la izquierda y presiona 
-                                <strong style="color: var(--text-primary);">"Generar Ideas"</strong> 
-                                para obtener sugerencias creativas impulsadas por IA.
+                                <strong style="color: var(--text-primary);">"Generar Copywriting"</strong> 
+                                para obtener textos optimizados para cada red social.
                             </p>
                             
                             <!-- Características destacadas -->
                             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; width: 100%; max-width: 500px;">
                                 <div style="text-align: center; padding: 1rem;">
                                     <div style="width: 50px; height: 50px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
-                                        <i class="fas fa-brain" style="color: white; font-size: 1.25rem;"></i>
+                                        <i class="fas fa-share-alt" style="color: white; font-size: 1.25rem;"></i>
                                     </div>
-                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">IA Avanzada</h4>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Powered by Deepseek</p>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Multi-Plataforma</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">9 redes sociales</p>
                                 </div>
                                 
                                 <div style="text-align: center; padding: 1rem;">
                                     <div style="width: 50px; height: 50px; background: var(--secondary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
-                                        <i class="fas fa-save" style="color: white; font-size: 1.25rem;"></i>
+                                        <i class="fas fa-palette" style="color: white; font-size: 1.25rem;"></i>
                                     </div>
-                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Auto-Guardado</h4>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Historial persistente</p>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">12 Tipos de Copy</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Estilos especializados</p>
                                 </div>
                                 
                                 <div style="text-align: center; padding: 1rem;">
                                     <div style="width: 50px; height: 50px; background: var(--accent-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
-                                        <i class="fas fa-download" style="color: white; font-size: 1.25rem;"></i>
+                                        <i class="fas fa-brain" style="color: white; font-size: 1.25rem;"></i>
                                     </div>
-                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Exportación</h4>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">JSON, TXT, Markdown</p>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">IA Especializada</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Copywriting persuasivo</p>
                                 </div>
                             </div>
                         </div>
@@ -345,6 +403,7 @@ Audiencia objetivo, limitaciones, recursos disponibles..."></textarea>
 
     <!-- Scripts -->
     <script type="module" src="js/main.js"></script>
+    <script type="module" src="js/copywriting.js"></script>
     
     <!-- Estilos específicos para ideas y animaciones -->
     <style>

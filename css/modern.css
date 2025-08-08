@@ -976,6 +976,374 @@ section {
     }
 }
 
+/* =========================================
+   COMPONENTES DE COPYWRITING
+   ========================================= */
+
+/* Labels modernos */
+.modern-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Radio buttons modernos */
+.modern-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.modern-radio {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: var(--radius-md);
+    transition: var(--transition-smooth);
+    border: 1px solid var(--border-light);
+}
+
+.modern-radio:hover {
+    background: var(--surface-hover);
+    border-color: var(--primary-color);
+}
+
+.modern-radio input[type="radio"] {
+    display: none;
+}
+
+.radio-custom {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border-light);
+    border-radius: 50%;
+    position: relative;
+    transition: var(--transition-smooth);
+}
+
+.modern-radio input[type="radio"]:checked + .radio-custom {
+    border-color: var(--primary-color);
+    background: var(--primary-gradient);
+}
+
+.modern-radio input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+.radio-text {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Grid de redes sociales */
+.social-networks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.social-network-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    background: white;
+    position: relative;
+}
+
+.social-network-item:hover {
+    border-color: var(--primary-color);
+    background: var(--surface-hover);
+}
+
+.social-network-item.selected {
+    border-color: var(--primary-color);
+    background: var(--primary-color-alpha);
+}
+
+.social-network-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: #f5f5f5;
+}
+
+.social-network-item.disabled::after {
+    content: '🔒';
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 0.75rem;
+}
+
+.social-network-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.social-network-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+/* Select moderno */
+.modern-select {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    background: white;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.modern-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px var(--primary-color-alpha);
+}
+
+.modern-select option:disabled {
+    opacity: 0.5;
+    color: #999;
+}
+
+/* Descripción del tipo de copy */
+.copy-type-description {
+    margin-top: 0.75rem;
+    padding: 1rem;
+    background: var(--surface-hover);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--primary-color);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    display: none;
+}
+
+.copy-type-description.show {
+    display: block;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+/* Notas de campo */
+.field-note {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    line-height: 1.4;
+}
+
+/* Responsive para copywriting */
+@media (max-width: 768px) {
+    .social-networks-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    
+    .modern-radio-group {
+        gap: 0.5rem;
+    }
+    
+    .modern-radio {
+        padding: 0.5rem;
+    }
+}
+
+/* =========================================
+   RESULTADOS DE COPYWRITING
+   ========================================= */
+
+.modern-copywriting-results {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.copywriting-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.copywriting-result-item {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    transition: all var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.copywriting-result-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+    border-color: var(--primary-color);
+}
+
+.copywriting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.social-network-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: white;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    box-shadow: var(--shadow-sm);
+}
+
+.variation-badge {
+    background: var(--accent-gradient);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-md);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.copywriting-content {
+    margin-bottom: 1rem;
+    min-height: 80px;
+}
+
+.copywriting-content p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+    margin: 0;
+    word-wrap: break-word;
+}
+
+.copywriting-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.copy-btn {
+    background: var(--primary-gradient);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.copy-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.copywriting-global-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--glass-border);
+}
+
+.copywriting-global-actions .modern-btn {
+    min-width: 150px;
+}
+
+/* Responsive para resultados de copywriting */
+@media (max-width: 768px) {
+    .copywriting-results-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .copywriting-result-item {
+        padding: 1rem;
+    }
+    
+    .copywriting-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+    }
+    
+    .copywriting-global-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .copywriting-global-actions .modern-btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+/* Animaciones específicas para copywriting */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efecto de escritura para el copywriting */
+.copywriting-content p {
+    animation: typewriter 0.8s ease-out;
+}
+
+@keyframes typewriter {
+    from {
+        width: 0;
+        opacity: 0;
+    }
+    to {
+        width: 100%;
+        opacity: 1;
+    }
+}
+
 /* Ideas Display Components */
 .modern-ideas-container {
     margin-top: 2rem;
