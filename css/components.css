@@ -274,3 +274,63 @@
         padding: 1.5rem;
     }
 }
+
+/* =========================================
+   HISTORIAL DE IDEAS
+   ========================================= */
+.history-item {
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.history-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.history-item .media-content {
+    overflow: hidden;
+}
+
+.history-item .title {
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.history-item .subtitle {
+    margin-bottom: 0.5rem;
+}
+
+/* =========================================
+   DROPDOWNS MEJORADOS
+   ========================================= */
+.dropdown-content {
+    border-radius: 8px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+    border: 1px solid #e9ecef;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1rem;
+    transition: var(--transition);
+}
+
+.dropdown-item:hover {
+    background-color: var(--bg-color-light);
+    color: var(--primary-color);
+}
+
+/* =========================================
+   EXPORTACIÓN Y ACCIONES
+   ========================================= */
+.idea-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.idea-actions .dropdown {
+    display: inline-block;
+}

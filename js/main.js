@@ -21,6 +21,15 @@ import {
     toggleButtonLoading,
     debounce
 } from './utils.js';
+import { 
+    saveIdeasSession, 
+    loadUserIdeasHistory, 
+    exportIdeasToJSON, 
+    exportIdeasToTxt, 
+    exportIdeasToMarkdown,
+    getCachedUserIdeas,
+    searchIdeas
+} from './ideas-manager.js';
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js';
 
@@ -29,6 +38,7 @@ import { httpsCallable } from 'https://www.gstatic.com/firebasejs/9.21.0/firebas
 // =========================================
 let isGenerating = false;
 let userProfile = null;
+let currentIdeasSession = null;
 
 // =========================================
 // ELEMENTOS DEL DOM
@@ -65,7 +75,9 @@ const elements = {
     // Otros elementos
     userInfo: null,
     ideasContainer: null,
-    premiumStatus: null
+    premiumStatus: null,
+    historyContainer: null,
+    searchInput: null
 };
 
 // =========================================
@@ -113,6 +125,8 @@ function initializeElements() {
     elements.userInfo = document.getElementById('userInfo');
     elements.ideasContainer = document.getElementById('ideasContainer');
     elements.premiumStatus = document.getElementById('premiumStatus');
+    elements.historyContainer = document.getElementById('historyContainer');
+    elements.searchInput = document.getElementById('searchInput');
 }
 
 /**
@@ -176,8 +190,10 @@ async function handleAuthStateChange(user) {
     
     if (user && user.emailVerified) {
         await loadUserProfile(user);
+        await loadUserIdeasHistory(); // Cargar historial de ideas
         showAppSection();
         updateUserInfo(user);
+        updateHistoryDisplay(); // Mostrar historial
     } else {
         showLoginSection();
         if (user && !user.emailVerified) {
@@ -349,6 +365,11 @@ async function generateIdeas(topic, context) {
         });
         
         const ideas = result.data.ideas;
+        
+        // Guardar la sesión de ideas en Firestore
+        const sessionId = await saveIdeasSession(ideas, topic, context);
+        currentIdeasSession = { ideas, topic, context, sessionId };
+        
         displayIdeas(ideas, topic);
         
         showNotification('¡Ideas generadas exitosamente!', 'success');
@@ -386,6 +407,29 @@ function displayIdeas(ideas, topic) {
                     <button class="button is-secondary" onclick="copyAllIdeas()">
                         📋 Copiar todas las ideas
                     </button>
+                    <div class="dropdown is-hoverable ml-2">
+                        <div class="dropdown-trigger">
+                            <button class="button is-info" aria-haspopup="true" aria-controls="dropdown-menu">
+                                <span>📥 Exportar</span>
+                                <span class="icon is-small">
+                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                </span>
+                            </button>
+                        </div>
+                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                            <div class="dropdown-content">
+                                <a class="dropdown-item" onclick="exportCurrentSession('json')">
+                                    📄 Formato JSON
+                                </a>
+                                <a class="dropdown-item" onclick="exportCurrentSession('txt')">
+                                    📝 Archivo de Texto
+                                </a>
+                                <a class="dropdown-item" onclick="exportCurrentSession('md')">
+                                    📋 Markdown
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -472,6 +516,79 @@ function validatePasswordField() {
 }
 
 // =========================================
+// FUNCIONES DE HISTORIAL DE IDEAS
+// =========================================
+
+/**
+ * Actualiza la visualización del historial de ideas
+ */
+function updateHistoryDisplay() {
+    if (!elements.historyContainer) return;
+    
+    const cachedIdeas = getCachedUserIdeas();
+    
+    if (cachedIdeas.length === 0) {
+        elements.historyContainer.innerHTML = `
+            <div class="has-text-centered p-4">
+                <span class="icon is-large has-text-grey-light">
+                    <i class="fas fa-history fa-2x"></i>
+                </span>
+                <p class="has-text-grey">No hay sesiones guardadas aún</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const historyHtml = cachedIdeas.map(session => `
+        <div class="history-item card mb-3" data-session-id="${session.id}">
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-left">
+                        <span class="icon is-large has-text-primary">
+                            <i class="fas fa-lightbulb fa-2x"></i>
+                        </span>
+                    </div>
+                    <div class="media-content">
+                        <p class="title is-6">${session.topic}</p>
+                        <p class="subtitle is-7 has-text-grey">
+                            ${session.ideaCount} ideas • ${formatDate(session.createdAt)}
+                        </p>
+                        ${session.context ? `<p class="is-size-7">${session.context.substring(0, 100)}...</p>` : ''}
+                    </div>
+                    <div class="media-right">
+                        <div class="buttons are-small">
+                            <button class="button is-small is-primary" onclick="viewIdeasSession('${session.id}')">
+                                <span class="icon">
+                                    <i class="fas fa-eye"></i>
+                                </span>
+                            </button>
+                            <div class="dropdown is-hoverable">
+                                <div class="dropdown-trigger">
+                                    <button class="button is-small is-info" aria-haspopup="true">
+                                        <span class="icon">
+                                            <i class="fas fa-download"></i>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class="dropdown-menu" role="menu">
+                                    <div class="dropdown-content">
+                                        <a class="dropdown-item" onclick="exportSession('${session.id}', 'json')">JSON</a>
+                                        <a class="dropdown-item" onclick="exportSession('${session.id}', 'txt')">TXT</a>
+                                        <a class="dropdown-item" onclick="exportSession('${session.id}', 'md')">MD</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    
+    elements.historyContainer.innerHTML = historyHtml;
+}
+
+// =========================================
 // FUNCIONES GLOBALES (para HTML)
 // =========================================
 
@@ -490,4 +607,84 @@ window.copyAllIdeas = async function() {
         console.error('Error al copiar:', error);
         showNotification('Error al copiar al portapapeles', 'danger');
     }
+};
+
+/**
+ * Exporta la sesión actual de ideas
+ */
+window.exportCurrentSession = function(format) {
+    if (!currentIdeasSession) {
+        showNotification('No hay sesión actual para exportar', 'warning');
+        return;
+    }
+    
+    const session = {
+        topic: currentIdeasSession.topic,
+        context: currentIdeasSession.context,
+        ideas: currentIdeasSession.ideas,
+        createdAt: new Date(),
+        ideaCount: currentIdeasSession.ideas.length
+    };
+    
+    switch (format) {
+        case 'json':
+            exportIdeasToJSON(session);
+            break;
+        case 'txt':
+            exportIdeasToTxt(session);
+            break;
+        case 'md':
+            exportIdeasToMarkdown(session);
+            break;
+        default:
+            showNotification('Formato no válido', 'danger');
+    }
+};
+
+/**
+ * Exporta una sesión específica
+ */
+window.exportSession = function(sessionId, format) {
+    const cachedIdeas = getCachedUserIdeas();
+    const session = cachedIdeas.find(s => s.id === sessionId);
+    
+    if (!session) {
+        showNotification('Sesión no encontrada', 'danger');
+        return;
+    }
+    
+    switch (format) {
+        case 'json':
+            exportIdeasToJSON(session);
+            break;
+        case 'txt':
+            exportIdeasToTxt(session);
+            break;
+        case 'md':
+            exportIdeasToMarkdown(session);
+            break;
+        default:
+            showNotification('Formato no válido', 'danger');
+    }
+};
+
+/**
+ * Visualiza una sesión específica de ideas
+ */
+window.viewIdeasSession = async function(sessionId) {
+    const cachedIdeas = getCachedUserIdeas();
+    const session = cachedIdeas.find(s => s.id === sessionId);
+    
+    if (!session) {
+        showNotification('Sesión no encontrada', 'danger');
+        return;
+    }
+    
+    // Mostrar las ideas en el contenedor principal
+    displayIdeas(session.ideas, session.topic);
+    
+    // Actualizar la sesión actual
+    currentIdeasSession = session;
+    
+    showNotification('Sesión cargada correctamente', 'success', 2000);
 };
