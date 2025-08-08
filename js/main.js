@@ -368,7 +368,10 @@ async function generateIdeas(topic, context) {
         
         // Guardar la sesión de ideas en Firestore
         const sessionId = await saveIdeasSession(ideas, topic, context);
-        currentIdeasSession = { ideas, topic, context, sessionId };
+        const session = { ideas, topic, context, sessionId, id: sessionId };
+        
+        currentIdeasSession = session;
+        window.currentSession = session; // Para las funciones de UI modernas
         
         displayIdeas(ideas, topic);
         
@@ -383,54 +386,70 @@ async function generateIdeas(topic, context) {
 }
 
 /**
- * Muestra las ideas generadas en la UI
+ * Muestra las ideas generadas en la UI con diseño moderno
  */
 function displayIdeas(ideas, topic) {
     if (!elements.ideasContainer || !ideas || !Array.isArray(ideas)) return;
     
     const ideasHtml = `
-        <div class="card animate__animated animate__fadeInUp">
-            <div class="card-content">
-                <h3 class="section-title">💡 Ideas para: ${topic}</h3>
-                <div class="ideas-list">
-                    ${ideas.map((idea, index) => `
-                        <div class="idea-item animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
-                            <div class="idea-number">${index + 1}</div>
-                            <div class="idea-content">
-                                <h4>${idea.title || `Idea ${index + 1}`}</h4>
-                                <p>${idea.description || idea}</p>
-                            </div>
+        <div class="modern-ideas-container animate__animated animate__fadeInUp">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="font-size: 2rem; font-weight: 700; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
+                    💡 Ideas para: ${topic}
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 1rem;">
+                    Generadas con IA • ${ideas.length} ideas creativas
+                </p>
+            </div>
+            
+            <div class="modern-ideas-list">
+                ${ideas.map((idea, index) => `
+                    <div class="modern-idea-item animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
+                        <div class="modern-idea-number">${index + 1}</div>
+                        <div class="modern-idea-content" style="flex: 1;">
+                            <h4>${idea.title || `Idea Creativa ${index + 1}`}</h4>
+                            <p>${idea.description || idea}</p>
                         </div>
-                    `).join('')}
-                </div>
-                <div class="idea-actions mt-4">
-                    <button class="button is-secondary" onclick="copyAllIdeas()">
-                        📋 Copiar todas las ideas
-                    </button>
-                    <div class="dropdown is-hoverable ml-2">
-                        <div class="dropdown-trigger">
-                            <button class="button is-info" aria-haspopup="true" aria-controls="dropdown-menu">
-                                <span>📥 Exportar</span>
-                                <span class="icon is-small">
-                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                </span>
-                            </button>
-                        </div>
-                        <div class="dropdown-menu" id="dropdown-menu" role="menu">
-                            <div class="dropdown-content">
-                                <a class="dropdown-item" onclick="exportCurrentSession('json')">
-                                    📄 Formato JSON
-                                </a>
-                                <a class="dropdown-item" onclick="exportCurrentSession('txt')">
-                                    📝 Archivo de Texto
-                                </a>
-                                <a class="dropdown-item" onclick="exportCurrentSession('md')">
-                                    📋 Markdown
-                                </a>
-                            </div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="modern-idea-actions">
+                <button class="modern-btn" onclick="copyAllIdeas()" style="background: var(--accent-gradient); color: white;">
+                    <i class="fas fa-copy mr-2"></i>
+                    Copiar Todas
+                </button>
+                
+                <div class="dropdown is-hoverable">
+                    <div class="dropdown-trigger">
+                        <button class="modern-btn" style="background: var(--secondary-gradient); color: white;">
+                            <i class="fas fa-download mr-2"></i>
+                            Exportar
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" role="menu" style="min-width: 180px;">
+                        <div class="dropdown-content" style="border-radius: var(--radius-md); box-shadow: var(--shadow-lg);">
+                            <a class="dropdown-item" onclick="exportCurrentSession('json')" style="padding: 0.75rem 1rem;">
+                                <i class="fas fa-code mr-2"></i>
+                                Formato JSON
+                            </a>
+                            <a class="dropdown-item" onclick="exportCurrentSession('txt')" style="padding: 0.75rem 1rem;">
+                                <i class="fas fa-file-alt mr-2"></i>
+                                Archivo de Texto
+                            </a>
+                            <a class="dropdown-item" onclick="exportCurrentSession('md')" style="padding: 0.75rem 1rem;">
+                                <i class="fab fa-markdown mr-2"></i>
+                                Markdown
+                            </a>
                         </div>
                     </div>
                 </div>
+                
+                <button class="modern-btn" onclick="generateNewIdeas()" style="background: var(--dark-gradient); color: white;">
+                    <i class="fas fa-plus mr-2"></i>
+                    Generar Más
+                </button>
             </div>
         </div>
     `;
@@ -685,6 +704,60 @@ window.viewIdeasSession = async function(sessionId) {
     
     // Actualizar la sesión actual
     currentIdeasSession = session;
+    window.currentSession = session;
     
     showNotification('Sesión cargada correctamente', 'success', 2000);
 };
+
+/**
+ * Copia todas las ideas al portapapeles
+ */
+function copyAllIdeas() {
+    const currentSession = window.currentSession;
+    if (!currentSession || !currentSession.ideas) {
+        showNotification('No hay ideas para copiar', 'warning');
+        return;
+    }
+    
+    const ideasText = currentSession.ideas
+        .map((idea, index) => `${index + 1}. ${idea.title || `Idea ${index + 1}`}\n   ${idea.description || idea}`)
+        .join('\n\n');
+    
+    const fullText = `💡 Ideas para: ${currentSession.topic}\n\n${ideasText}`;
+    
+    navigator.clipboard.writeText(fullText).then(() => {
+        showNotification('¡Ideas copiadas al portapapeles!', 'success');
+    }).catch(err => {
+        console.error('Error al copiar:', err);
+        showNotification('Error al copiar las ideas', 'danger');
+    });
+}
+
+/**
+ * Genera nuevas ideas para el mismo tema
+ */
+async function generateNewIdeas() {
+    const currentSession = window.currentSession;
+    if (!currentSession || !currentSession.topic) {
+        showNotification('No hay tema actual para generar más ideas', 'warning');
+        return;
+    }
+    
+    const generateBtn = document.querySelector('.modern-idea-actions .modern-btn:last-child');
+    if (generateBtn) {
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generando...';
+        generateBtn.disabled = true;
+    }
+    
+    try {
+        await generateIdeas(currentSession.topic);
+    } catch (error) {
+        console.error('Error al generar nuevas ideas:', error);
+        showNotification('Error al generar nuevas ideas', 'danger');
+    } finally {
+        if (generateBtn) {
+            generateBtn.innerHTML = '<i class="fas fa-plus mr-2"></i>Generar Más';
+            generateBtn.disabled = false;
+        }
+    }
+}

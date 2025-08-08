@@ -3,170 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedFlow - Generador de Ideas</title>
+    <title>FeedFlow - Generador de Ideas Inteligente</title>
+    
+    <!-- Fuentes modernas -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- CSS Externo -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- CSS Personalizado -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/modern.css">
     
     <!-- Meta tags para SEO -->
-    <meta name="description" content="Generador de ideas inteligente para potenciar tu creatividad">
-    <meta name="keywords" content="ideas, creatividad, generador, brainstorming, innovación">
+    <meta name="description" content="Generador de ideas inteligente impulsado por IA para potenciar tu creatividad">
+    <meta name="keywords" content="ideas, creatividad, generador, brainstorming, innovación, IA">
     <meta name="author" content="FeedFlow">
+    <meta name="theme-color" content="#667eea">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
-    <!-- Contenedor de notificaciones -->
+    <!-- Contenedor de notificaciones moderno -->
     <div class="notifications-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
-    <!-- Pantalla de carga inicial -->
+    <!-- Pantalla de carga moderna -->
     <section id="loadingSection" class="hero is-fullheight">
         <div class="hero-body">
-            <div class="container has-text-centered">
-                <div class="loading-animation"></div>
-                <p class="title has-text-white mt-4">Cargando FeedFlow...</p>
+            <div class="loading-container">
+                <div class="modern-loading">
+                    <div class="loading-ring">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                    </div>
+                </div>
+                <h1 class="modern-title mt-5">FeedFlow</h1>
+                <p class="modern-subtitle">Inicializando tu generador de ideas inteligente...</p>
             </div>
         </div>
     </section>
 
-    <!-- Sección de Login/Registro -->
+    <!-- Sección de Login/Registro moderna -->
     <section id="loginSection" class="hero is-fullheight is-hidden">
         <div class="hero-body">
             <div class="container">
                 <div class="columns is-centered">
-                    <div class="column is-4">
+                    <div class="column is-5-tablet is-4-desktop">
                         
                         <!-- Formulario de Login -->
-                        <div id="loginFormContainer" class="card animate__animated animate__fadeIn">
-                            <div class="card-content">
-                                <div class="has-text-centered mb-4">
-                                    <div class="logo">
-                                        <i class="fas fa-lightbulb fa-3x"></i>
-                                    </div>
-                                    <h1 class="title has-text-primary">FeedFlow</h1>
-                                    <p class="subtitle has-text-grey">Tu generador de ideas inteligente</p>
+                        <div id="loginFormContainer" class="glass-card fade-in-up">
+                            <div class="has-text-centered mb-5">
+                                <div class="modern-logo">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <h1 class="modern-title">FeedFlow</h1>
+                                <p class="modern-subtitle">Tu generador de ideas inteligente</p>
+                            </div>
+
+                            <form id="loginForm">
+                                <div class="modern-field">
+                                    <input id="loginEmail" class="modern-input" type="email" 
+                                           placeholder="✉️ Tu email" required>
                                 </div>
 
-                                <form id="loginForm">
-                                    <div class="field">
-                                        <label class="label">Email</label>
-                                        <div class="control has-icons-left">
-                                            <input id="loginEmail" class="input" type="email" placeholder="tu@email.com" required>
-                                            <span class="icon is-small is-left">
-                                                <i class="fas fa-envelope"></i>
-                                            </span>
-                                        </div>
-                                    </div>
+                                <div class="modern-field">
+                                    <input id="loginPassword" class="modern-input" type="password" 
+                                           placeholder="🔒 Tu contraseña" required>
+                                </div>
 
-                                    <div class="field">
-                                        <label class="label">Contraseña</label>
-                                        <div class="control has-icons-left">
-                                            <input id="loginPassword" class="input" type="password" placeholder="••••••••" required>
-                                            <span class="icon is-small is-left">
-                                                <i class="fas fa-lock"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control">
-                                            <button id="loginBtn" type="submit" class="button is-primary is-fullwidth is-large">
-                                                <span class="icon">
-                                                    <i class="fas fa-sign-in-alt"></i>
-                                                </span>
-                                                <span>Iniciar Sesión</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-
-                                <div class="has-text-centered">
-                                    <p class="mb-3">o</p>
-                                    <button id="googleBtn" class="button is-light is-fullwidth">
-                                        <span class="icon">
-                                            <i class="fab fa-google"></i>
-                                        </span>
-                                        <span>Continuar con Google</span>
+                                <div class="modern-field">
+                                    <button id="loginBtn" type="submit" class="modern-btn is-primary">
+                                        <i class="fas fa-sign-in-alt mr-2"></i>
+                                        Iniciar Sesión
                                     </button>
                                 </div>
+                            </form>
 
-                                <hr>
-                                <div class="has-text-centered">
-                                    <p>¿No tienes cuenta? 
-                                        <a id="showRegister" class="has-text-primary">Regístrate aquí</a>
-                                    </p>
-                                </div>
+                            <div class="has-text-centered my-4">
+                                <span style="color: var(--text-light); font-size: 0.875rem;">o continúa con</span>
+                            </div>
+
+                            <button id="googleBtn" class="modern-btn is-google">
+                                <i class="fab fa-google mr-2"></i>
+                                Google
+                            </button>
+
+                            <hr style="background: var(--glass-border); margin: 2rem 0;">
+                            
+                            <div class="has-text-centered">
+                                <p style="color: var(--text-light);">
+                                    ¿Nuevo en FeedFlow? 
+                                    <a id="showRegister" style="color: white; font-weight: 600; text-decoration: underline;">
+                                        Crear cuenta
+                                    </a>
+                                </p>
                             </div>
                         </div>
 
                         <!-- Formulario de Registro -->
-                        <div id="registerFormContainer" class="card animate__animated animate__fadeIn is-hidden">
-                            <div class="card-content">
-                                <div class="has-text-centered mb-4">
-                                    <div class="logo">
-                                        <i class="fas fa-lightbulb fa-3x"></i>
-                                    </div>
-                                    <h1 class="title has-text-primary">Crear Cuenta</h1>
-                                    <p class="subtitle has-text-grey">Únete a la comunidad creativa</p>
+                        <div id="registerFormContainer" class="glass-card fade-in-up is-hidden">
+                            <div class="has-text-centered mb-5">
+                                <div class="modern-logo">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <h1 class="modern-title">Únete a FeedFlow</h1>
+                                <p class="modern-subtitle">Comienza tu viaje creativo</p>
+                            </div>
+
+                            <form id="registerForm">
+                                <div class="modern-field">
+                                    <input id="registerName" class="modern-input" type="text" 
+                                           placeholder="👤 Tu nombre completo" required>
                                 </div>
 
-                                <form id="registerForm">
-                                    <div class="field">
-                                        <label class="label">Nombre Completo</label>
-                                        <div class="control has-icons-left">
-                                            <input id="registerName" class="input" type="text" placeholder="Tu nombre completo" required>
-                                            <span class="icon is-small is-left">
-                                                <i class="fas fa-user"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <label class="label">Email</label>
-                                        <div class="control has-icons-left">
-                                            <input id="registerEmail" class="input" type="email" placeholder="tu@email.com" required>
-                                            <span class="icon is-small is-left">
-                                                <i class="fas fa-envelope"></i>
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <label class="label">Contraseña</label>
-                                        <div class="control has-icons-left">
-                                            <input id="registerPassword" class="input" type="password" placeholder="••••••••" required>
-                                            <span class="icon is-small is-left">
-                                                <i class="fas fa-lock"></i>
-                                            </span>
-                                        </div>
-                                        <div id="password-help" class="help"></div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control">
-                                            <button id="registerBtn" type="submit" class="button is-primary is-fullwidth is-large">
-                                                <span class="icon">
-                                                    <i class="fas fa-user-plus"></i>
-                                                </span>
-                                                <span>Crear Cuenta</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-
-                                <hr>
-                                <div class="has-text-centered">
-                                    <p>¿Ya tienes cuenta? 
-                                        <a id="showLogin" class="has-text-primary">Inicia sesión aquí</a>
-                                    </p>
+                                <div class="modern-field">
+                                    <input id="registerEmail" class="modern-input" type="email" 
+                                           placeholder="✉️ Tu email" required>
                                 </div>
+
+                                <div class="modern-field">
+                                    <input id="registerPassword" class="modern-input" type="password" 
+                                           placeholder="🔒 Crea una contraseña segura" required>
+                                    <div id="password-help" class="help" style="color: var(--text-light); font-size: 0.75rem; margin-top: 0.5rem;"></div>
+                                </div>
+
+                                <div class="modern-field">
+                                    <button id="registerBtn" type="submit" class="modern-btn is-primary">
+                                        <i class="fas fa-rocket mr-2"></i>
+                                        Crear Mi Cuenta
+                                    </button>
+                                </div>
+                            </form>
+
+                            <hr style="background: var(--glass-border); margin: 2rem 0;">
+                            
+                            <div class="has-text-centered">
+                                <p style="color: var(--text-light);">
+                                    ¿Ya tienes cuenta? 
+                                    <a id="showLogin" style="color: white; font-weight: 600; text-decoration: underline;">
+                                        Iniciar sesión
+                                    </a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -176,154 +161,180 @@
     </section>
 
     <!-- Sección Principal de la Aplicación -->
-    <section id="appSection" class="section is-hidden">
-        <!-- Header de la aplicación -->
-        <div class="container">
-            <nav class="navbar" role="navigation" aria-label="main navigation">
-                <div class="navbar-brand">
-                    <div class="navbar-item">
-                        <span class="icon is-large has-text-primary">
-                            <i class="fas fa-lightbulb fa-2x"></i>
-                        </span>
-                        <div class="ml-3">
-                            <h1 class="title is-4 has-text-primary mb-0">FeedFlow</h1>
-                            <p class="subtitle is-6 has-text-grey">Generador de Ideas</p>
+    <section id="appSection" class="is-hidden" style="min-height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);">
+        <!-- Header moderno -->
+        <nav class="modern-navbar">
+            <div class="container">
+                <div class="navbar is-transparent">
+                    <div class="navbar-brand">
+                        <div class="navbar-item">
+                            <div class="brand-logo">
+                                <i class="fas fa-lightbulb" style="color: white; font-size: 1.2rem;"></i>
+                            </div>
+                            <div class="brand-text">
+                                <h1>FeedFlow</h1>
+                                <p>Generador de Ideas IA</p>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="navbar-menu">
-                    <div class="navbar-end">
-                        <div class="navbar-item">
-                            <div class="field is-grouped">
-                                <div class="control">
-                                    <span id="userInfo" class="tag is-medium has-text-weight-semibold"></span>
-                                </div>
-                                <div class="control">
-                                    <span id="premiumStatus" class="badge is-regular"></span>
-                                </div>
-                                <div class="control">
-                                    <button id="logoutBtn" class="button is-light">
-                                        <span class="icon">
-                                            <i class="fas fa-sign-out-alt"></i>
-                                        </span>
-                                        <span>Salir</span>
-                                    </button>
+                    <div class="navbar-menu">
+                        <div class="navbar-end">
+                            <div class="navbar-item">
+                                <div class="field is-grouped">
+                                    <div class="control">
+                                        <div class="tags has-addons">
+                                            <span class="tag is-dark">👋</span>
+                                            <span id="userInfo" class="tag is-primary"></span>
+                                        </div>
+                                    </div>
+                                    <div class="control">
+                                        <span id="premiumStatus" class="tag is-warning">⭐ Premium</span>
+                                    </div>
+                                    <div class="control">
+                                        <button id="logoutBtn" class="button is-light is-small">
+                                            <span class="icon">
+                                                <i class="fas fa-sign-out-alt"></i>
+                                            </span>
+                                            <span>Salir</span>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </nav>
-        </div>
+            </div>
+        </nav>
 
-        <!-- Contenido principal -->
-        <div class="container mt-6">
-            <div class="columns">
+        <!-- Contenido principal moderno -->
+        <div class="container" style="padding: 2rem 1rem;">
+            <div class="columns is-gapless">
                 <!-- Panel izquierdo: Generación e Historial -->
-                <div class="column is-4">
+                <div class="column is-4" style="padding-right: 1.5rem;">
                     <!-- Panel de generación de ideas -->
-                    <div class="card mb-4">
-                        <div class="card-content">
-                            <h2 class="title is-4 has-text-primary">
-                                <span class="icon">
-                                    <i class="fas fa-magic"></i>
-                                </span>
-                                Generar Ideas
-                            </h2>
-                            
-                            <form id="ideaForm">
-                                <div class="field">
-                                    <label class="label">Tema o Problema</label>
-                                    <div class="control">
-                                        <input id="ideaTopic" class="input" type="text" 
-                                               placeholder="Ej: Marketing para una app móvil" required>
-                                    </div>
-                                    <p class="help">Describe el tema sobre el que necesitas ideas</p>
-                                </div>
+                    <div class="modern-content-card fade-in-left mb-6">
+                        <h2>
+                            <i class="fas fa-magic" style="color: #667eea;"></i>
+                            Generar Ideas
+                        </h2>
+                        
+                        <form id="ideaForm">
+                            <div class="modern-field">
+                                <input id="ideaTopic" class="modern-input" type="text" 
+                                       placeholder="🎯 ¿Sobre qué necesitas ideas?" required>
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                    Ej: Marketing para una app móvil, Ideas para un blog tech...
+                                </p>
+                            </div>
 
-                                <div class="field">
-                                    <label class="label">Contexto (Opcional)</label>
-                                    <div class="control">
-                                        <textarea id="ideaContext" class="textarea" rows="4" 
-                                                  placeholder="Proporciona más detalles sobre tu proyecto, audiencia objetivo, limitaciones, etc."></textarea>
-                                    </div>
-                                    <p class="help">Más contexto = ideas más específicas y útiles</p>
-                                </div>
+                            <div class="modern-field">
+                                <textarea id="ideaContext" class="modern-input" rows="4" 
+                                          placeholder="📝 Contexto adicional (opcional)
+Audiencia objetivo, limitaciones, recursos disponibles..."></textarea>
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">
+                                    Más contexto = ideas más específicas y útiles
+                                </p>
+                            </div>
 
-                                <div class="field">
-                                    <div class="control">
-                                        <button id="generateBtn" type="submit" class="button is-primary is-fullwidth is-large">
-                                            <span class="icon">
-                                                <i class="fas fa-rocket"></i>
-                                            </span>
-                                            <span>Generar Ideas</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
+                            <div class="modern-field">
+                                <button id="generateBtn" type="submit" class="modern-btn is-primary">
+                                    <i class="fas fa-rocket mr-2"></i>
+                                    Generar Ideas con IA
+                                </button>
+                            </div>
+                        </form>
 
-                            <!-- Enlaces rápidos -->
-                            <div class="mt-5">
-                                <h4 class="title is-6 has-text-grey">Enlaces Rápidos</h4>
-                                <div class="buttons are-small">
-                                    <a href="admin.html" class="button is-light">
-                                        <span class="icon">
-                                            <i class="fas fa-cog"></i>
-                                        </span>
-                                        <span>Panel Admin</span>
-                                    </a>
-                                </div>
+                        <!-- Enlaces rápidos -->
+                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-light);">
+                            <h4 style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem; font-weight: 600;">
+                                ACCESOS RÁPIDOS
+                            </h4>
+                            <div class="buttons are-small">
+                                <a href="admin.html" class="modern-btn-small" style="background: var(--accent-gradient); color: white; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500; transition: var(--transition-smooth);">
+                                    <i class="fas fa-cog"></i>
+                                    Panel Admin
+                                </a>
                             </div>
                         </div>
                     </div>
 
                     <!-- Panel de historial de ideas -->
-                    <div class="card">
-                        <div class="card-content">
-                            <h3 class="title is-5 has-text-primary">
-                                <span class="icon">
-                                    <i class="fas fa-history"></i>
-                                </span>
-                                Historial de Ideas
-                            </h3>
-                            
-                            <!-- Búsqueda en historial -->
-                            <div class="field">
-                                <div class="control has-icons-left">
-                                    <input id="searchInput" class="input is-small" type="text" 
-                                           placeholder="Buscar en tu historial...">
-                                    <span class="icon is-small is-left">
-                                        <i class="fas fa-search"></i>
-                                    </span>
-                                </div>
-                            </div>
-                            
-                            <!-- Contenedor del historial -->
-                            <div id="historyContainer" style="max-height: 400px; overflow-y: auto;">
-                                <div class="has-text-centered p-4">
-                                    <div class="loading-animation" style="margin: 0 auto;"></div>
-                                    <p class="mt-2">Cargando historial...</p>
-                                </div>
+                    <div class="modern-content-card fade-in-left" style="animation-delay: 0.2s;">
+                        <h3 style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <i class="fas fa-history" style="color: #f093fb;"></i>
+                            Historial de Ideas
+                        </h3>
+                        
+                        <!-- Búsqueda en historial -->
+                        <div class="modern-field">
+                            <input id="searchInput" class="modern-input" type="text" 
+                                   placeholder="🔍 Buscar en tu historial..."
+                                   style="font-size: 0.875rem; padding: 0.75rem 1rem;">
+                        </div>
+                        
+                        <!-- Contenedor del historial -->
+                        <div id="historyContainer" style="max-height: 400px; overflow-y: auto; border-radius: var(--radius-md);">
+                            <div class="has-text-centered" style="padding: 2rem;">
+                                <div style="width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                                <p style="margin-top: 1rem; color: var(--text-secondary);">Cargando historial...</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Panel de resultados -->
-                <div class="column is-8">
-                    <div id="ideasContainer">
-                        <!-- Las ideas generadas aparecerán aquí -->
-                        <div class="has-text-centered">
-                            <div class="box" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 2px dashed #dee2e6;">
-                                <span class="icon is-large has-text-grey-light">
-                                    <i class="fas fa-lightbulb fa-3x"></i>
-                                </span>
-                                <h3 class="title is-4 has-text-grey">¡Comienza a generar ideas!</h3>
-                                <p class="subtitle has-text-grey">
-                                    Completa el formulario de la izquierda y presiona "Generar Ideas" 
-                                    para obtener sugerencias creativas e innovadoras.
-                                </p>
+                <!-- Panel de resultados moderno -->
+                <div class="column is-8" style="padding-left: 1.5rem;">
+                    <div id="ideasContainer" class="fade-in-right">
+                        <!-- Estado inicial moderno -->
+                        <div class="modern-content-card has-text-centered" style="min-height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(247, 148, 164, 0.05));">
+                            
+                            <!-- Icono animado -->
+                            <div style="position: relative; margin-bottom: 2rem;">
+                                <div style="width: 100px; height: 100px; background: var(--accent-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: pulse 2s infinite;">
+                                    <i class="fas fa-lightbulb" style="font-size: 2.5rem; color: white;"></i>
+                                </div>
+                                <div style="position: absolute; top: -10px; right: -10px; width: 30px; height: 30px; background: var(--secondary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: bounce 2s infinite;">
+                                    <i class="fas fa-plus" style="font-size: 0.875rem; color: white;"></i>
+                                </div>
+                            </div>
+                            
+                            <!-- Texto motivacional -->
+                            <h3 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                                ¡Desata tu Creatividad!
+                            </h3>
+                            
+                            <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 400px; line-height: 1.6; margin-bottom: 2rem;">
+                                Completa el formulario de la izquierda y presiona 
+                                <strong style="color: var(--text-primary);">"Generar Ideas"</strong> 
+                                para obtener sugerencias creativas impulsadas por IA.
+                            </p>
+                            
+                            <!-- Características destacadas -->
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; width: 100%; max-width: 500px;">
+                                <div style="text-align: center; padding: 1rem;">
+                                    <div style="width: 50px; height: 50px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
+                                        <i class="fas fa-brain" style="color: white; font-size: 1.25rem;"></i>
+                                    </div>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">IA Avanzada</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Powered by Deepseek</p>
+                                </div>
+                                
+                                <div style="text-align: center; padding: 1rem;">
+                                    <div style="width: 50px; height: 50px; background: var(--secondary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
+                                        <i class="fas fa-save" style="color: white; font-size: 1.25rem;"></i>
+                                    </div>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Auto-Guardado</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Historial persistente</p>
+                                </div>
+                                
+                                <div style="text-align: center; padding: 1rem;">
+                                    <div style="width: 50px; height: 50px; background: var(--accent-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
+                                        <i class="fas fa-download" style="color: white; font-size: 1.25rem;"></i>
+                                    </div>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Exportación</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">JSON, TXT, Markdown</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -335,82 +346,124 @@
     <!-- Scripts -->
     <script type="module" src="js/main.js"></script>
     
-    <!-- Estilos específicos para ideas -->
+    <!-- Estilos específicos para ideas y animaciones -->
     <style>
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px auto;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), #8a2a99);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
+        /* Animaciones adicionales */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
-
-        .ideas-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
-
-        .idea-item {
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Estilos para ideas generadas */
+        .modern-ideas-container {
+            background: var(--surface-light);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-light);
+        }
+        
+        .modern-idea-item {
             display: flex;
             align-items: flex-start;
             gap: 1rem;
             padding: 1.5rem;
-            background: #f8f9fa;
-            border-radius: 15px;
-            border-left: 4px solid var(--primary-color);
-            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            margin-bottom: 1rem;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
         }
-
-        .idea-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        
+        .modern-idea-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-gradient);
+            transform: scaleY(0);
+            transition: var(--transition-smooth);
         }
-
-        .idea-number {
-            background: linear-gradient(135deg, var(--primary-color), #8a2a99);
+        
+        .modern-idea-item:hover {
+            transform: translateX(8px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .modern-idea-item:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .modern-idea-number {
+            background: var(--primary-gradient);
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            flex-shrink: 0;
-        }
-
-        .idea-content h4 {
-            color: var(--primary-color);
+            font-weight: 700;
             font-size: 1.1rem;
+            flex-shrink: 0;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .modern-idea-content h4 {
+            color: var(--text-primary);
+            font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            line-height: 1.3;
         }
-
-        .idea-content p {
-            color: #555;
+        
+        .modern-idea-content p {
+            color: var(--text-secondary);
             line-height: 1.6;
             margin: 0;
         }
-
-        .idea-actions {
-            text-align: center;
-            padding-top: 1rem;
-            border-top: 1px solid #e9ecef;
+        
+        .modern-idea-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-light);
+            flex-wrap: wrap;
         }
-
+        
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .idea-item {
+            .columns {
                 flex-direction: column;
-                text-align: center;
             }
             
-            .idea-number {
-                align-self: center;
+            .column {
+                padding: 0.5rem !important;
+            }
+            
+            .modern-content-card {
+                margin-bottom: 1rem;
+            }
+            
+            .modern-title {
+                font-size: 2rem;
             }
         }
     </style>

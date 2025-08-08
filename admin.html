@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/modern.css">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/admin.css">
@@ -23,12 +24,13 @@
     <!-- Contenedor de notificaciones -->
     <div class="notifications-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
-    <!-- Pantalla de carga inicial -->
-    <section id="loadingSection" class="hero is-fullheight">
-        <div class="hero-body">
-            <div class="container has-text-centered">
-                <div class="loading-animation"></div>
-                <p class="title has-text-white mt-4">Verificando permisos...</p>
+    <!-- Pantalla de carga inicial moderna -->
+    <section id="loadingSection" class="modern-hero">
+        <div class="modern-loading-container">
+            <div class="modern-loading-content">
+                <div class="modern-loading-spinner"></div>
+                <h1 class="modern-loading-title">Verificando permisos...</h1>
+                <p class="modern-loading-subtitle">Accediendo al panel de administración</p>
             </div>
         </div>
     </section>
@@ -38,16 +40,29 @@
         <!-- El contenido se genera dinámicamente en JavaScript -->
     </section>
 
-    <!-- Panel de Administración -->
+    <!-- Panel de Administración Moderno -->
     <section id="adminSection" class="is-hidden">
-        <!-- Header del Admin -->
-        <div class="admin-container">
-            <div class="admin-header animate__animated animate__fadeIn">
-                <div class="columns is-vcentered">
-                    <div class="column">
-                        <h1 class="title">
-                            <span class="icon is-large">
-                                <i class="fas fa-shield-alt"></i>
+        <!-- Header del Admin Moderno -->
+        <div class="modern-navbar">
+            <div class="modern-navbar-content">
+                <div class="brand-logo">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="brand-text">
+                    <h1>Panel Admin</h1>
+                    <p>Gestión y configuración</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-container" style="padding: 2rem; max-width: 1200px; margin: 0 auto;">
+            <div class="modern-admin-header glass-card fade-in-up" style="margin-bottom: 2rem; padding: 2rem; text-align: center;">
+                <h2 style="font-size: 2rem; font-weight: 700; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
+                    🛡️ Panel de Administración
+                </h2>
+                <p style="color: var(--text-secondary); font-size: 1rem;">
+                    Gestiona usuarios, configuraciones y estadísticas del sistema
+                </p>
                             </span>
                             Panel de Administración
                         </h1>
