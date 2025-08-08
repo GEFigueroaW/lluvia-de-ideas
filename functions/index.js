@@ -14,7 +14,7 @@ exports.getAdminStats = getAdminStats;
 exports.isUserAdmin = isUserAdmin;
 
 // Configuración del cliente Deepseek
-const DEEPSEEK_API_KEY = functions.config().deepseek.key;
+const DEEPSEEK_API_KEY = 'sk-97c8f4c543fa45acabaf02ebcac60f03';
 const deepseekConfig = new Configuration({
     apiKey: DEEPSEEK_API_KEY,
     basePath: "https://api.deepseek.com/v1"
@@ -73,7 +73,7 @@ const copyTypes = [
     { name: "Venta directa o persuasivo", desc: "Convencimiento directo para cerrar ventas." }
 ];
 
-exports.generateIdeas = functions.https.onCall(async (data, context) => {
+exports.api = functions.https.onCall(async (data, context) => {
     // 1. Autenticación y Validación de Sesión
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'The function must be called while authenticated.');

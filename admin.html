@@ -3,446 +3,258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedFlow - Panel de Administración</title>
+    <title>Panel de Administración - FeedFlow</title>
+    
+    <!-- CSS Externo -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #6a1a79;
-            --secondary-color: #ffd700;
-            --bg-color-light: #f7f3f9;
-            --text-color: #333;
-            --card-bg-color: #ffffff;
-            --card-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color-light);
-            color: var(--text-color);
-        }
-
-        .hero.is-fullheight {
-            background: linear-gradient(135deg, var(--primary-color), #4a0f5a);
-        }
-
-        .admin-panel {
-            background-color: var(--card-bg-color);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: var(--card-shadow);
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--primary-color);
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        .notification.is-danger {
-            background-color: #ff3860;
-            color: white;
-        }
-
-        .notification.is-success {
-            background-color: #48c774;
-            color: white;
-        }
-    </style>
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/admin.css">
+    
+    <!-- Meta tags -->
+    <meta name="description" content="Panel de administración para gestionar usuarios y configuraciones de FeedFlow">
+    <meta name="robots" content="noindex, nofollow">
 </head>
 <body>
-    <div id="app">
-        <!-- Vista de login para admin -->
-        <section id="admin-login-view" class="hero is-fullheight is-bold">
-            <div class="hero-body">
-                <div class="container has-text-centered">
-                    <div class="columns is-centered">
-                        <div class="column is-one-third">
-                            <div class="admin-panel">
-                                <h1 class="title has-text-primary">
-                                    <i class="fas fa-shield-alt"></i> Panel de Administración
-                                </h1>
-                                <p class="subtitle">Solo para administradores autorizados</p>
-                                
-                                <div class="field">
-                                    <label class="label">Email de Administrador</label>
-                                    <div class="control">
-                                        <input id="admin-email" class="input" type="email" placeholder="admin@feedflow.com">
-                                    </div>
-                                </div>
-                                
-                                <div class="field">
-                                    <label class="label">Contraseña</label>
-                                    <div class="control">
-                                        <input id="admin-password" class="input" type="password">
-                                    </div>
-                                </div>
-                                
-                                <button id="admin-login-btn" class="button is-primary is-fullwidth">
-                                    <span class="icon"><i class="fas fa-sign-in-alt"></i></span>
-                                    <span>Ingresar</span>
-                                </button>
-                                
-                                <p id="admin-login-message" class="help has-text-danger mt-3"></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Contenedor de notificaciones -->
+    <div class="notifications-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+
+    <!-- Pantalla de carga inicial -->
+    <section id="loadingSection" class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <div class="loading-animation"></div>
+                <p class="title has-text-white mt-4">Verificando permisos...</p>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Panel de administración -->
-        <section id="admin-panel-view" class="section is-hidden">
-            <div class="container">
-                <div class="columns is-centered">
-                    <div class="column is-two-thirds">
-                        <div class="admin-panel">
-                            <div class="level">
-                                <div class="level-left">
-                                    <h1 class="title has-text-primary">
-                                        <i class="fas fa-cog"></i> Panel de Control
-                                    </h1>
-                                </div>
-                                <div class="level-right">
-                                    <button id="admin-logout-btn" class="button is-danger">
-                                        <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
-                                        <span>Salir</span>
-                                    </button>
-                                </div>
-                            </div>
+    <!-- Sección de login/acceso requerido -->
+    <section id="loginSection" class="is-hidden">
+        <!-- El contenido se genera dinámicamente en JavaScript -->
+    </section>
 
-                            <div id="admin-notification" class="notification is-hidden">
-                                <button class="delete"></button>
-                                <span id="notification-text"></span>
-                            </div>
-
-                            <div class="box">
-                                <h2 class="subtitle has-text-weight-bold">
-                                    <i class="fas fa-crown"></i> Configuración Premium
-                                </h2>
-                                
-                                <div class="field is-horizontal">
-                                    <div class="field-label is-normal">
-                                        <label class="label">Premium Global Activo</label>
-                                    </div>
-                                    <div class="field-body">
-                                        <div class="field">
-                                            <div class="control">
-                                                <label class="switch">
-                                                    <input type="checkbox" id="premium-global-toggle">
-                                                    <span class="slider"></span>
-                                                </label>
-                                            </div>
-                                            <p class="help">Cuando está activo, todos los usuarios tienen acceso premium</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="field is-horizontal">
-                                    <div class="field-label is-normal">
-                                        <label class="label">Promoción de Lanzamiento</label>
-                                    </div>
-                                    <div class="field-body">
-                                        <div class="field">
-                                            <div class="control">
-                                                <label class="switch">
-                                                    <input type="checkbox" id="launch-promo-toggle">
-                                                    <span class="slider"></span>
-                                                </label>
-                                            </div>
-                                            <p class="help">Promoción especial de lanzamiento</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="field is-horizontal">
-                                    <div class="field-label is-normal">
-                                        <label class="label">Créditos Semanales</label>
-                                    </div>
-                                    <div class="field-body">
-                                        <div class="field has-addons">
-                                            <div class="control">
-                                                <input id="weekly-credits" class="input" type="number" min="1" max="100" value="3">
-                                            </div>
-                                            <div class="control">
-                                                <span class="button is-static">créditos por semana</span>
-                                            </div>
-                                        </div>
-                                        <p class="help">Número de generaciones gratuitas por semana para usuarios no premium</p>
-                                    </div>
-                                </div>
-
-                                <div class="field is-horizontal">
-                                    <div class="field-label"></div>
-                                    <div class="field-body">
-                                        <div class="field">
-                                            <div class="control">
-                                                <button id="save-config-btn" class="button is-success">
-                                                    <span class="icon"><i class="fas fa-save"></i></span>
-                                                    <span>Guardar Configuración</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
+    <!-- Panel de Administración -->
+    <section id="adminSection" class="is-hidden">
+        <!-- Header del Admin -->
+        <div class="admin-container">
+            <div class="admin-header animate__animated animate__fadeIn">
+                <div class="columns is-vcentered">
+                    <div class="column">
+                        <h1 class="title">
+                            <span class="icon is-large">
+                                <i class="fas fa-shield-alt"></i>
+                            </span>
+                            Panel de Administración
+                        </h1>
+                        <p>Gestión y monitoreo de FeedFlow</p>
+                    </div>
+                    <div class="column is-narrow">
+                        <div class="field is-grouped">
+                            <div class="control">
+                                <div class="tags has-addons">
+                                    <span class="tag is-dark">Admin:</span>
+                                    <span id="adminInfo" class="tag is-primary">Cargando...</span>
                                 </div>
                             </div>
-
-                            <div class="box">
-                                <h2 class="subtitle has-text-weight-bold">
-                                    <i class="fas fa-users"></i> Estadísticas de Usuarios
-                                </h2>
-                                <div class="columns">
-                                    <div class="column">
-                                        <div class="has-text-centered">
-                                            <p class="heading">Total de Usuarios</p>
-                                            <p id="total-users" class="title">-</p>
-                                        </div>
-                                    </div>
-                                    <div class="column">
-                                        <div class="has-text-centered">
-                                            <p class="heading">Usuarios Premium</p>
-                                            <p id="premium-users" class="title">-</p>
-                                        </div>
-                                    </div>
-                                    <div class="column">
-                                        <div class="has-text-centered">
-                                            <p class="heading">Generaciones Hoy</p>
-                                            <p id="generations-today" class="title">-</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button id="refresh-stats-btn" class="button is-info">
-                                    <span class="icon"><i class="fas fa-sync-alt"></i></span>
-                                    <span>Actualizar Estadísticas</span>
+                            <div class="control">
+                                <button id="refreshBtn" class="button is-light">
+                                    <span class="icon">
+                                        <i class="fas fa-sync-alt"></i>
+                                    </span>
+                                    <span>Actualizar</span>
+                                </button>
+                            </div>
+                            <div class="control">
+                                <button id="logoutBtn" class="button is-danger">
+                                    <span class="icon">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </span>
+                                    <span>Salir</span>
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
 
-    <script type="module">
-        // Import Firebase functions
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+            <!-- Estadísticas principales -->
+            <div class="stats-grid animate__animated animate__fadeInUp">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Usuarios Totales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="premiumUsers">0</div>
+                    <div class="stat-label">Usuarios Premium</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalIdeas">0</div>
+                    <div class="stat-label">Ideas Generadas</div>
+                </div>
+            </div>
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCScJA-UGs3WcBnfAm-6K94ybZ4bzBahz8",
-            authDomain: "brain-storm-8f0d8.firebaseapp.com",
-            databaseURL: "https://brain-storm-8f0d8-default-rtdb.firebaseio.com",
-            projectId: "brain-storm-8f0d8",
-            storageBucket: "brain-storm-8f0d8.appspot.com",
-            messagingSenderId: "401208607043",
-            appId: "1:401208607043:web:1ec3ea3dabacbe11beaff6"
-        };
+            <!-- Controles de Administración -->
+            <div class="admin-controls animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="control-section">
+                    <h3>
+                        <i class="fas fa-cogs"></i>
+                        Configuración de la Aplicación
+                    </h3>
+                    
+                    <div class="control-item">
+                        <div class="control-info">
+                            <div class="control-title">Promociones Gratuitas</div>
+                            <div class="control-description">
+                                Permitir que usuarios gratuitos reciban promociones automáticas a premium
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="freePromotionsToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+                    <div class="control-item">
+                        <div class="control-info">
+                            <div class="control-title">Promociones Premium</div>
+                            <div class="control-description">
+                                Activar promociones especiales y ofertas para usuarios premium
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="premiumPromotionsToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
 
-        // Admin emails autorizados
-        const ADMIN_EMAILS = ['eugenfw@gmail.com', 'admin@feedflow.com'];
+                    <div class="control-item">
+                        <div class="control-info">
+                            <div class="control-title">Modo Mantenimiento</div>
+                            <div class="control-description">
+                                Activar cuando se necesite realizar mantenimiento en la aplicación
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="maintenanceToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
 
-        // DOM elements
-        const adminLoginView = document.getElementById('admin-login-view');
-        const adminPanelView = document.getElementById('admin-panel-view');
-        const adminEmailInput = document.getElementById('admin-email');
-        const adminPasswordInput = document.getElementById('admin-password');
-        const adminLoginBtn = document.getElementById('admin-login-btn');
-        const adminLoginMessage = document.getElementById('admin-login-message');
-        const adminLogoutBtn = document.getElementById('admin-logout-btn');
-        const adminNotification = document.getElementById('admin-notification');
-        const notificationText = document.getElementById('notification-text');
-        
-        const premiumGlobalToggle = document.getElementById('premium-global-toggle');
-        const launchPromoToggle = document.getElementById('launch-promo-toggle');
-        const weeklyCreditsInput = document.getElementById('weekly-credits');
-        const saveConfigBtn = document.getElementById('save-config-btn');
-        const refreshStatsBtn = document.getElementById('refresh-stats-btn');
-        
-        const totalUsersEl = document.getElementById('total-users');
-        const premiumUsersEl = document.getElementById('premium-users');
-        const generationsTodayEl = document.getElementById('generations-today');
+                <div class="control-section">
+                    <h3>
+                        <i class="fas fa-tools"></i>
+                        Herramientas de Administración
+                    </h3>
+                    
+                    <div class="buttons">
+                        <button class="button is-info" onclick="exportUsersToCSV()">
+                            <span class="icon">
+                                <i class="fas fa-download"></i>
+                            </span>
+                            <span>Exportar Usuarios (CSV)</span>
+                        </button>
+                        <button class="button is-warning" onclick="clearCache()">
+                            <span class="icon">
+                                <i class="fas fa-broom"></i>
+                            </span>
+                            <span>Limpiar Caché</span>
+                        </button>
+                        <a href="index.html" class="button is-primary">
+                            <span class="icon">
+                                <i class="fas fa-home"></i>
+                            </span>
+                            <span>Ir a la App</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-        let currentAdmin = null;
+            <!-- Gestión de Usuarios -->
+            <div class="users-table-container animate__animated animate__fadeInUp" style="animation-delay: 0.4s;">
+                <div style="padding: 1.5rem; border-bottom: 1px solid #e9ecef;">
+                    <h3 class="title is-5 mb-0">
+                        <span class="icon">
+                            <i class="fas fa-users"></i>
+                        </span>
+                        Gestión de Usuarios
+                    </h3>
+                </div>
+                
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Plan</th>
+                                <th>Ideas</th>
+                                <th>Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="5" class="has-text-centered">
+                                    <div class="loading-animation" style="margin: 2rem auto;"></div>
+                                    <p>Cargando usuarios...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-        // Auth state observer
-        onAuthStateChanged(auth, async (user) => {
-            if (user && ADMIN_EMAILS.includes(user.email)) {
-                currentAdmin = user;
-                await loadAdminPanel();
-                showView('admin-panel-view');
-            } else {
-                currentAdmin = null;
-                showView('admin-login-view');
-                if (user) {
-                    // Si el usuario no es admin, hacer logout
-                    await signOut(auth);
-                    showNotification('Acceso denegado. Solo administradores autorizados.', 'danger');
-                }
-            }
-        });
+            <!-- Alertas importantes -->
+            <div class="admin-alert animate__animated animate__fadeInUp" style="animation-delay: 0.6s;">
+                <h4>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Información Importante
+                </h4>
+                <p>
+                    Este panel permite gestionar usuarios y configuraciones críticas de la aplicación. 
+                    Todas las acciones realizadas aquí quedan registradas en los logs del sistema.
+                    Por favor, usa estas herramientas con responsabilidad.
+                </p>
+            </div>
+        </div>
+    </section>
 
-        // Show/hide views
-        function showView(viewId) {
-            adminLoginView.classList.add('is-hidden');
-            adminPanelView.classList.add('is-hidden');
-            document.getElementById(viewId).classList.remove('is-hidden');
-        }
-
-        // Show notification
-        function showNotification(message, type = 'info') {
-            notificationText.textContent = message;
-            adminNotification.className = `notification is-${type}`;
-            adminNotification.classList.remove('is-hidden');
-            setTimeout(() => {
-                adminNotification.classList.add('is-hidden');
-            }, 5000);
-        }
-
-        // Admin login
-        adminLoginBtn.addEventListener('click', async () => {
-            const email = adminEmailInput.value.trim();
-            const password = adminPasswordInput.value;
-            
-            if (!email || !password) {
-                adminLoginMessage.textContent = 'Completa todos los campos';
-                return;
-            }
-
-            if (!ADMIN_EMAILS.includes(email)) {
-                adminLoginMessage.textContent = 'Email no autorizado como administrador';
-                return;
-            }
-
-            try {
-                await signInWithEmailAndPassword(auth, email, password);
-                adminLoginMessage.textContent = '';
-            } catch (error) {
-                adminLoginMessage.textContent = 'Credenciales incorrectas';
-            }
-        });
-
-        // Admin logout
-        adminLogoutBtn.addEventListener('click', async () => {
-            await signOut(auth);
-        });
-
-        // Load admin panel data
-        async function loadAdminPanel() {
-            try {
-                // Load app config
-                const configDoc = await getDoc(doc(db, 'appConfig', 'config'));
-                const config = configDoc.exists() ? configDoc.data() : {};
-
-                premiumGlobalToggle.checked = config.isPremiumGlobalActive || false;
-                launchPromoToggle.checked = config.isLaunchPromoActive || false;
-                weeklyCreditsInput.value = config.weeklyCredits || 3;
-
-                // Load stats
-                await loadStats();
-            } catch (error) {
-                console.error('Error loading admin panel:', error);
-                showNotification('Error al cargar datos del panel', 'danger');
-            }
-        }
-
-        // Load statistics
-        async function loadStats() {
-            try {
-                // Count total users
-                const usersSnapshot = await getDocs(collection(db, 'users'));
-                totalUsersEl.textContent = usersSnapshot.size;
-
-                // Count premium users
-                let premiumCount = 0;
-                usersSnapshot.forEach(doc => {
-                    if (doc.data().isPremium) premiumCount++;
+    <!-- Scripts -->
+    <script type="module" src="js/admin.js"></script>
+    
+    <!-- Funciones adicionales -->
+    <script>
+        // Función para limpiar caché
+        window.clearCache = function() {
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
                 });
-                premiumUsersEl.textContent = premiumCount;
-
-                // Count generations today (this would need a generations collection)
-                generationsTodayEl.textContent = '-';
-            } catch (error) {
-                console.error('Error loading stats:', error);
             }
-        }
-
-        // Save configuration
-        saveConfigBtn.addEventListener('click', async () => {
-            try {
-                const config = {
-                    isPremiumGlobalActive: premiumGlobalToggle.checked,
-                    isLaunchPromoActive: launchPromoToggle.checked,
-                    weeklyCredits: parseInt(weeklyCreditsInput.value),
-                    lastUpdated: Timestamp.now(),
-                    updatedBy: currentAdmin.email
-                };
-
-                await setDoc(doc(db, 'appConfig', 'config'), config, { merge: true });
-                showNotification('Configuración guardada exitosamente', 'success');
-            } catch (error) {
-                console.error('Error saving config:', error);
-                showNotification('Error al guardar configuración', 'danger');
+            
+            // Limpiar localStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Mostrar notificación (asumiendo que la función está disponible)
+            if (window.showNotification) {
+                showNotification('Caché limpiado correctamente', 'success');
+            } else {
+                alert('Caché limpiado correctamente');
             }
-        });
-
-        // Refresh stats
-        refreshStatsBtn.addEventListener('click', loadStats);
-
-        // Hide notification on click
-        document.querySelector('.notification .delete').addEventListener('click', () => {
-            adminNotification.classList.add('is-hidden');
-        });
-
-        // Enter key listeners
-        adminPasswordInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') adminLoginBtn.click();
-        });
+            
+            // Recargar página después de un breve delay
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        };
     </script>
 </body>
 </html>

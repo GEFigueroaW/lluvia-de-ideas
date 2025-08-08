@@ -1,0 +1,159 @@
+/* =========================================
+   VARIABLES CSS GLOBALES
+   ========================================= */
+:root {
+    --primary-color: #6a1a79;
+    --secondary-color: #ffd700;
+    --bg-color-light: #f7f3f9;
+    --bg-color-dark: #333;
+    --text-color: #333;
+    --card-bg-color: #ffffff;
+    --card-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    --border-radius: 15px;
+    --transition: all 0.3s ease;
+}
+
+/* =========================================
+   RESET Y BASE
+   ========================================= */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color-light);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+    transition: var(--transition);
+}
+
+/* =========================================
+   UTILIDADES
+   ========================================= */
+.is-hidden {
+    display: none !important;
+}
+
+.has-text-primary {
+    color: var(--primary-color) !important;
+}
+
+.has-text-center {
+    text-align: center;
+}
+
+.mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.mt-4 {
+    margin-top: 1.5rem;
+}
+
+/* =========================================
+   CONTENEDORES
+   ========================================= */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.container.is-fluid {
+    padding: 20px;
+}
+
+/* =========================================
+   HERO SECTIONS
+   ========================================= */
+.hero.is-fullheight {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--primary-color), #4a0f5a);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-body {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1.5rem;
+}
+
+/* =========================================
+   ANIMACIONES
+   ========================================= */
+.animate__animated {
+    animation-duration: 0.5s;
+    animation-fill-mode: both;
+}
+
+.animate__fadeIn {
+    animation-name: fadeIn;
+}
+
+.animate__fadeInUp {
+    animation-name: fadeInUp;
+    animation-delay: 0.1s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 40px, 0);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0);
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =========================================
+   LOADING SPINNER
+   ========================================= */
+.loading-animation {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--primary-color);
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+    
+    .hero-body {
+        padding: 2rem 1rem;
+    }
+    
+    .columns {
+        flex-direction: column;
+    }
+    
+    .column {
+        width: 100% !important;
+    }
+}

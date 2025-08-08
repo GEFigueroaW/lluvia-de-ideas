@@ -3,821 +3,384 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FeedFlow</title>
+    <title>FeedFlow - Generador de Ideas</title>
+    
+    <!-- CSS Externo -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #6a1a79; /* Morado */
-            --secondary-color: #ffd700; /* Dorado */
-            --bg-color-light: #f7f3f9;
-            --bg-color-dark: #333;
-            --text-color: #333;
-            --card-bg-color: #ffffff;
-            --card-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color-light);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .container.is-fluid {
-            padding: 20px;
-        }
-
-        .hero.is-fullheight {
-            background: linear-gradient(135deg, var(--primary-color), #4a0f5a);
-        }
-
-        .login-box {
-            background-color: var(--card-bg-color);
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: var(--card-shadow);
-            text-align: center;
-        }
-
-        .logo {
-            width: 120px;
-            height: 120px;
-            margin-bottom: 20px;
-            border-radius: 50%;
-            background-color: var(--secondary-color);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: var(--primary-color);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-
-        .app-name {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-top: -10px;
-        }
-
-        .button.is-google {
-            background-color: #4285F4;
-            color: white;
-            font-weight: bold;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .button.is-google:hover {
-            background-color: #357ae8;
-        }
-
-        .button.is-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .button.is-primary:hover {
-            background-color: #5a1467;
-        }
-
-        .card-feedflow {
-            background-color: var(--card-bg-color);
-            border-radius: 15px;
-            box-shadow: var(--card-shadow);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card-result {
-            border: 2px solid var(--primary-color);
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(106, 26, 121, 0.2);
-            background: linear-gradient(145deg, #f0e6f7, #ffffff);
-            padding: 2rem;
-        }
-
-        .card-result h3, .card-result p {
-            color: #4a0f5a;
-        }
-
-        .tag.is-medium {
-            font-weight: bold;
-        }
-
-        .blurred-image {
-            filter: blur(8px);
-        }
-
-        .footer-cta {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1.5rem;
-            text-align: center;
-            border-radius: 10px;
-            margin-top: 2rem;
-        }
-
-        .select, .input {
-            border-radius: 8px;
-        }
-
-        .select:not(.is-multiple):not(.is-loading):hover::after {
-            border-color: var(--primary-color);
-        }
-
-        .checkbox-label {
-            display: block;
-            margin-bottom: 5px;
-        }
-
-        .columns.is-desktop.is-vcentered {
-            align-items: center;
-        }
-
-        .logo-small {
-            width: 40px;
-            height: 40px;
-            background-color: var(--secondary-color);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary-color);
-            font-size: 1.2rem;
-        }
-
-        .nav-bar {
-            padding: 10px 20px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            background-color: var(--card-bg-color);
-            box-shadow: var(--card-shadow);
-        }
-
-        .nav-left .button {
-            margin-right: 10px;
-        }
-
-        .ad-container {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-            color: #666;
-            font-style: italic;
-        }
-
-        .loading-animation {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid var(--primary-color);
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    
+    <!-- CSS Personalizado -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    
+    <!-- Meta tags para SEO -->
+    <meta name="description" content="Generador de ideas inteligente para potenciar tu creatividad">
+    <meta name="keywords" content="ideas, creatividad, generador, brainstorming, innovación">
+    <meta name="author" content="FeedFlow">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
+    <!-- Contenedor de notificaciones -->
+    <div class="notifications-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
-    <div id="app">
+    <!-- Pantalla de carga inicial -->
+    <section id="loadingSection" class="hero is-fullheight">
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                <div class="loading-animation"></div>
+                <p class="title has-text-white mt-4">Cargando FeedFlow...</p>
+            </div>
+        </div>
+    </section>
 
-        <section id="login-view" class="hero is-fullheight is-bold">
-            <div class="hero-body">
-                <div class="container has-text-centered">
-                    <div class="columns is-centered">
-                        <div class="column is-half">
-                            <div class="login-box">
-                                <div class="logo">
-                                    <i class="fas fa-seedling"></i>
+    <!-- Sección de Login/Registro -->
+    <section id="loginSection" class="hero is-fullheight is-hidden">
+        <div class="hero-body">
+            <div class="container">
+                <div class="columns is-centered">
+                    <div class="column is-4">
+                        
+                        <!-- Formulario de Login -->
+                        <div id="loginFormContainer" class="card animate__animated animate__fadeIn">
+                            <div class="card-content">
+                                <div class="has-text-centered mb-4">
+                                    <div class="logo">
+                                        <i class="fas fa-lightbulb fa-3x"></i>
+                                    </div>
+                                    <h1 class="title has-text-primary">FeedFlow</h1>
+                                    <p class="subtitle has-text-grey">Tu generador de ideas inteligente</p>
                                 </div>
-                                <h1 class="app-name mb-4">FeedFlow</h1>
-                                <div class="field has-addons has-addons-centered mb-5">
-                                    <p class="control">
-                                        <span class="select is-small">
-                                            <select id="language-selector">
-                                                <option value="es" selected>Español</option>
-                                                <option value="en">English</option>
-                                                <option value="pt">Português</option>
-                                            </select>
-                                        </span>
-                                    </p>
-                                </div>
-                                <button id="login-google-btn" class="button is-google is-large">
-                                    <span class="icon is-left">
-                                        <i class="fab fa-google"></i>
-                                    </span>
-                                    <span>Ingresar con Google</span>
-                                </button>
-                                <p class="mt-4 is-size-7 has-text-grey">
-                                    Al ingresar, aceptas nuestros términos y condiciones.
-                                </p>
-                                <button id="show-email-form-btn" class="button is-link is-light is-large mb-2">Ingresar con correo</button>
-                                <form id="email-auth-form" class="box mt-3" style="display:none;">
+
+                                <form id="loginForm">
                                     <div class="field">
-                                        <label class="label">Correo electrónico</label>
-                                        <div class="control">
-                                            <input id="email-input" class="input" type="email" required autocomplete="username">
+                                        <label class="label">Email</label>
+                                        <div class="control has-icons-left">
+                                            <input id="loginEmail" class="input" type="email" placeholder="tu@email.com" required>
+                                            <span class="icon is-small is-left">
+                                                <i class="fas fa-envelope"></i>
+                                            </span>
                                         </div>
                                     </div>
+
                                     <div class="field">
                                         <label class="label">Contraseña</label>
-                                        <div class="control">
-                                            <input id="password-input" class="input" type="password" required autocomplete="current-password">
+                                        <div class="control has-icons-left">
+                                            <input id="loginPassword" class="input" type="password" placeholder="••••••••" required>
+                                            <span class="icon is-small is-left">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
                                         </div>
                                     </div>
-                                    <div class="field is-grouped is-grouped-centered">
-                                        <p class="control">
-                                            <button id="login-email-btn" type="button" class="button is-link">Ingresar</button>
-                                        </p>
-                                        <p class="control">
-                                            <button id="register-email-btn" type="button" class="button is-success">Crear cuenta</button>
-                                        </p>
+
+                                    <div class="field">
+                                        <div class="control">
+                                            <button id="loginBtn" type="submit" class="button is-primary is-fullwidth is-large">
+                                                <span class="icon">
+                                                    <i class="fas fa-sign-in-alt"></i>
+                                                </span>
+                                                <span>Iniciar Sesión</span>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <p id="email-auth-message" class="help has-text-danger"></p>
                                 </form>
+
+                                <div class="has-text-centered">
+                                    <p class="mb-3">o</p>
+                                    <button id="googleBtn" class="button is-light is-fullwidth">
+                                        <span class="icon">
+                                            <i class="fab fa-google"></i>
+                                        </span>
+                                        <span>Continuar con Google</span>
+                                    </button>
+                                </div>
+
+                                <hr>
+                                <div class="has-text-centered">
+                                    <p>¿No tienes cuenta? 
+                                        <a id="showRegister" class="has-text-primary">Regístrate aquí</a>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Formulario de Registro -->
+                        <div id="registerFormContainer" class="card animate__animated animate__fadeIn is-hidden">
+                            <div class="card-content">
+                                <div class="has-text-centered mb-4">
+                                    <div class="logo">
+                                        <i class="fas fa-lightbulb fa-3x"></i>
+                                    </div>
+                                    <h1 class="title has-text-primary">Crear Cuenta</h1>
+                                    <p class="subtitle has-text-grey">Únete a la comunidad creativa</p>
+                                </div>
+
+                                <form id="registerForm">
+                                    <div class="field">
+                                        <label class="label">Nombre Completo</label>
+                                        <div class="control has-icons-left">
+                                            <input id="registerName" class="input" type="text" placeholder="Tu nombre completo" required>
+                                            <span class="icon is-small is-left">
+                                                <i class="fas fa-user"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="label">Email</label>
+                                        <div class="control has-icons-left">
+                                            <input id="registerEmail" class="input" type="email" placeholder="tu@email.com" required>
+                                            <span class="icon is-small is-left">
+                                                <i class="fas fa-envelope"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <label class="label">Contraseña</label>
+                                        <div class="control has-icons-left">
+                                            <input id="registerPassword" class="input" type="password" placeholder="••••••••" required>
+                                            <span class="icon is-small is-left">
+                                                <i class="fas fa-lock"></i>
+                                            </span>
+                                        </div>
+                                        <div id="password-help" class="help"></div>
+                                    </div>
+
+                                    <div class="field">
+                                        <div class="control">
+                                            <button id="registerBtn" type="submit" class="button is-primary is-fullwidth is-large">
+                                                <span class="icon">
+                                                    <i class="fas fa-user-plus"></i>
+                                                </span>
+                                                <span>Crear Cuenta</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <hr>
+                                <div class="has-text-centered">
+                                    <p>¿Ya tienes cuenta? 
+                                        <a id="showLogin" class="has-text-primary">Inicia sesión aquí</a>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="inputs-view" class="section is-hidden animate__animated animate__fadeIn">
-            <div class="container is-fluid">
-                <div class="nav-bar is-flex is-justify-content-space-between is-align-items-center mb-4">
-                    <div class="nav-left is-flex is-align-items-center">
-                        <div class="logo-small mr-2">
-                            <i class="fas fa-seedling"></i>
+    <!-- Sección Principal de la Aplicación -->
+    <section id="appSection" class="section is-hidden">
+        <!-- Header de la aplicación -->
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    <div class="navbar-item">
+                        <span class="icon is-large has-text-primary">
+                            <i class="fas fa-lightbulb fa-2x"></i>
+                        </span>
+                        <div class="ml-3">
+                            <h1 class="title is-4 has-text-primary mb-0">FeedFlow</h1>
+                            <p class="subtitle is-6 has-text-grey">Generador de Ideas</p>
                         </div>
-                        <p id="greeting-text" class="is-size-5 has-text-weight-bold">¡Hola, Usuario!</p>
-                    </div>
-                    <div class="nav-right">
-                        <button id="logout-btn" class="button is-danger is-light">
-                            <span class="icon"><i class="fas fa-sign-out-alt"></i></span>
-                            <span>Salir</span>
-                        </button>
                     </div>
                 </div>
-                <div class="columns is-desktop is-vcentered">
-                    <div class="column is-two-thirds">
-                        <div class="card-feedflow">
-                            <h2 class="title is-4">Generador de Ideas para Redes Sociales</h2>
-                            <p id="credits-counter" class="subtitle is-6 has-text-grey">
-                                Generaciones restantes esta semana: 3/3
-                            </p>
-                            <form id="generation-form">
+
+                <div class="navbar-menu">
+                    <div class="navbar-end">
+                        <div class="navbar-item">
+                            <div class="field is-grouped">
+                                <div class="control">
+                                    <span id="userInfo" class="tag is-medium has-text-weight-semibold"></span>
+                                </div>
+                                <div class="control">
+                                    <span id="premiumStatus" class="badge is-regular"></span>
+                                </div>
+                                <div class="control">
+                                    <button id="logoutBtn" class="button is-light">
+                                        <span class="icon">
+                                            <i class="fas fa-sign-out-alt"></i>
+                                        </span>
+                                        <span>Salir</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="container mt-6">
+            <div class="columns">
+                <!-- Panel de generación de ideas -->
+                <div class="column is-4">
+                    <div class="card">
+                        <div class="card-content">
+                            <h2 class="title is-4 has-text-primary">
+                                <span class="icon">
+                                    <i class="fas fa-magic"></i>
+                                </span>
+                                Generar Ideas
+                            </h2>
+                            
+                            <form id="ideaForm">
                                 <div class="field">
-                                    <label class="label">1. Red Social (modo de generación)</label>
+                                    <label class="label">Tema o Problema</label>
                                     <div class="control">
-                                        <label class="radio">
-                                            <input type="radio" name="generation-mode" value="multi" checked>
-                                            Generar 1 idea para cada red social seleccionada
-                                        </label>
-                                        <br>
-                                        <label class="radio">
-                                            <input type="radio" name="generation-mode" value="single">
-                                            Generar 3 ideas distintas para una sola red social
-                                        </label>
+                                        <input id="ideaTopic" class="input" type="text" 
+                                               placeholder="Ej: Marketing para una app móvil" required>
                                     </div>
-                                    <div id="social-media-container" class="mt-3">
-                                        </div>
+                                    <p class="help">Describe el tema sobre el que necesitas ideas</p>
                                 </div>
 
                                 <div class="field">
-                                    <label class="label">2. Palabra clave / tema central</label>
+                                    <label class="label">Contexto (Opcional)</label>
                                     <div class="control">
-                                        <input id="keyword-input" class="input" type="text" placeholder="Ej: 'Marketing digital para emprendedores'">
+                                        <textarea id="ideaContext" class="textarea" rows="4" 
+                                                  placeholder="Proporciona más detalles sobre tu proyecto, audiencia objetivo, limitaciones, etc."></textarea>
                                     </div>
-                                    <p class="help">
-                                        ¡Sé lo más preciso posible! Cuanto más claro el tema, mejores serán las ideas.
-                                    </p>
+                                    <p class="help">Más contexto = ideas más específicas y útiles</p>
                                 </div>
 
                                 <div class="field">
-                                    <label class="label">3. Tipo de Copy</label>
                                     <div class="control">
-                                        <div class="select is-fullwidth">
-                                            <select id="copy-type-select">
-                                                </select>
-                                        </div>
-                                    </div>
-                                    <p id="copy-description" class="help mt-2"></p>
-                                </div>
-
-                                <div class="field mt-5">
-                                    <div class="control">
-                                        <button id="generate-btn" class="button is-primary is-large is-fullwidth" type="submit">
-                                            <span class="icon is-left"><i class="fas fa-magic"></i></span>
+                                        <button id="generateBtn" type="submit" class="button is-primary is-fullwidth is-large">
+                                            <span class="icon">
+                                                <i class="fas fa-rocket"></i>
+                                            </span>
                                             <span>Generar Ideas</span>
                                         </button>
                                     </div>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-                    <div class="column is-one-third">
-                        <div id="ad-panel" class="ad-container is-hidden">
-                            <h3 class="title is-5">¡Obtén más con Premium!</h3>
-                            <p>Desbloquea todas las funciones sin límites y sin anuncios.</p>
-                            <img src="https://via.placeholder.com/300x250.png?text=Anuncio" alt="Anuncio publicitario" class="my-4">
-                            <button class="button is-info is-small">Actualizar a Premium</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <section id="results-view" class="section is-hidden animate__animated animate__fadeIn">
-            <div class="container is-fluid">
-                <div class="nav-bar is-flex is-justify-content-space-between is-align-items-center mb-4">
-                    <div class="nav-left">
-                        <p class="is-size-5 has-text-weight-bold">Tus Ideas Generadas</p>
-                    </div>
-                    <div class="nav-right">
-                        <button id="new-generation-btn" class="button is-primary">
-                            <span class="icon is-left"><i class="fas fa-sync-alt"></i></span>
-                            <span>Nueva Generación</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="results-container" class="columns is-multiline">
-                    <div class="column is-12 has-text-centered" id="loading-spinner" style="display: none;">
-                        <div class="loading-animation is-inline-block"></div>
-                        <p class="mt-4 has-text-grey">Generando ideas, esto puede tomar unos segundos...</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <script type="module">
-        // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
-        import { getFirestore, collection, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
-
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyCScJA-UGs3WcBnfAm-6K94ybZ4bzBahz8",
-            authDomain: "brain-storm-8f0d8.firebaseapp.com",
-            databaseURL: "https://brain-storm-8f0d8-default-rtdb.firebaseio.com",
-            projectId: "brain-storm-8f0d8",
-            storageBucket: "brain-storm-8f0d8.appspot.com",
-            messagingSenderId: "401208607043",
-            appId: "1:401208607043:web:1ec3ea3dabacbe11beaff6"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const functions = getFunctions(app);
-        const googleProvider = new GoogleAuthProvider();
-
-        // Referencias del DOM
-        const loginView = document.getElementById('login-view');
-        const inputsView = document.getElementById('inputs-view');
-        const resultsView = document.getElementById('results-view');
-
-        const loginGoogleBtn = document.getElementById('login-google-btn');
-        const languageSelector = document.getElementById('language-selector');
-    const showEmailFormBtn = document.getElementById('show-email-form-btn');
-    const emailAuthForm = document.getElementById('email-auth-form');
-    const emailInput = document.getElementById('email-input');
-    const passwordInput = document.getElementById('password-input');
-    const loginEmailBtn = document.getElementById('login-email-btn');
-    const registerEmailBtn = document.getElementById('register-email-btn');
-    const emailAuthMessage = document.getElementById('email-auth-message');
-        const logoutBtn = document.getElementById('logout-btn');
-        const greetingText = document.getElementById('greeting-text');
-        const creditsCounter = document.getElementById('credits-counter');
-        const generationForm = document.getElementById('generation-form');
-        const socialMediaContainer = document.getElementById('social-media-container');
-        const copyTypeSelect = document.getElementById('copy-type-select');
-        const copyDescription = document.getElementById('copy-description');
-        const generateBtn = document.getElementById('generate-btn');
-        const resultsContainer = document.getElementById('results-container');
-        const newGenerationBtn = document.getElementById('new-generation-btn');
-        const adPanel = document.getElementById('ad-panel');
-        const loadingSpinner = document.getElementById('loading-spinner');
-
-        // Mostrar/ocultar formulario de email
-        showEmailFormBtn.addEventListener('click', () => {
-            emailAuthForm.style.display = emailAuthForm.style.display === 'none' ? 'block' : 'none';
-            emailAuthMessage.textContent = '';
-        });
-
-        // Login con email
-        loginEmailBtn.addEventListener('click', async () => {
-            emailAuthMessage.textContent = '';
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            if (!email || !password) {
-                emailAuthMessage.textContent = 'Completa ambos campos.';
-                return;
-            }
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                if (!userCredential.user.emailVerified) {
-                    emailAuthMessage.textContent = 'Debes verificar tu correo antes de ingresar.';
-                    await signOut(auth);
-                }
-            } catch (error) {
-                emailAuthMessage.textContent = error.message;
-            }
-        });
-
-        // Registro con email
-        registerEmailBtn.addEventListener('click', async () => {
-            emailAuthMessage.textContent = '';
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            if (!email || !password) {
-                emailAuthMessage.textContent = 'Completa ambos campos.';
-                return;
-            }
-            if (password.length < 6) {
-                emailAuthMessage.textContent = 'La contraseña debe tener al menos 6 caracteres.';
-                return;
-            }
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                await sendEmailVerification(userCredential.user);
-                emailAuthMessage.textContent = 'Registro exitoso. Revisa tu correo para verificar tu cuenta.';
-                await signOut(auth);
-            } catch (error) {
-                emailAuthMessage.textContent = error.message;
-            }
-        });
-
-        // Datos de la aplicación
-        const socialMediaOptions = ["Facebook", "LinkedIn", "X / Twitter", "WhatsApp", "Telegram", "Reddit", "Instagram", "TikTok", "YouTube"];
-        const copyTypes = [
-            { name: "De beneficio o solución", desc: "Cómo el producto mejora la vida del cliente." },
-            { name: "De novedad o lanzamiento", desc: "Anuncia algo nuevo para atraer atención inmediata." },
-            { name: "De interacción o pregunta", desc: "Diseñado para generar respuestas de la audiencia." },
-            { name: "De urgencia o escasez", desc: "Genera sensación de urgencia para actuar." },
-            { name: "Informativo o educativo", desc: "Comparte conocimiento útil." },
-            { name: "Informal", desc: "Tono casual, cercano." },
-            { name: "Llamada a la acción (CTA)", desc: "Motiva acción directa (comprar, registrarse)." },
-            { name: "Narrativo o storytelling", desc: "Cuenta una historia emocional." },
-            { name: "Posicionamiento o branding", desc: "Refuerza imagen de marca." },
-            { name: "Testimonio o prueba social", desc: "Muestra experiencias positivas de otros usuarios." },
-            { name: "Técnico o profesional", desc: "Información especializada o técnica." },
-            { name: "Venta directa o persuasivo", desc: "Convencimiento directo para cerrar ventas." }
-        ];
-
-        let currentUser = null;
-        let isPremium = false;
-        let generationCredits = 0;
-        let appConfig = {};
-
-        // Manejo de Vistas
-        function showView(viewId) {
-            loginView.classList.add('is-hidden');
-            inputsView.classList.add('is-hidden');
-            resultsView.classList.add('is-hidden');
-            document.getElementById(viewId).classList.remove('is-hidden');
-        }
-
-        // Lógica de autenticación
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                await initializeUserSession(user);
-                showView('inputs-view');
-            } else {
-                currentUser = null;
-                showView('login-view');
-            }
-        });
-
-        loginGoogleBtn.addEventListener('click', async () => {
-            try {
-                await signInWithPopup(auth, googleProvider);
-            } catch (error) {
-                console.error("Error al iniciar sesión:", error);
-            }
-        });
-
-        logoutBtn.addEventListener('click', async () => {
-            await signOut(auth);
-        });
-
-        // Inicialización de la sesión del usuario
-        async function initializeUserSession(user) {
-            const userDocRef = doc(db, 'users', user.uid);
-            const userDoc = await getDoc(userDocRef);
-
-            // Sincronizar idioma
-            const lang = localStorage.getItem('feedflow-lang') || 'es';
-            languageSelector.value = lang;
-
-            if (!userDoc.exists()) {
-                await setDoc(userDocRef, {
-                    email: user.email,
-                    name: user.displayName,
-                    isPremium: false,
-                    generationCredits: 3,
-                    lastGenerationDate: new Date(0),
-                    languagePreference: lang
-                }, { merge: true });
-            } else {
-                await updateDoc(userDocRef, { languagePreference: lang });
-            }
-
-            // Obtener configuración de la app y del usuario
-            await fetchUserAndAppConfig();
-            updateUI();
-        }
-
-        async function fetchUserAndAppConfig() {
-            if (!currentUser) return;
-            const userDocRef = doc(db, 'users', currentUser.uid);
-            const appConfigDocRef = doc(db, 'appConfig', 'config');
-
-            const [userDoc, appConfigDoc] = await Promise.all([
-                getDoc(userDocRef),
-                getDoc(appConfigDocRef)
-            ]);
-
-            const userData = userDoc.data();
-            appConfig = appConfigDoc.exists() ? appConfigDoc.data() : {};
-
-            // Lógica de isEffectivePremium
-            isPremium = userData.isPremium || appConfig.isPremiumGlobalActive || appConfig.isLaunchPromoActive;
-            generationCredits = userData.generationCredits;
-        }
-
-        // Actualización de la interfaz
-        function updateUI() {
-            if (!currentUser) return;
-
-            greetingText.textContent = `¡Hola, ${currentUser.displayName.split(' ')[0]}!`;
-
-            if (!isPremium) {
-                creditsCounter.textContent = `Generaciones restantes esta semana: ${generationCredits}/3`;
-                creditsCounter.classList.remove('is-hidden');
-                adPanel.classList.remove('is-hidden');
-            } else {
-                creditsCounter.classList.add('is-hidden');
-                // Mostrar publicidad solo si no es premium individual y hay promo
-                if (!getDoc(doc(db, 'users', currentUser.uid)).then(doc => doc.data().isPremium) && (appConfig.isPremiumGlobalActive || appConfig.isLaunchPromoActive)) {
-                    adPanel.classList.remove('is-hidden');
-                } else {
-                    adPanel.classList.add('is-hidden');
-                }
-            }
-
-            renderSocialMediaOptions();
-            renderCopyTypes();
-        }
-
-        function renderSocialMediaOptions() {
-            socialMediaContainer.innerHTML = '';
-            const generationMode = document.querySelector('input[name="generation-mode"]:checked').value;
-            const isSingleMode = generationMode === 'single';
-
-            socialMediaOptions.forEach(social => {
-                const isFacebook = social === "Facebook";
-                const isAllowed = isPremium || isFacebook;
-                const checkbox = document.createElement('input');
-                checkbox.type = isSingleMode ? 'radio' : 'checkbox';
-                checkbox.name = isSingleMode ? 'social-media-single' : 'social-media-multi';
-                checkbox.value = social;
-                checkbox.disabled = !isAllowed;
-
-                const label = document.createElement('label');
-                label.className = `checkbox-label`;
-                if (!isAllowed) {
-                    label.classList.add('has-text-grey-light');
-                }
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(` ${social}`));
-
-                if (!isAllowed) {
-                    const lockIcon = document.createElement('span');
-                    lockIcon.className = 'icon is-small has-text-warning ml-2';
-                    lockIcon.innerHTML = '<i class="fas fa-lock"></i>';
-                    label.appendChild(lockIcon);
-                }
-                socialMediaContainer.appendChild(label);
-            });
-        }
-
-        function renderCopyTypes() {
-            copyTypeSelect.innerHTML = '';
-            copyTypes.forEach(copy => {
-                const option = document.createElement('option');
-                option.value = copy.name;
-                option.textContent = copy.name;
-
-                const isFreeType = ["Informativo o educativo", "Informal", "Técnico o profesional"].includes(copy.name);
-                const isAllowed = isPremium || isFreeType;
-
-                if (!isAllowed) {
-                    option.disabled = true;
-                    option.classList.add('has-text-grey-light');
-                    option.textContent = `${copy.name} (Premium)`;
-                }
-                copyTypeSelect.appendChild(option);
-            });
-            copyDescription.textContent = copyTypes[0].desc;
-        }
-
-        // Event Listeners para la interfaz
-        generationForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            if (!currentUser) return;
-            if (!isPremium && generationCredits <= 0) {
-                alert("Has agotado tus generaciones semanales. ¡Mejora a Premium para continuar!");
-                return;
-            }
-
-            const generationMode = document.querySelector('input[name="generation-mode"]:checked').value;
-            const keyword = document.getElementById('keyword-input').value;
-            const copyType = document.getElementById('copy-type-select').value;
-            
-            let socialMediaSelected = [];
-            if (generationMode === 'multi') {
-                document.querySelectorAll('input[name="social-media-multi"]:checked').forEach(cb => {
-                    socialMediaSelected.push(cb.value);
-                });
-            } else {
-                const singleSocial = document.querySelector('input[name="social-media-single"]:checked');
-                if (singleSocial) socialMediaSelected.push(singleSocial.value);
-            }
-
-            if (!socialMediaSelected.length || !keyword) {
-                alert("Por favor, selecciona una red social y escribe una palabra clave.");
-                return;
-            }
-
-            // Ocultar inputs, mostrar spinner
-            inputsView.classList.add('is-hidden');
-            resultsView.classList.remove('is-hidden');
-            loadingSpinner.style.display = 'block';
-            resultsContainer.innerHTML = '';
-
-            try {
-                const generateIdeasCallable = httpsCallable(functions, 'generateIdeas');
-                const response = await generateIdeasCallable({
-                    generationMode,
-                    socialMedia: socialMediaSelected,
-                    keyword,
-                    copyType,
-                    language: languageSelector.value
-                });
-
-                if (response.data.success) {
-                    displayResults(response.data.ideas);
-                    // Actualizar créditos si es usuario gratuito
-                    if (!isPremium) {
-                        generationCredits--;
-                        creditsCounter.textContent = `Generaciones restantes esta semana: ${generationCredits}/3`;
-                    }
-                } else {
-                    alert(response.data.error || "Ocurrió un error al generar las ideas.");
-                    showView('inputs-view'); // Volver a la vista de inputs
-                }
-
-            } catch (error) {
-                console.error("Error al llamar a la función:", error);
-                alert("Ocurrió un error al conectar con el servidor. Inténtalo de nuevo más tarde.");
-                showView('inputs-view');
-            } finally {
-                loadingSpinner.style.display = 'none';
-            }
-        });
-
-        // Actualizar opciones de red social al cambiar el modo
-        document.querySelectorAll('input[name="generation-mode"]').forEach(radio => {
-            radio.addEventListener('change', renderSocialMediaOptions);
-        });
-
-        // Mostrar descripción de copy type
-        copyTypeSelect.addEventListener('change', (e) => {
-            const selectedCopy = copyTypes.find(c => c.name === e.target.value);
-            copyDescription.textContent = selectedCopy ? selectedCopy.desc : '';
-        });
-
-        // Botón de nueva generación
-        newGenerationBtn.addEventListener('click', () => {
-            showView('inputs-view');
-            resultsContainer.innerHTML = ''; // Limpiar resultados
-        });
-
-        // Funciones para la pantalla de resultados
-        function displayResults(ideas) {
-            resultsContainer.innerHTML = '';
-            ideas.forEach(idea => {
-                const card = document.createElement('div');
-                card.className = `column is-12 animate__animated animate__fadeInUp`;
-                card.innerHTML = `
-                    <div class="card card-result">
-                        <div class="card-content">
-                            <h3 class="title is-4 has-text-weight-bold has-text-centered mb-4">${idea.socialMedia || 'Idea Generada'}</h3>
-                            <p class="subtitle is-6 has-text-grey-light mb-4">
-                                Gancho Verbal Impactante: <br>
-                                <strong class="has-text-dark">${idea.hook}</strong>
-                            </p>
-                            <p class="is-size-6 has-text-grey-darker mb-4">${idea.postText}</p>
-                            <div class="tags are-small mb-4">
-                                ${idea.hashtags.map(tag => `<span class="tag is-primary is-light">${tag}</span>`).join('')}
+                            <!-- Enlaces rápidos -->
+                            <div class="mt-5">
+                                <h4 class="title is-6 has-text-grey">Enlaces Rápidos</h4>
+                                <div class="buttons are-small">
+                                    <a href="admin.html" class="button is-light">
+                                        <span class="icon">
+                                            <i class="fas fa-cog"></i>
+                                        </span>
+                                        <span>Panel Admin</span>
+                                    </a>
+                                </div>
                             </div>
-                            <p class="subtitle is-6 has-text-grey-light mb-4">
-                                Llamada a la Acción (CTA): <br>
-                                <strong class="has-text-link">${idea.cta}</strong>
-                            </p>
-                            <div class="content">
-                                <p class="is-size-7 has-text-grey-dark">
-                                    <strong>Formato Visual Sugerido:</strong>
-                                    <span class="${!isPremium ? 'blurred-image' : ''}">${idea.visualFormat}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de resultados -->
+                <div class="column is-8">
+                    <div id="ideasContainer">
+                        <!-- Las ideas generadas aparecerán aquí -->
+                        <div class="has-text-centered">
+                            <div class="box" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 2px dashed #dee2e6;">
+                                <span class="icon is-large has-text-grey-light">
+                                    <i class="fas fa-lightbulb fa-3x"></i>
+                                </span>
+                                <h3 class="title is-4 has-text-grey">¡Comienza a generar ideas!</h3>
+                                <p class="subtitle has-text-grey">
+                                    Completa el formulario de la izquierda y presiona "Generar Ideas" 
+                                    para obtener sugerencias creativas e innovadoras.
                                 </p>
                             </div>
                         </div>
-                        <footer class="card-footer p-3">
-                            <button class="button card-footer-item is-small copy-btn" data-text="${idea.postText}">
-                                <span class="icon"><i class="fas fa-copy"></i></span>
-                                <span>Copiar</span>
-                            </button>
-                            <button class="button card-footer-item is-small share-btn" data-text="${idea.postText}">
-                                <span class="icon"><i class="fas fa-share-alt"></i></span>
-                                <span>Compartir</span>
-                            </button>
-                            <span class="card-footer-item">
-                                <span class="icon"><i class="fas fa-heart has-text-danger"></i></span>
-                            </span>
-                        </footer>
                     </div>
-                `;
-                resultsContainer.appendChild(card);
-            });
-            // Añadir la frase motivadora final
-            const finalQuote = ideas[0].finalQuote;
-            if (finalQuote) {
-                const quoteCard = document.createElement('div');
-                quoteCard.className = `column is-12 has-text-centered mt-4`;
-                quoteCard.innerHTML = `<p class="is-size-5 has-text-grey-dark">${finalQuote}</p>`;
-                resultsContainer.appendChild(quoteCard);
-            }
-            attachResultListeners();
-        }
-        
-        function attachResultListeners() {
-            document.querySelectorAll('.copy-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    navigator.clipboard.writeText(btn.dataset.text);
-                    btn.classList.add('is-success');
-                    btn.querySelector('span:last-child').textContent = 'Copiado!';
-                    setTimeout(() => {
-                        btn.classList.remove('is-success');
-                        btn.querySelector('span:last-child').textContent = 'Copiar';
-                    }, 2000);
-                });
-            });
+                </div>
+            </div>
+        </div>
+    </section>
 
-            document.querySelectorAll('.share-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (navigator.share) {
-                        navigator.share({
-                            title: 'FeedFlow - Idea para Red Social',
-                            text: btn.dataset.text
-                        }).catch(error => console.error('Error al compartir:', error));
-                    } else {
-                        alert('La API de compartir no está disponible en este navegador.');
-                    }
-                });
-            });
+    <!-- Scripts -->
+    <script type="module" src="js/main.js"></script>
+    
+    <!-- Estilos específicos para ideas -->
+    <style>
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), #8a2a99);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
         }
 
-        // Idioma
-        languageSelector.addEventListener('change', (e) => {
-            const lang = e.target.value;
-            localStorage.setItem('feedflow-lang', lang);
-            // Si el usuario está autenticado, actualizar en Firestore
-            if (currentUser) {
-                updateDoc(doc(db, 'users', currentUser.uid), { languagePreference: lang });
-            }
-            // La UI se puede recargar si es necesario para los textos
-            // Por simplicidad en este ejemplo, solo se guarda la preferencia.
-            // Los textos dinámicos ya se envían al backend
-        });
+        .ideas-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
 
-    </script>
+        .idea-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .idea-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .idea-number {
+            background: linear-gradient(135deg, var(--primary-color), #8a2a99);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .idea-content h4 {
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .idea-content p {
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .idea-actions {
+            text-align: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .idea-item {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .idea-number {
+                align-self: center;
+            }
+        }
+    </style>
 </body>
 </html>

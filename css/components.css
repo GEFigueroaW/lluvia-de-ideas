@@ -1,0 +1,276 @@
+/* =========================================
+   COMPONENTES REUTILIZABLES
+   ========================================= */
+
+/* =========================================
+   CARDS
+   ========================================= */
+.card {
+    background-color: var(--card-bg-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+    transition: var(--transition);
+    position: relative;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.card-content {
+    padding: 2rem;
+}
+
+/* =========================================
+   BOTONES
+   ========================================= */
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Variantes de botones */
+.button.is-primary {
+    background: linear-gradient(135deg, var(--primary-color), #8a2a99);
+    color: white;
+}
+
+.button.is-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #7a1f89, #9a2fa9);
+    transform: translateY(-2px);
+}
+
+.button.is-secondary {
+    background: linear-gradient(135deg, var(--secondary-color), #ffed4e);
+    color: var(--text-color);
+}
+
+.button.is-secondary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #ffe100, #fff34e);
+    transform: translateY(-2px);
+}
+
+.button.is-danger {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+}
+
+.button.is-danger:hover:not(:disabled) {
+    background: linear-gradient(135deg, #d62c1a, #a93226);
+    transform: translateY(-2px);
+}
+
+.button.is-fullwidth {
+    width: 100%;
+}
+
+.button.is-large {
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+}
+
+/* =========================================
+   FORMULARIOS
+   ========================================= */
+.field {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.input, .textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e1e5e9;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background-color: white;
+}
+
+.input:focus, .textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(106, 26, 121, 0.1);
+}
+
+/* =========================================
+   COLUMNAS
+   ========================================= */
+.columns {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -0.75rem;
+}
+
+.column {
+    flex: 1;
+    padding: 0.75rem;
+}
+
+.column.is-half {
+    flex: 0 0 50%;
+}
+
+.column.is-one-third {
+    flex: 0 0 33.333%;
+}
+
+.column.is-two-thirds {
+    flex: 0 0 66.667%;
+}
+
+/* =========================================
+   TÍTULOS
+   ========================================= */
+.title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.subtitle {
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.section-title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+/* =========================================
+   NOTIFICACIONES
+   ========================================= */
+.notification {
+    padding: 1.25rem 2.5rem 1.25rem 1.5rem;
+    border-radius: var(--border-radius);
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.notification.is-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.notification.is-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.notification.is-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.notification.is-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+}
+
+/* =========================================
+   PROGRESO
+   ========================================= */
+.progress {
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), #8a2a99);
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+/* =========================================
+   MODAL/OVERLAY STYLES
+   ========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* =========================================
+   RESPONSIVE ADJUSTMENTS
+   ========================================= */
+@media (max-width: 768px) {
+    .title {
+        font-size: 2rem;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+    
+    .button {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+    
+    .card-content {
+        padding: 1.5rem;
+    }
+}
