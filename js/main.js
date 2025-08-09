@@ -44,6 +44,7 @@ let currentIdeasSession = null;
 // Lista de administradores autorizados
 const ADMIN_EMAILS = [
     'eugenfw@gmail.com',
+    'eugenfw@hotmail.com',
     'admin@feedflow.com'
 ];
 

@@ -50,7 +50,7 @@ export async function signInWithEmail(email, password, button = null) {
         const user = userCredential.user;
         
         // Lista de administradores que pueden saltarse la verificación de email
-        const ADMIN_EMAILS = ['eugenfw@gmail.com', 'admin@feedflow.com'];
+        const ADMIN_EMAILS = ['eugenfw@gmail.com', 'eugenfw@hotmail.com', 'admin@feedflow.com'];
         const isAdmin = ADMIN_EMAILS.includes(user.email);
         
         if (!user.emailVerified && !isAdmin) {

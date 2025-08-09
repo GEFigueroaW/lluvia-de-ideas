@@ -1,0 +1,48 @@
+{"users": [
+{
+  "localId": "YfeOy6AVIyYJPLfIFxOqfk2YLoT2",
+  "email": "di.daniela.bazan@gmail.com",
+  "emailVerified": true,
+  "displayName": "Daniela Bazan",
+  "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJGelvXlzoFWUXAiECQpoggy26Y5DwHSo6fiyg1V3p3isK2dA=s96-c",
+  "lastSignedInAt": "1748798937450",
+  "createdAt": "1747098997392",
+  "providerUserInfo": [
+    {
+      "providerId": "google.com",
+      "rawId": "105534932655364121625",
+      "email": "di.daniela.bazan@gmail.com",
+      "displayName": "Daniela Bazan",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocJGelvXlzoFWUXAiECQpoggy26Y5DwHSo6fiyg1V3p3isK2dA=s96-c"
+    }
+  ]
+},
+{
+  "localId": "f9vUuYJsuvUJBr5aPkfrOjOlTTt2",
+  "email": "eugenfw@gmail.com",
+  "emailVerified": true,
+  "displayName": "Guillermo Figueroa W",
+  "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocIOLu_qr7iuJc4NmE0eB1nLYavyBwq-W-4y4EJkn3-LReMuWJAF=s96-c",
+  "lastSignedInAt": "1754751307600",
+  "createdAt": "1748801420883",
+  "providerUserInfo": [
+    {
+      "providerId": "google.com",
+      "rawId": "105193257119823155259",
+      "email": "eugenfw@gmail.com",
+      "displayName": "Guillermo Figueroa W",
+      "photoUrl": "https://lh3.googleusercontent.com/a/ACg8ocIOLu_qr7iuJc4NmE0eB1nLYavyBwq-W-4y4EJkn3-LReMuWJAF=s96-c"
+    }
+  ]
+},
+{
+  "localId": "mRDJd5rpiAUFy3SLbpctKDzlTml2",
+  "email": "eugenfw@hotmail.com",
+  "emailVerified": false,
+  "passwordHash": "s8yJ0Tir/LL9EsaVXa5aQsVYWPtytSNJq4ZFKrLz4mMFZ/A2Gr2b/hHVwVKH6yl3JIBfUJJxLJSkzLjCRBHv6A==",
+  "salt": "Fk1anNRz6I08tA==",
+  "displayName": "Eugen",
+  "lastSignedInAt": "1754754660712",
+  "createdAt": "1754754660712",
+  "providerUserInfo": []
+}]}
