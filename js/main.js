@@ -97,29 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeElements();
     initializeEventListeners();
     initAuthStateListener(handleAuthStateChange);
-});
 
 /**
- * Debug para verificar elementos críticos del DOM
- */
-function debugDOMElements() {
-    console.log('--- DEBUG DOM ELEMENTS ---');
-    console.log('adminBtn:', !!document.getElementById('adminBtn'));
-    console.log('loginSection:', !!document.getElementById('loginSection'));
-    console.log('appSection:', !!document.getElementById('appSection'));
-    console.log('--- FIN DEBUG DOM ---');
-}
-
-/**
- * Inicializa las referencias a elementos del DOM
- */
-function initializeElements() {
-    // Secciones
-    elements.loginSection = document.getElementById('loginSection');
-    elements.appSection = document.getElementById('appSection');
-    elements.loadingSection = document.getElementById('loadingSection');
-    
-    // Formularios
     elements.loginForm = document.getElementById('loginForm');
     elements.registerForm = document.getElementById('registerForm');
     elements.ideaForm = document.getElementById('ideaForm');
@@ -195,7 +174,7 @@ function initializeEventListeners() {
     
     if (elements.registerEmail) {
         elements.registerEmail.addEventListener('blur', validateEmailField);
-    }
+
 }
 
 // =========================================
@@ -660,9 +639,13 @@ async function loadUserProfile(user) {
             premiumSource: premiumSource
         };
 
-        // Sincronizar estado premium con el módulo de copywriting
+        // Log para depuración premium
+        console.log('[PREMIUM] userProfile:', userProfile);
         if (window.setCopywritingPremiumStatus) {
+            console.log('[PREMIUM] Llamando setCopywritingPremiumStatus con:', isPremium);
             window.setCopywritingPremiumStatus(isPremium);
+        } else {
+            console.warn('[PREMIUM] setCopywritingPremiumStatus no está definido');
         }
     } catch (error) {
         console.error('Error loading user profile:', error);
@@ -722,9 +705,7 @@ function validatePasswordField() {
  */
 function updateHistoryDisplay() {
     if (!elements.historyContainer) return;
-    
     const cachedIdeas = getCachedUserIdeas();
-    
     if (cachedIdeas.length === 0) {
         elements.historyContainer.innerHTML = `
             <div class="has-text-centered p-4">
@@ -736,54 +717,16 @@ function updateHistoryDisplay() {
         `;
         return;
     }
-    
-    const historyHtml = cachedIdeas.map(session => `
-        <div class="history-item card mb-3" data-session-id="${session.id}">
-            <div class="card-content">
-                <div class="media">
-                    <div class="media-left">
-                        <span class="icon is-large has-text-primary">
-                            <i class="fas fa-lightbulb fa-2x"></i>
-                        </span>
-                    </div>
-                    <div class="media-content">
-                        <p class="title is-6">${session.topic}</p>
-                        <p class="subtitle is-7 has-text-grey">
-                            ${session.ideaCount} ideas • ${formatDate(session.createdAt)}
-                        </p>
-                        ${session.context ? `<p class="is-size-7">${session.context.substring(0, 100)}...</p>` : ''}
-                    </div>
-                    <div class="media-right">
-                        <div class="buttons are-small">
-                            <button class="button is-small is-primary" onclick="viewIdeasSession('${session.id}')">
-                                <span class="icon">
-                                    <i class="fas fa-eye"></i>
-                                </span>
-                            </button>
-                            <div class="dropdown is-hoverable">
-                                <div class="dropdown-trigger">
-                                    <button class="button is-small is-info" aria-haspopup="true">
-                                        <span class="icon">
-                                            <i class="fas fa-download"></i>
-                                        </span>
-                                    </button>
-                                </div>
-                                <div class="dropdown-menu" role="menu">
-                                    <div class="dropdown-content">
-                                        <a class="dropdown-item" onclick="exportSession('${session.id}', 'json')">JSON</a>
-                                        <a class="dropdown-item" onclick="exportSession('${session.id}', 'txt')">TXT</a>
-                                        <a class="dropdown-item" onclick="exportSession('${session.id}', 'md')">MD</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    // Renderizar historial normalmente aquí si hay sesiones
+    let historyHtml = cachedIdeas.map(session => `
+        <div class="history-session">
+            <div><strong>${session.topic}</strong> (${session.ideas.length} ideas)</div>
+            <button onclick="viewIdeasSession('${session.id}')">Ver</button>
+            <button onclick="exportSession('${session.id}', 'json')">Exportar JSON</button>
         </div>
     `).join('');
-    
     elements.historyContainer.innerHTML = historyHtml;
+
 }
 
 // =========================================
@@ -887,30 +830,6 @@ window.viewIdeasSession = async function(sessionId) {
     
     showNotification('Sesión cargada correctamente', 'success', 2000);
 };
-
-/**
- * Copia todas las ideas al portapapeles
- */
-function copyAllIdeas() {
-    const currentSession = window.currentSession;
-    if (!currentSession || !currentSession.ideas) {
-        showNotification('No hay ideas para copiar', 'warning');
-        return;
-    }
-    
-    const ideasText = currentSession.ideas
-        .map((idea, index) => `${index + 1}. ${idea.title || `Idea ${index + 1}`}\n   ${idea.description || idea}`)
-        .join('\n\n');
-    
-    const fullText = `💡 Ideas para: ${currentSession.topic}\n\n${ideasText}`;
-    
-    navigator.clipboard.writeText(fullText).then(() => {
-        showNotification('¡Ideas copiadas al portapapeles!', 'success');
-    }).catch(err => {
-        console.error('Error al copiar:', err);
-        showNotification('Error al copiar las ideas', 'danger');
-    });
-}
 
 /**
  * Genera nuevas ideas para el mismo tema
