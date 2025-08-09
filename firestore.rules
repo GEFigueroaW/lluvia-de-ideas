@@ -42,5 +42,11 @@ service cloud.firestore {
     match /settings/{document} {
       allow read, write, create, update, delete: if isAdmin();
     }
+    
+    // Permitir a usuarios leer sus propias sesiones de ideas y a admins leer todas
+    match /ideas_sessions/{sessionId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow read: if isAdmin();
+    }
   }
 }
