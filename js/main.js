@@ -40,6 +40,12 @@ let isGenerating = false;
 let userProfile = null;
 let currentIdeasSession = null;
 
+// Lista de administradores autorizados
+const ADMIN_EMAILS = [
+    'eugenfw@gmail.com',
+    'admin@feedflow.com'
+];
+
 // =========================================
 // ELEMENTOS DEL DOM
 // =========================================
@@ -188,20 +194,86 @@ function initializeEventListeners() {
 async function handleAuthStateChange(user) {
     hideElement(elements.loadingSection);
     
-    if (user && user.emailVerified) {
-        await loadUserProfile(user);
-        await loadUserIdeasHistory(); // Cargar historial de ideas
-        showAppSection();
-        updateUserInfo(user);
-        updateHistoryDisplay(); // Mostrar historial
-    } else {
-        showLoginSection();
-        if (user && !user.emailVerified) {
+    if (user) {
+        console.log('Usuario logueado:', {
+            email: user.email,
+            emailVerified: user.emailVerified,
+            uid: user.uid
+        });
+        
+        // Para admins, permitir acceso incluso sin verificación de email
+        const isAdmin = await checkAdminStatus(user);
+        
+        if (user.emailVerified || isAdmin) {
+            await loadUserProfile(user);
+            await loadUserIdeasHistory(); // Cargar historial de ideas
+            showAppSection();
+            updateUserInfo(user);
+            updateHistoryDisplay(); // Mostrar historial
+            
+            // Verificar si es administrador
+            await checkAndShowAdminAccess(user);
+        } else {
+            showLoginSection();
             showNotification(
                 'Por favor verifica tu email para continuar.',
                 'warning'
             );
         }
+    } else {
+        showLoginSection();
+    }
+}
+
+/**
+ * Verifica si el usuario es administrador y muestra el acceso
+ */
+async function checkAndShowAdminAccess(user) {
+    try {
+        const isAdmin = await checkAdminStatus(user);
+        const adminBtn = document.getElementById('adminBtn');
+        
+        if (isAdmin && adminBtn) {
+            adminBtn.style.display = 'inline-flex';
+            adminBtn.style.background = 'var(--accent-gradient)';
+            adminBtn.innerHTML = '<i class="fas fa-crown mr-2"></i>Panel Admin';
+            
+            console.log('Botón de admin mostrado para:', user.email);
+            showNotification('🔑 Acceso de administrador activado', 'success', 3000);
+        } else if (adminBtn) {
+            adminBtn.style.display = 'none';
+            console.log('Acceso de admin negado para:', user.email);
+        }
+    } catch (error) {
+        console.error('Error verificando estado de admin:', error);
+    }
+}
+
+/**
+ * Verifica si el usuario es administrador
+ */
+async function checkAdminStatus(user) {
+    try {
+        // Verificar por email
+        if (ADMIN_EMAILS.includes(user.email)) {
+            console.log('Usuario admin detectado por email:', user.email);
+            return true;
+        }
+        
+        // Verificar en la base de datos
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            if (userData.isAdmin === true) {
+                console.log('Usuario admin detectado en base de datos');
+                return true;
+            }
+        }
+        
+        return false;
+    } catch (error) {
+        console.error('Error checking admin status:', error);
+        return false;
     }
 }
 
