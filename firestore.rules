@@ -37,5 +37,10 @@ service cloud.firestore {
       allow read, write: if isAdmin() && 
         (resource == null || resource.data.keys().hasAny(['freePromotionsEnabled', 'premiumPromotionsEnabled', 'maintenanceMode']));
     }
+    
+    // Permitir a administradores leer y escribir en /settings/{document}
+    match /settings/{document} {
+      allow read, write, create, update, delete: if isAdmin();
+    }
   }
 }
