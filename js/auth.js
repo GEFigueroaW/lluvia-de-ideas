@@ -49,10 +49,18 @@ export async function signInWithEmail(email, password, button = null) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         
-        if (!user.emailVerified) {
+        // Lista de administradores que pueden saltarse la verificación de email
+        const ADMIN_EMAILS = ['eugenfw@gmail.com', 'admin@feedflow.com'];
+        const isAdmin = ADMIN_EMAILS.includes(user.email);
+        
+        if (!user.emailVerified && !isAdmin) {
             showNotification('Por favor, verifica tu email antes de continuar.', 'warning');
             await signOut(auth);
             return false;
+        }
+        
+        if (isAdmin && !user.emailVerified) {
+            showNotification('🔑 Acceso de administrador autorizado (sin verificación de email)', 'info');
         }
         
         showNotification('¡Bienvenido de vuelta!', 'success');

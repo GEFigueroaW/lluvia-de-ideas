@@ -148,12 +148,13 @@ function initializeEventListeners() {
 async function handleAuthStateChange(user) {
     hideElement(elements.loadingSection);
     
-    if (user && user.emailVerified) {
+    if (user) {  // Removemos la verificación de emailVerified para admins
         console.log('=== DEBUG DOM ELEMENTS ===');
         console.log('adminInfo:', elements.adminInfo);
         console.log('loginSection:', elements.loginSection);
         console.log('appSection:', elements.appSection);
-        console.log('isAdmin?:', true);
+        console.log('Usuario:', user.email);
+        console.log('Email verificado:', user.emailVerified);
         console.log('--- FIN DEBUG DOM ELEMENTS ---');
         
         const adminCheck = await checkAdminStatus(user);
@@ -171,6 +172,11 @@ async function handleAuthStateChange(user) {
             console.log('✅ Usuario admin detectado por email:', user.email);
             console.log('Botón de admin mostrado para:', user.email);
             console.log('=== VERIFICACIÓN ADMIN FINALIZADA ===');
+            
+            // Si es admin pero no tiene email verificado, mostrar aviso
+            if (!user.emailVerified) {
+                showNotification('⚠️ Acceso de administrador sin verificación de email', 'warning', 3000);
+            }
             
             showAdminSection();
             updateAdminInfo(user);
