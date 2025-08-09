@@ -547,7 +547,6 @@ function updateStatsDisplay() {
  */
 function updateUsersTable() {
     if (!elements.usersTableBody || !users) return;
-    
     const tableHtml = users.map(user => `
         <tr>
             <td>
@@ -567,19 +566,22 @@ function updateUsersTable() {
                 <span class="badge ${user.isPremium ? 'is-premium' : 'is-regular'}">
                     ${user.isPremium ? 'Premium' : 'Gratuito'}
                 </span>
+                ${user.premiumUntil ? `<br><small>Hasta: ${formatDate(new Date(user.premiumUntil.seconds ? user.premiumUntil.seconds * 1000 : user.premiumUntil))}</small>` : ''}
             </td>
             <td>${user.ideasGenerated || 0}</td>
-            <td>${formatDate(user.createdAt?.toDate())}</td>
+            <td>${formatDate(user.createdAt?.toDate ? user.createdAt.toDate() : user.createdAt)}</td>
             <td>
                 <div class="buttons are-small">
                     <button class="button is-small is-info" onclick="toggleUserPremium('${user.id}', ${!user.isPremium})">
                         ${user.isPremium ? 'Quitar Premium' : 'Hacer Premium'}
                     </button>
+                    <button class="button is-small is-warning" onclick="setUserPremiumUntil('${user.id}')">
+                        Vigencia
+                    </button>
                 </div>
             </td>
         </tr>
     `).join('');
-    
     elements.usersTableBody.innerHTML = tableHtml;
 }
 
@@ -798,5 +800,32 @@ window.testPremiumConfig = async function() {
     } catch (error) {
         console.error('❌ Error en test premium:', error);
         showNotification(`❌ Error en test: ${error.message}`, 'danger', 5000);
+    }
+};
+
+// Permite al admin establecer la vigencia premium individual
+window.setUserPremiumUntil = async function(userId) {
+    const until = prompt('Ingrese la fecha de vigencia premium (YYYY-MM-DD) o deje vacío para eliminar vigencia:');
+    if (until === null) return;
+    let premiumUntil = null;
+    if (until.trim() !== '') {
+        const date = new Date(until.trim());
+        if (isNaN(date.getTime())) {
+            showNotification('Fecha inválida', 'danger');
+            return;
+        }
+        premiumUntil = date;
+    }
+    try {
+        const userRef = doc(db, 'users', userId);
+        await updateDoc(userRef, {
+            premiumUntil: premiumUntil || null,
+            premiumUpdatedAt: new Date(),
+            premiumUpdatedBy: getCurrentUser()?.uid
+        });
+        showNotification('Vigencia premium actualizada', 'success');
+        await loadAdminData();
+    } catch (error) {
+        handleError(error, 'al actualizar vigencia premium');
     }
 };
