@@ -30,6 +30,7 @@ import {
     getCachedUserIdeas,
     searchIdeas
 } from './ideas-manager.js';
+import './copywriting.js'; // Importar módulo de copywriting
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js';
 
@@ -90,10 +91,23 @@ const elements = {
 // INICIALIZACIÓN
 // =========================================
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('=== DOM CARGADO ===');
+    debugDOMElements();
     initializeElements();
     initializeEventListeners();
     initAuthStateListener(handleAuthStateChange);
 });
+
+/**
+ * Debug para verificar elementos críticos del DOM
+ */
+function debugDOMElements() {
+    console.log('--- DEBUG DOM ELEMENTS ---');
+    console.log('adminBtn:', !!document.getElementById('adminBtn'));
+    console.log('loginSection:', !!document.getElementById('loginSection'));
+    console.log('appSection:', !!document.getElementById('appSection'));
+    console.log('--- FIN DEBUG DOM ---');
+}
 
 /**
  * Inicializa las referencias a elementos del DOM
@@ -230,10 +244,18 @@ async function handleAuthStateChange(user) {
  */
 async function checkAndShowAdminAccess(user) {
     try {
+        console.log('=== VERIFICACIÓN ADMIN INICIADA ===');
+        console.log('Usuario:', user.email);
+        console.log('ADMIN_EMAILS:', ADMIN_EMAILS);
+        
         const isAdmin = await checkAdminStatus(user);
+        console.log('¿Es admin?:', isAdmin);
+        
         const adminBtn = document.getElementById('adminBtn');
+        console.log('Botón admin encontrado:', !!adminBtn);
         
         if (isAdmin && adminBtn) {
+            console.log('Mostrando botón de admin...');
             adminBtn.style.display = 'inline-flex';
             adminBtn.style.background = 'var(--accent-gradient)';
             adminBtn.innerHTML = '<i class="fas fa-crown mr-2"></i>Panel Admin';
@@ -241,9 +263,13 @@ async function checkAndShowAdminAccess(user) {
             console.log('Botón de admin mostrado para:', user.email);
             showNotification('🔑 Acceso de administrador activado', 'success', 3000);
         } else if (adminBtn) {
+            console.log('Ocultando botón de admin...');
             adminBtn.style.display = 'none';
             console.log('Acceso de admin negado para:', user.email);
+        } else {
+            console.log('ERROR: No se encontró el elemento adminBtn');
         }
+        console.log('=== VERIFICACIÓN ADMIN FINALIZADA ===');
     } catch (error) {
         console.error('Error verificando estado de admin:', error);
     }
@@ -254,22 +280,33 @@ async function checkAndShowAdminAccess(user) {
  */
 async function checkAdminStatus(user) {
     try {
+        console.log('--- checkAdminStatus iniciado ---');
+        console.log('Email del usuario:', user.email);
+        console.log('Lista de admins:', ADMIN_EMAILS);
+        
         // Verificar por email
         if (ADMIN_EMAILS.includes(user.email)) {
-            console.log('Usuario admin detectado por email:', user.email);
+            console.log('✅ Usuario admin detectado por email:', user.email);
             return true;
         }
         
+        console.log('❌ Usuario NO encontrado en lista de admins');
+        
         // Verificar en la base de datos
+        console.log('Verificando en base de datos...');
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
             const userData = userDoc.data();
+            console.log('Datos del usuario en BD:', userData);
             if (userData.isAdmin === true) {
-                console.log('Usuario admin detectado en base de datos');
+                console.log('✅ Usuario admin detectado en base de datos');
                 return true;
             }
+        } else {
+            console.log('❌ Usuario no encontrado en base de datos');
         }
         
+        console.log('--- checkAdminStatus: resultado false ---');
         return false;
     } catch (error) {
         console.error('Error checking admin status:', error);
