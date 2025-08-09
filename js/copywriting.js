@@ -129,7 +129,16 @@ const COPY_TYPES = {
 // Variables globales
 let selectedSocialNetworks = new Set(['facebook']); // Facebook por defecto
 let currentGenerationMode = 'multi';
+
 let isUserPremium = false; // Se actualizará con el estado real del usuario
+
+// Permitir que el main.js actualice el estado premium y refresque la UI
+window.setCopywritingPremiumStatus = function(premium) {
+    isUserPremium = premium;
+    setupSocialNetworks();
+    setupCopyTypes();
+    updateUserStatus && updateUserStatus();
+};
 
 /**
  * Inicializa el módulo de copywriting

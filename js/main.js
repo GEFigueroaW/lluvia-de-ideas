@@ -659,6 +659,11 @@ async function loadUserProfile(user) {
             isPremium: isPremium,
             premiumSource: premiumSource
         };
+
+        // Sincronizar estado premium con el módulo de copywriting
+        if (window.setCopywritingPremiumStatus) {
+            window.setCopywritingPremiumStatus(isPremium);
+        }
     } catch (error) {
         console.error('Error loading user profile:', error);
         userProfile = { isPremium: false, ideasGenerated: 0, premiumSource: 'none' };
