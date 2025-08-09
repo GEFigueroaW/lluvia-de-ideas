@@ -474,30 +474,43 @@ async function loadAppConfig() {
  */
 async function initializeDefaultConfig() {
     try {
+        const currentUser = getCurrentUser();
+        if (!currentUser || !ADMIN_EMAILS.includes(currentUser.email)) {
+            throw new Error('Solo administradores pueden inicializar la configuración');
+        }
+
         const defaultConfig = {
             freePromotionsEnabled: true,
             premiumPromotionsEnabled: true,
             maintenanceMode: false,
+            isPremiumGlobalActive: false,
+            isLaunchPromoActive: false,
+            weeklyCredits: 3,
             createdAt: new Date(),
-            createdBy: getCurrentUser()?.email || 'system'
+            createdBy: currentUser.email,
+            lastUpdated: new Date(),
+            version: '1.0'
         };
         
-        // Crear en ambas ubicaciones para compatibilidad
-        await Promise.all([
-            updateDoc(doc(db, 'config', 'app'), defaultConfig).catch(async () => {
-                // Si el documento no existe, crearlo
-                await setDoc(doc(db, 'config', 'app'), defaultConfig);
-            }),
-            updateDoc(doc(db, 'appConfig', 'config'), defaultConfig).catch(async () => {
-                // Si el documento no existe, crearlo
-                await setDoc(doc(db, 'appConfig', 'config'), defaultConfig);
-            })
-        ]);
+        console.log('Creando configuración inicial:', defaultConfig);
         
-        console.log('Configuración inicial creada');
+        // Crear en ambas ubicaciones usando setDoc (no updateDoc)
+        const promises = [
+            setDoc(doc(db, 'config', 'app'), defaultConfig),
+            setDoc(doc(db, 'appConfig', 'config'), defaultConfig)
+        ];
+        
+        await Promise.all(promises);
+        
+        console.log('✅ Configuración inicial creada exitosamente');
+        showNotification('Configuración inicial creada correctamente', 'success');
+        
+        return true;
         
     } catch (error) {
-        console.error('Error al crear configuración inicial:', error);
+        console.error('❌ Error al crear configuración inicial:', error);
+        showNotification(`Error: ${error.message}`, 'danger');
+        throw error;
     }
 }
 
@@ -593,63 +606,64 @@ async function handleMaintenanceToggle(event) {
  */
 async function updateAppConfig(key, value) {
     try {
+        const currentUser = getCurrentUser();
+        if (!currentUser || !ADMIN_EMAILS.includes(currentUser.email)) {
+            throw new Error('Solo administradores pueden actualizar la configuración');
+        }
+
+        console.log(`🔄 Actualizando ${key} = ${value}`);
+        
         const updates = {
             [key]: value,
             lastUpdated: new Date(),
-            updatedBy: getCurrentUser()?.email || 'system'
+            updatedBy: currentUser.email
         };
         
-        // Actualizar en ambas ubicaciones para compatibilidad
-        const promises = [];
+        // Intentar actualizar config/app primero
+        try {
+            await updateDoc(doc(db, 'config', 'app'), updates);
+            console.log('✅ Configuración actualizada en config/app');
+        } catch (error) {
+            if (error.code === 'not-found') {
+                console.log('📝 Documento no existe, creando configuración completa...');
+                await initializeDefaultConfig();
+                // Intentar actualizar de nuevo
+                await updateDoc(doc(db, 'config', 'app'), updates);
+                console.log('✅ Configuración actualizada después de crear documento');
+            } else {
+                throw error;
+            }
+        }
         
-        // Intentar actualizar config/app
-        promises.push(
-            updateDoc(doc(db, 'config', 'app'), updates).catch(async (error) => {
-                if (error.code === 'not-found') {
-                    // Si el documento no existe, crearlo con configuración completa
-                    await setDoc(doc(db, 'config', 'app'), {
-                        freePromotionsEnabled: key === 'freePromotionsEnabled' ? value : true,
-                        premiumPromotionsEnabled: key === 'premiumPromotionsEnabled' ? value : true,
-                        maintenanceMode: key === 'maintenanceMode' ? value : false,
-                        ...updates
-                    });
-                } else {
-                    throw error;
-                }
-            })
-        );
+        // También actualizar en appConfig/config para compatibilidad
+        try {
+            await updateDoc(doc(db, 'appConfig', 'config'), updates);
+            console.log('✅ Configuración también actualizada en appConfig/config');
+        } catch (error) {
+            console.log('⚠️ No se pudo actualizar appConfig/config:', error.message);
+        }
         
-        // Intentar actualizar appConfig/config también para compatibilidad
-        promises.push(
-            updateDoc(doc(db, 'appConfig', 'config'), updates).catch(async (error) => {
-                if (error.code === 'not-found') {
-                    await setDoc(doc(db, 'appConfig', 'config'), {
-                        freePromotionsEnabled: key === 'freePromotionsEnabled' ? value : true,
-                        premiumPromotionsEnabled: key === 'premiumPromotionsEnabled' ? value : true,
-                        maintenanceMode: key === 'maintenanceMode' ? value : false,
-                        ...updates
-                    });
-                } else {
-                    throw error;
-                }
-            })
-        );
-        
-        await Promise.all(promises);
-        
-        showNotification(`Configuración actualizada: ${key}`, 'success', 2000);
+        showNotification(`✅ ${key} actualizado correctamente`, 'success', 3000);
         
     } catch (error) {
-        console.error('Error al actualizar configuración:', error);
-        handleError(error, 'al actualizar configuración');
+        console.error(`❌ Error al actualizar ${key}:`, error);
+        showNotification(`❌ Error: ${error.message}`, 'danger', 5000);
         
         // Revertir el toggle si falló la actualización
-        const toggle = document.getElementById(key === 'freePromotionsEnabled' ? 'freePromotionsToggle' : 
-                                           key === 'premiumPromotionsEnabled' ? 'premiumPromotionsToggle' : 
-                                           'maintenanceToggle');
+        const toggleMap = {
+            'freePromotionsEnabled': 'freePromotionsToggle',
+            'premiumPromotionsEnabled': 'premiumPromotionsToggle',
+            'maintenanceMode': 'maintenanceToggle'
+        };
+        
+        const toggleId = toggleMap[key];
+        const toggle = document.getElementById(toggleId);
         if (toggle) {
             toggle.checked = !value;
+            console.log(`🔄 Toggle ${toggleId} revertido`);
         }
+        
+        throw error;
     }
 }
 
@@ -730,5 +744,52 @@ window.initializeAppConfig = async function() {
     } catch (error) {
         console.error('Error al inicializar configuración:', error);
         showNotification('Error al inicializar configuración', 'danger');
+    }
+};
+
+/**
+ * Test de configuración premium - verifica que todo funcione
+ */
+window.testPremiumConfig = async function() {
+    try {
+        showNotification('🧪 Iniciando test de configuración premium...', 'info', 3000);
+        
+        const currentUser = getCurrentUser();
+        console.log('=== TEST PREMIUM INICIADO ===');
+        console.log('Usuario:', currentUser?.email);
+        console.log('Es admin:', ADMIN_EMAILS.includes(currentUser?.email));
+        
+        // 1. Verificar que el documento existe
+        console.log('1️⃣ Verificando documento de configuración...');
+        const configDoc = await getDoc(doc(db, 'config', 'app'));
+        
+        if (!configDoc.exists()) {
+            console.log('❌ Documento no existe, creando...');
+            await initializeDefaultConfig();
+            showNotification('✅ Configuración creada', 'success', 2000);
+        } else {
+            console.log('✅ Documento existe:', configDoc.data());
+        }
+        
+        // 2. Test de actualización
+        console.log('2️⃣ Probando actualización de configuración...');
+        await updateAppConfig('isPremiumGlobalActive', true);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Esperar 1 segundo
+        await updateAppConfig('isPremiumGlobalActive', false);
+        
+        console.log('3️⃣ Probando promociones premium...');
+        await updateAppConfig('premiumPromotionsEnabled', false);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await updateAppConfig('premiumPromotionsEnabled', true);
+        
+        console.log('✅ Test completado exitosamente');
+        showNotification('🎉 Test premium completado exitosamente!', 'success', 5000);
+        
+        // Recargar configuración
+        await loadAppConfig();
+        
+    } catch (error) {
+        console.error('❌ Error en test premium:', error);
+        showNotification(`❌ Error en test: ${error.message}`, 'danger', 5000);
     }
 };

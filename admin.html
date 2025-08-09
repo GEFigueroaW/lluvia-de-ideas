@@ -186,7 +186,19 @@
                             </span>
                             <span>Inicializar Configuración</span>
                         </button>
-                        <a href="index.html" class="button is-primary">
+                        <button class="button is-primary" onclick="testPremiumConfig()">
+                            <span class="icon">
+                                <i class="fas fa-vial"></i>
+                            </span>
+                            <span>Test Premium</span>
+                        </button>
+                        <button class="button is-danger" onclick="activatePremiumFeatures()">
+                            <span class="icon">
+                                <i class="fas fa-crown"></i>
+                            </span>
+                            <span>🚀 ACTIVAR PREMIUM</span>
+                        </button>
+                        <a href="index.html" class="button is-link">
                             <span class="icon">
                                 <i class="fas fa-home"></i>
                             </span>
@@ -247,6 +259,7 @@
 
     <!-- Scripts -->
     <script type="module" src="js/admin.js"></script>
+    <script type="module" src="premium-activator.js"></script>
     
     <!-- Funciones adicionales -->
     <script>
