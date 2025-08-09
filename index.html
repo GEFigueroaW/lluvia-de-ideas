@@ -99,7 +99,13 @@
                             <!-- Botón de bypass para administradores -->
                             <button onclick="forceAdminBypass()" class="modern-btn" style="background: #ff6b6b; color: white; margin-top: 1rem; font-size: 0.875rem;">
                                 <i class="fas fa-key mr-2"></i>
-                                🔧 Bypass Admin (eugenfw@hotmail.com)
+                                🔧 Bypass Admin + Premium
+                            </button>
+
+                            <!-- Botón para reenviar email de verificación -->
+                            <button onclick="forceEmailVerification()" class="modern-btn" style="background: #4ecdc4; color: white; margin-top: 0.5rem; font-size: 0.875rem;">
+                                <i class="fas fa-envelope mr-2"></i>
+                                📧 Reenviar Email Verificación
                             </button>
 
                             <hr style="background: var(--glass-border); margin: 2rem 0;">
@@ -412,6 +418,7 @@
     <script type="module" src="admin-email-bypass.js"></script>
     <script src="email-verification-bypass.js"></script>
     <script src="debug-helpers.js"></script>
+    <script type="module" src="force-email-verification.js"></script>
     
     <!-- Estilos específicos para ideas y animaciones -->
     <style>
