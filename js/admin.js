@@ -23,7 +23,8 @@ import {
     getDocs, 
     doc, 
     updateDoc,
-    getDoc 
+    getDoc,
+    setDoc 
 } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js';
 
@@ -148,9 +149,29 @@ async function handleAuthStateChange(user) {
     hideElement(elements.loadingSection);
     
     if (user && user.emailVerified) {
+        console.log('=== DEBUG DOM ELEMENTS ===');
+        console.log('adminInfo:', elements.adminInfo);
+        console.log('loginSection:', elements.loginSection);
+        console.log('appSection:', elements.appSection);
+        console.log('isAdmin?:', true);
+        console.log('--- FIN DEBUG DOM ELEMENTS ---');
+        
         const adminCheck = await checkAdminStatus(user);
         if (adminCheck) {
             isAdmin = true;
+            console.log('=== VERIFICACIÓN ADMIN INICIADA ===');
+            console.log('Email del usuario:', user.email);
+            console.log('ADMIN_EMAILS:', ADMIN_EMAILS);
+            console.log('✅ Usuario admin detectado por email:', user.email);
+            console.log('¿Es admin?:', true);
+            console.log('Mostrando botón de admin...');
+            console.log('--- checkAdminStatus iniciado ---');
+            console.log('Email del usuario:', user.email);
+            console.log('Lista de admins: ', ADMIN_EMAILS);
+            console.log('✅ Usuario admin detectado por email:', user.email);
+            console.log('Botón de admin mostrado para:', user.email);
+            console.log('=== VERIFICACIÓN ADMIN FINALIZADA ===');
+            
             showAdminSection();
             updateAdminInfo(user);
             await loadAdminData();
@@ -388,9 +409,48 @@ async function loadUsers() {
  */
 async function loadAppConfig() {
     try {
-        const configDoc = await getDoc(doc(db, 'config', 'app'));
+        // Intentar cargar desde config/app primero
+        let configDoc = await getDoc(doc(db, 'config', 'app'));
+        
+        // Si no existe, intentar desde appConfig/config
+        if (!configDoc.exists()) {
+            configDoc = await getDoc(doc(db, 'appConfig', 'config'));
+        }
+        
+        // Si tampoco existe, crear configuración inicial
+        if (!configDoc.exists()) {
+            console.log('--- VERIFICACIÓN ADMIN INICIADA ---');
+            console.log('Usuario logeado:', getCurrentUser()?.email);
+            console.log('ADMIN_EMAILS:', ADMIN_EMAILS);
+            
+            const currentUserEmail = getCurrentUser()?.email;
+            console.log('Lista de admins:', ADMIN_EMAILS);
+            console.log('✅ Usuario admin detectado por email:', currentUserEmail);
+            
+            if (ADMIN_EMAILS.includes(currentUserEmail)) {
+                console.log('¿Es admin?:', true);
+                console.log('Botón admin encontrado para:', currentUserEmail);
+                console.log('--- VERIFICACIÓN ADMIN FINALIZADA ---');
+                await initializeDefaultConfig();
+                // Intentar cargar de nuevo después de inicializar
+                configDoc = await getDoc(doc(db, 'config', 'app'));
+            }
+        }
+        
         if (configDoc.exists()) {
             const config = configDoc.data();
+            console.log('=== VERIFICACIÓN ADMIN INICIADA ===');
+            console.log('Email del usuario:', getCurrentUser()?.email);
+            console.log('Lista de admins:', ADMIN_EMAILS);
+            console.log('✅ Usuario admin detectado por email:', getCurrentUser()?.email);
+            console.log('¿Es admin?:', true);
+            console.log('Mostrando botón de admin...');
+            console.log('--- checkAdminStatus iniciado ---');
+            console.log('Email del usuario:', getCurrentUser()?.email);
+            console.log('Lista de admins: ', ADMIN_EMAILS);
+            console.log('✅ Usuario admin detectado por email:', getCurrentUser()?.email);
+            console.log('Botón de admin mostrado para:', getCurrentUser()?.email);
+            console.log('=== VERIFICACIÓN ADMIN FINALIZADA ===');
             
             // Actualizar toggles
             if (elements.freePromotionsToggle) {
@@ -405,6 +465,39 @@ async function loadAppConfig() {
         }
     } catch (error) {
         console.error('Error loading app config:', error);
+        handleError(error, 'al cargar configuración');
+    }
+}
+
+/**
+ * Inicializa la configuración por defecto
+ */
+async function initializeDefaultConfig() {
+    try {
+        const defaultConfig = {
+            freePromotionsEnabled: true,
+            premiumPromotionsEnabled: true,
+            maintenanceMode: false,
+            createdAt: new Date(),
+            createdBy: getCurrentUser()?.email || 'system'
+        };
+        
+        // Crear en ambas ubicaciones para compatibilidad
+        await Promise.all([
+            updateDoc(doc(db, 'config', 'app'), defaultConfig).catch(async () => {
+                // Si el documento no existe, crearlo
+                await setDoc(doc(db, 'config', 'app'), defaultConfig);
+            }),
+            updateDoc(doc(db, 'appConfig', 'config'), defaultConfig).catch(async () => {
+                // Si el documento no existe, crearlo
+                await setDoc(doc(db, 'appConfig', 'config'), defaultConfig);
+            })
+        ]);
+        
+        console.log('Configuración inicial creada');
+        
+    } catch (error) {
+        console.error('Error al crear configuración inicial:', error);
     }
 }
 
@@ -500,16 +593,63 @@ async function handleMaintenanceToggle(event) {
  */
 async function updateAppConfig(key, value) {
     try {
-        const configRef = doc(db, 'config', 'app');
-        await updateDoc(configRef, {
+        const updates = {
             [key]: value,
-            lastUpdated: new Date()
-        });
+            lastUpdated: new Date(),
+            updatedBy: getCurrentUser()?.email || 'system'
+        };
+        
+        // Actualizar en ambas ubicaciones para compatibilidad
+        const promises = [];
+        
+        // Intentar actualizar config/app
+        promises.push(
+            updateDoc(doc(db, 'config', 'app'), updates).catch(async (error) => {
+                if (error.code === 'not-found') {
+                    // Si el documento no existe, crearlo con configuración completa
+                    await setDoc(doc(db, 'config', 'app'), {
+                        freePromotionsEnabled: key === 'freePromotionsEnabled' ? value : true,
+                        premiumPromotionsEnabled: key === 'premiumPromotionsEnabled' ? value : true,
+                        maintenanceMode: key === 'maintenanceMode' ? value : false,
+                        ...updates
+                    });
+                } else {
+                    throw error;
+                }
+            })
+        );
+        
+        // Intentar actualizar appConfig/config también para compatibilidad
+        promises.push(
+            updateDoc(doc(db, 'appConfig', 'config'), updates).catch(async (error) => {
+                if (error.code === 'not-found') {
+                    await setDoc(doc(db, 'appConfig', 'config'), {
+                        freePromotionsEnabled: key === 'freePromotionsEnabled' ? value : true,
+                        premiumPromotionsEnabled: key === 'premiumPromotionsEnabled' ? value : true,
+                        maintenanceMode: key === 'maintenanceMode' ? value : false,
+                        ...updates
+                    });
+                } else {
+                    throw error;
+                }
+            })
+        );
+        
+        await Promise.all(promises);
         
         showNotification(`Configuración actualizada: ${key}`, 'success', 2000);
         
     } catch (error) {
+        console.error('Error al actualizar configuración:', error);
         handleError(error, 'al actualizar configuración');
+        
+        // Revertir el toggle si falló la actualización
+        const toggle = document.getElementById(key === 'freePromotionsEnabled' ? 'freePromotionsToggle' : 
+                                           key === 'premiumPromotionsEnabled' ? 'premiumPromotionsToggle' : 
+                                           'maintenanceToggle');
+        if (toggle) {
+            toggle.checked = !value;
+        }
     }
 }
 
@@ -576,4 +716,19 @@ window.exportUsersToCSV = function() {
     document.body.removeChild(link);
     
     showNotification('Datos exportados correctamente', 'success');
+};
+
+/**
+ * Inicializa la configuración de la aplicación manualmente
+ */
+window.initializeAppConfig = async function() {
+    try {
+        showNotification('Inicializando configuración...', 'info');
+        await initializeDefaultConfig();
+        await loadAppConfig();
+        showNotification('Configuración inicializada correctamente', 'success');
+    } catch (error) {
+        console.error('Error al inicializar configuración:', error);
+        showNotification('Error al inicializar configuración', 'danger');
+    }
 };
