@@ -805,6 +805,17 @@ window.testPremiumConfig = async function() {
 
 // Permite al admin establecer la vigencia premium individual
 window.setUserPremiumUntil = async function(userId) {
+    // Si existe activatePremiumServices (del premium-manager.js), usarlo en su lugar
+    if (window.activatePremiumServices) {
+        // Abrimos el gestor de premium preconfigurado para este usuario
+        document.getElementById('premiumActivationType').value = 'individual';
+        await toggleUserSelector();
+        document.getElementById('userSelector').value = userId;
+        document.getElementById('premiumActivationModal').classList.add('is-active');
+        return;
+    }
+    
+    // Fallback al método antiguo si no existe el nuevo gestor
     const until = prompt('Ingrese la fecha de vigencia premium (YYYY-MM-DD) o deje vacío para eliminar vigencia:');
     if (until === null) return;
     let premiumUntil = null;
@@ -819,9 +830,11 @@ window.setUserPremiumUntil = async function(userId) {
     try {
         const userRef = doc(db, 'users', userId);
         await updateDoc(userRef, {
+            isPremium: premiumUntil !== null,
             premiumUntil: premiumUntil || null,
             premiumUpdatedAt: new Date(),
-            premiumUpdatedBy: getCurrentUser()?.uid
+            premiumUpdatedBy: getCurrentUser()?.uid,
+            premiumSource: 'admin'
         });
         showNotification('Vigencia premium actualizada', 'success');
         await loadAdminData();
