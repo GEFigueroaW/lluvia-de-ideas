@@ -427,11 +427,24 @@ function updateUserInfo(user) {
     if (elements.userInfo && user) {
         elements.userInfo.textContent = `¡Hola, ${user.displayName || user.email}!`;
     }
-    
     if (elements.premiumStatus && userProfile) {
         const isPremium = userProfile.isPremium || false;
-        elements.premiumStatus.textContent = isPremium ? 'Premium' : 'Gratuito';
-        elements.premiumStatus.className = `badge ${isPremium ? 'is-premium' : 'is-regular'}`;
+        let label = 'Gratuito';
+        let badgeClass = 'is-regular';
+        if (isPremium) {
+            if (userProfile.premiumSource === 'user') {
+                label = 'Premium (Usuario)';
+                badgeClass = 'is-premium';
+            } else if (userProfile.premiumSource === 'global') {
+                label = 'Premium (Global)';
+                badgeClass = 'is-premium-global';
+            } else {
+                label = 'Premium';
+                badgeClass = 'is-premium';
+            }
+        }
+        elements.premiumStatus.textContent = label;
+        elements.premiumStatus.className = `badge ${badgeClass}`;
     }
 }
 
@@ -586,18 +599,69 @@ function clearIdeasContainer() {
 async function loadUserProfile(user) {
     try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
+        let userData = null;
         if (userDoc.exists()) {
-            userProfile = userDoc.data();
+            userData = userDoc.data();
         } else {
-            userProfile = {
+            userData = {
                 isPremium: false,
                 ideasGenerated: 0,
                 createdAt: new Date()
             };
         }
+
+        // Obtener configuración global
+        let appConfig = null;
+        try {
+            const configDoc = await getDoc(doc(db, 'appConfig', 'config'));
+            if (configDoc.exists()) {
+                appConfig = configDoc.data();
+            }
+        } catch (e) {
+            appConfig = null;
+        }
+
+        // Lógica de premium
+        let now = new Date();
+        let isPremium = false;
+        let premiumSource = 'none';
+
+        // 1. Premium individual con vigencia
+        if (userData.premiumUntil) {
+            let premiumUntil = userData.premiumUntil instanceof Date ? userData.premiumUntil : (userData.premiumUntil.toDate ? userData.premiumUntil.toDate() : new Date(userData.premiumUntil));
+            if (premiumUntil > now) {
+                isPremium = true;
+                premiumSource = 'user';
+            }
+        } else if (userData.isPremium) {
+            isPremium = true;
+            premiumSource = 'user';
+        }
+
+        // 2. Premium global con vigencia
+        if (!isPremium && appConfig) {
+            if (appConfig.isPremiumGlobalActive) {
+                if (appConfig.promoEndDate) {
+                    let promoEndDate = appConfig.promoEndDate instanceof Date ? appConfig.promoEndDate : (appConfig.promoEndDate.toDate ? appConfig.promoEndDate.toDate() : new Date(appConfig.promoEndDate));
+                    if (promoEndDate > now) {
+                        isPremium = true;
+                        premiumSource = 'global';
+                    }
+                } else {
+                    isPremium = true;
+                    premiumSource = 'global';
+                }
+            }
+        }
+
+        userProfile = {
+            ...userData,
+            isPremium: isPremium,
+            premiumSource: premiumSource
+        };
     } catch (error) {
         console.error('Error loading user profile:', error);
-        userProfile = { isPremium: false, ideasGenerated: 0 };
+        userProfile = { isPremium: false, ideasGenerated: 0, premiumSource: 'none' };
     }
 }
 
