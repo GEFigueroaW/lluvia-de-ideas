@@ -466,14 +466,27 @@ async function generateCopywriting(params) {
         
         // Mapear los parámetros al formato que espera la Cloud Function
         const cloudFunctionParams = {
-            generationMode: params.generationMode, // 'single' o 'multi'
-            socialMedia: params.socialNetworks.map(net => SOCIAL_NETWORKS[net].name), // Nombres de las redes
-            keyword: params.keyword,
-            copyType: COPY_TYPES[params.copyType].name, // Nombre del tipo de copy
+            generationMode: params.generationMode || 'single', // 'single' o 'multi'
+            socialMedia: params.socialNetworks.map(net => SOCIAL_NETWORKS[net] ? SOCIAL_NETWORKS[net].name : net), // Nombres de las redes
+            keyword: params.keyword.trim(),
+            copyType: COPY_TYPES[params.copyType] ? COPY_TYPES[params.copyType].name : params.copyType, // Nombre del tipo de copy
             language: 'es' // Español por defecto
         };
         
-        console.log('[COPYWRITING] Parámetros enviados a Cloud Function:', cloudFunctionParams);
+        // Validar parámetros antes de enviar
+        if (!cloudFunctionParams.socialMedia || cloudFunctionParams.socialMedia.length === 0) {
+            throw new Error('No se seleccionó ninguna red social');
+        }
+        
+        if (!cloudFunctionParams.keyword || cloudFunctionParams.keyword.length === 0) {
+            throw new Error('La palabra clave es requerida');
+        }
+        
+        if (!cloudFunctionParams.copyType) {
+            throw new Error('El tipo de copy es requerido');
+        }
+        
+        console.log('[COPYWRITING] Parámetros validados y enviados a Cloud Function:', cloudFunctionParams);
         
         const result = await generateFunction(cloudFunctionParams);
         
@@ -493,7 +506,31 @@ async function generateCopywriting(params) {
         
     } catch (error) {
         console.error('[COPYWRITING] Error completo:', error);
-        showNotification(`Error al generar copywriting: ${error.message}`, 'error');
+        
+        // Manejo específico de errores
+        let errorMessage = 'Error al generar el copywriting';
+        
+        if (error.code === 'unauthenticated') {
+            errorMessage = 'Debes iniciar sesión para generar copywriting';
+        } else if (error.code === 'failed-precondition') {
+            errorMessage = 'Has agotado tus créditos semanales. Actualiza a Premium para continuar.';
+        } else if (error.code === 'permission-denied') {
+            errorMessage = 'Esta función requiere una cuenta Premium';
+        } else if (error.code === 'invalid-argument') {
+            errorMessage = 'Los parámetros enviados no son válidos. Verifica tu selección.';
+        } else if (error.message) {
+            errorMessage = `Error: ${error.message}`;
+        }
+        
+        showNotification(errorMessage, 'error');
+        
+        // Log detallado para debugging
+        console.error('[COPYWRITING] Detalles del error:', {
+            code: error.code,
+            message: error.message,
+            details: error.details,
+            stack: error.stack
+        });
     } finally {
         generateBtn.disabled = false;
         generateBtn.innerHTML = originalText;
