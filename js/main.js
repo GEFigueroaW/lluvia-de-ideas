@@ -18,7 +18,15 @@ import {
     validateEmail, 
     validatePassword,
     handleError,
-    toggleButtonLoading,
+    toggleButton        
+        // Actualizar el estado del usuario con la respuesta
+        if (result.data.remainingUses !== undefined) {
+            updateUserStatus({
+                remainingUses: result.data.remainingUses,
+                isPremium: result.data.isPremium || false,
+                isAdmin: result.data.isAdmin || false
+            });
+        }ding,
     debounce
 } from './utils.js';
 import { 
@@ -479,21 +487,33 @@ async function generateIdeas(topic, context) {
         isGenerating = true;
         toggleButtonLoading(elements.generateBtn, true);
         
-        // Llamar a la función de Cloud Functions
-        const generateIdeasFunction = httpsCallable(functions, 'api');
+        // Llamar a la función de Cloud Functions - CORREGIDO
+        const generateIdeasFunction = httpsCallable(functions, 'generateIdeas');
         const result = await generateIdeasFunction({
-            topic,
-            context,
-            userId: getCurrentUser()?.uid
+            keyword: topic,
+            platforms: ['Facebook', 'LinkedIn', 'X / Twitter'], // Plataformas por defecto
+            userContext: context
         });
         
+        // La función generateIdeas devuelve { ideas: {}, remainingUses: ..., isPremium: ..., isAdmin: ... }
         const ideas = result.data.ideas;
         
+        // Convertir objeto de ideas a array para compatibilidad
+        const ideasArray = Object.entries(ideas).map(([platform, content], index) => ({
+            id: index + 1,
+            title: `Idea para ${platform}`,
+            description: content,
+            platform: platform
+        }));
+        
         // Guardar la sesión de ideas en Firestore
-        const sessionId = await saveIdeasSession(ideas, topic, context);
-        const session = { ideas, topic, context, sessionId, id: sessionId };
+        const sessionId = await saveIdeasSession(ideasArray, topic, context);
+        const session = { ideas: ideasArray, topic, context, sessionId, id: sessionId };
         
         currentIdeasSession = session;
+        
+        // Mostrar las ideas generadas
+        showGeneratedIdeas(ideasArray);
         window.currentSession = session; // Para las funciones de UI modernas
         
         displayIdeas(ideas, topic);

@@ -466,22 +466,19 @@ async function generateCopywriting(params) {
         const prompt = buildCopywritingPrompt(params);
         console.log('[COPYWRITING] Prompt generado:', prompt);
         
-        // Llamar a la función de Cloud Functions (usando la existente)
-        const generateFunction = httpsCallable(functions, 'api');
-        console.log('[COPYWRITING] Llamando a Cloud Function...');
+        // Llamar a la función de Cloud Functions (CORREGIDO: generateIdeas)
+        const generateFunction = httpsCallable(functions, 'generateIdeas');
+        console.log('[COPYWRITING] Llamando a Cloud Function generateIdeas...');
         
-        // Mapear los parámetros al formato que espera la Cloud Function
+        // Mapear los parámetros al formato correcto que espera generateIdeas
         const cloudFunctionParams = {
-            generationMode: params.generationMode || 'single', // 'single' o 'multi'
-            socialMedia: params.socialNetworks.map(net => SOCIAL_NETWORKS[net] ? SOCIAL_NETWORKS[net].name : net), // Nombres de las redes
             keyword: params.keyword.trim(),
-            copyType: COPY_TYPES[params.copyType] ? COPY_TYPES[params.copyType].name : params.copyType, // Nombre del tipo de copy
-            context: params.context || '', // CONTEXTO ADICIONAL DEL USUARIO
-            language: 'es' // Español por defecto
+            platforms: params.socialNetworks.map(net => SOCIAL_NETWORKS[net] ? SOCIAL_NETWORKS[net].name : net), // Nombres de las redes
+            userContext: `Tipo de copy: ${COPY_TYPES[params.copyType] ? COPY_TYPES[params.copyType].name : params.copyType}. ${params.context || ''}`.trim()
         };
         
         // Validar parámetros antes de enviar
-        if (!cloudFunctionParams.socialMedia || cloudFunctionParams.socialMedia.length === 0) {
+        if (!cloudFunctionParams.platforms || cloudFunctionParams.platforms.length === 0) {
             throw new Error('No se seleccionó ninguna red social');
         }
         
@@ -489,19 +486,24 @@ async function generateCopywriting(params) {
             throw new Error('La palabra clave es requerida');
         }
         
-        if (!cloudFunctionParams.copyType) {
-            throw new Error('El tipo de copy es requerido');
-        }
-        
-        console.log('[COPYWRITING] Parámetros validados y enviados a Cloud Function:', cloudFunctionParams);
+        console.log('[COPYWRITING] Parámetros validados y enviados a generateIdeas:', cloudFunctionParams);
         
         const result = await generateFunction(cloudFunctionParams);
         
-        console.log('[COPYWRITING] Resultado de Cloud Function:', result);
+        console.log('[COPYWRITING] Resultado de generateIdeas:', result);
         
-        // La Cloud Function devuelve { success: true, ideas: [...] }
-        const copies = result.data.ideas;
-        console.log('[COPYWRITING] Ideas generadas:', copies);
+        // La función generateIdeas devuelve { ideas: {}, remainingUses: ..., isPremium: ..., isAdmin: ... }
+        const ideas = result.data.ideas;
+        console.log('[COPYWRITING] Ideas generadas:', ideas);
+        
+        // Convertir el objeto de ideas a array para compatibilidad
+        const copies = Object.entries(ideas).map(([platform, content]) => ({
+            platform,
+            content,
+            description: content
+        }));
+        
+        console.log('[COPYWRITING] Copies formateados:', copies);
         
         // Mostrar los resultados
         displayCopywritingResults(copies, params);
