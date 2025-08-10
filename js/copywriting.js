@@ -447,11 +447,23 @@ async function generateCopywriting(params) {
         generateBtn.disabled = true;
         generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Generando...';
         
+        // Verificar que las dependencias estén disponibles
+        if (!functions) {
+            throw new Error('Firebase Functions no está disponible');
+        }
+        
+        if (!getCurrentUser()) {
+            throw new Error('Usuario no autenticado');
+        }
+        
         // Construir el prompt para la IA
         const prompt = buildCopywritingPrompt(params);
+        console.log('[COPYWRITING] Prompt generado:', prompt);
         
         // Llamar a la función de Cloud Functions (usando la existente)
         const generateFunction = httpsCallable(functions, 'api');
+        console.log('[COPYWRITING] Llamando a Cloud Function...');
+        
         const result = await generateFunction({
             topic: prompt,
             context: `Generar copywriting para redes sociales`,
@@ -459,7 +471,10 @@ async function generateCopywriting(params) {
             type: 'copywriting'
         });
         
+        console.log('[COPYWRITING] Resultado de Cloud Function:', result);
+        
         const copies = result.data.ideas;
+        console.log('[COPYWRITING] Ideas generadas:', copies);
         
         // Mostrar los resultados
         displayCopywritingResults(copies, params);
@@ -469,6 +484,9 @@ async function generateCopywriting(params) {
         
         showNotification('¡Copywriting generado exitosamente!', 'success');
         
+    } catch (error) {
+        console.error('[COPYWRITING] Error completo:', error);
+        showNotification(`Error al generar copywriting: ${error.message}`, 'error');
     } finally {
         generateBtn.disabled = false;
         generateBtn.innerHTML = originalText;
