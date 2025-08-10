@@ -97,8 +97,29 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeElements();
     initializeEventListeners();
     initAuthStateListener(handleAuthStateChange);
+});
 
 /**
+ * Depura elementos del DOM para verificar que existen
+ */
+function debugDOMElements() {
+    console.log('=== DEBUG DOM ELEMENTS ===');
+    console.log('loginSection:', document.getElementById('loginSection'));
+    console.log('appSection:', document.getElementById('appSection'));
+    console.log('loadingSection:', document.getElementById('loadingSection'));
+    console.log('--- FIN DEBUG DOM ELEMENTS ---');
+}
+
+/**
+ * Inicializa las referencias a elementos del DOM
+ */
+function initializeElements() {
+    // Secciones principales
+    elements.loginSection = document.getElementById('loginSection');
+    elements.appSection = document.getElementById('appSection');
+    elements.loadingSection = document.getElementById('loadingSection');
+    
+    // Formularios
     elements.loginForm = document.getElementById('loginForm');
     elements.registerForm = document.getElementById('registerForm');
     elements.ideaForm = document.getElementById('ideaForm');
@@ -174,7 +195,7 @@ function initializeEventListeners() {
     
     if (elements.registerEmail) {
         elements.registerEmail.addEventListener('blur', validateEmailField);
-
+    }
 }
 
 // =========================================
