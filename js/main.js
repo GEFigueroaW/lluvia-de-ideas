@@ -613,11 +613,21 @@ async function loadUserProfile(user) {
         // Obtener configuración global
         let appConfig = null;
         try {
-            const configDoc = await getDoc(doc(db, 'appConfig', 'config'));
+            // Intentar cargar desde config/app primero (nueva ubicación)
+            let configDoc = await getDoc(doc(db, 'config', 'app'));
+            
+            // Si no existe, intentar desde appConfig/config (ubicación anterior)
+            if (!configDoc.exists()) {
+                configDoc = await getDoc(doc(db, 'appConfig', 'config'));
+            }
+            
             if (configDoc.exists()) {
                 appConfig = configDoc.data();
+                console.log('[PREMIUM] Configuración cargada desde:', configDoc.exists() ? 'config/app o appConfig/config' : 'ninguna');
+                console.log('[PREMIUM] appConfig:', appConfig);
             }
         } catch (e) {
+            console.error('[PREMIUM] Error cargando configuración:', e);
             appConfig = null;
         }
 
@@ -640,18 +650,36 @@ async function loadUserProfile(user) {
 
         // 2. Premium global con vigencia
         if (!isPremium && appConfig) {
+            console.log('[PREMIUM] Verificando premium global...');
+            console.log('[PREMIUM] isPremiumGlobalActive:', appConfig.isPremiumGlobalActive);
+            console.log('[PREMIUM] promoEndDate:', appConfig.promoEndDate);
+            
             if (appConfig.isPremiumGlobalActive) {
                 if (appConfig.promoEndDate) {
                     let promoEndDate = appConfig.promoEndDate instanceof Date ? appConfig.promoEndDate : (appConfig.promoEndDate.toDate ? appConfig.promoEndDate.toDate() : new Date(appConfig.promoEndDate));
+                    console.log('[PREMIUM] Fecha promoción:', promoEndDate);
+                    console.log('[PREMIUM] Fecha actual:', now);
+                    console.log('[PREMIUM] ¿Promoción vigente?:', promoEndDate > now);
+                    
                     if (promoEndDate > now) {
                         isPremium = true;
                         premiumSource = 'global';
+                        console.log('[PREMIUM] ✅ Premium global activado por fecha vigente');
+                    } else {
+                        console.log('[PREMIUM] ❌ Premium global expirado');
                     }
                 } else {
                     isPremium = true;
                     premiumSource = 'global';
+                    console.log('[PREMIUM] ✅ Premium global activado sin fecha límite');
                 }
+            } else {
+                console.log('[PREMIUM] ❌ Premium global no está activo');
             }
+        } else if (isPremium) {
+            console.log('[PREMIUM] Ya es premium por configuración individual');
+        } else {
+            console.log('[PREMIUM] No hay configuración de app disponible');
         }
 
         userProfile = {
