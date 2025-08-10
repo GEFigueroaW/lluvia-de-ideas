@@ -14,6 +14,100 @@ const DEEPSEEK_ENDPOINTS = [
 
 console.log('[INIT] Deepseek API configurado con múltiples endpoints');
 
+// Configuraciones específicas para cada red social
+const SOCIAL_NETWORK_SPECS = {
+    'Facebook': {
+        name: 'Facebook',
+        maxLength: 2200,
+        optimalLength: '50-80 palabras',
+        tone: 'conversacional y personal',
+        features: 'storytelling, emociones, comunidad',
+        hashtags: 'máximo 2-3 hashtags',
+        engagement: 'preguntas, polls, contenido que genere conversación',
+        cta: 'botones de acción, enlaces externos'
+    },
+    'LinkedIn': {
+        name: 'LinkedIn',
+        maxLength: 3000,
+        optimalLength: '100-150 palabras',
+        tone: 'profesional pero humano',
+        features: 'insights profesionales, networking, valor educativo',
+        hashtags: '3-5 hashtags profesionales',
+        engagement: 'comentarios reflexivos, conexiones profesionales',
+        cta: 'invitaciones a conectar, compartir experiencias'
+    },
+    'X / Twitter': {
+        name: 'X / Twitter',
+        maxLength: 280,
+        optimalLength: '120-180 caracteres',
+        tone: 'directo y conciso',
+        features: 'trending topics, tiempo real, viralidad',
+        hashtags: '2-3 hashtags estratégicos',
+        engagement: 'retweets, menciones, hilos',
+        cta: 'enlaces cortos, menciones a usuarios'
+    },
+    'WhatsApp': {
+        name: 'WhatsApp',
+        maxLength: 4096,
+        optimalLength: '30-60 palabras',
+        tone: 'personal e íntimo',
+        features: 'mensajería directa, urgencia, exclusividad',
+        hashtags: 'no son efectivos',
+        engagement: 'respuestas directas, llamadas a la acción',
+        cta: 'números de teléfono, enlaces directos'
+    },
+    'Telegram': {
+        name: 'Telegram',
+        maxLength: 4096,
+        optimalLength: '80-120 palabras',
+        tone: 'informativo y técnico',
+        features: 'canales, bots, comunidades especializadas',
+        hashtags: 'uso moderado',
+        engagement: 'forwards, reacciones, polls',
+        cta: 'enlaces a canales, bots interactivos'
+    },
+    'Reddit': {
+        name: 'Reddit',
+        maxLength: 40000,
+        optimalLength: '150-300 palabras',
+        tone: 'auténtico y comunitario',
+        features: 'subreddits especializados, discusiones profundas',
+        hashtags: 'no se usan',
+        engagement: 'upvotes, comentarios detallados',
+        cta: 'discusión, AMA, recursos útiles'
+    },
+    'Instagram': {
+        name: 'Instagram',
+        maxLength: 2200,
+        optimalLength: '100-150 palabras',
+        tone: 'visual y aspiracional',
+        features: 'contenido visual, stories, reels',
+        hashtags: '5-10 hashtags relevantes',
+        engagement: 'likes, shares, saves',
+        cta: 'enlaces en bio, stories interactivas'
+    },
+    'TikTok': {
+        name: 'TikTok',
+        maxLength: 2200,
+        optimalLength: '50-100 palabras',
+        tone: 'joven y trendy',
+        features: 'videos cortos, trends, música',
+        hashtags: '3-5 hashtags trending',
+        engagement: 'duetos, challenges, comentarios',
+        cta: 'follow, like, share'
+    },
+    'YouTube': {
+        name: 'YouTube',
+        maxLength: 5000,
+        optimalLength: '200-400 palabras',
+        tone: 'educativo y entretenido',
+        features: 'videos largos, tutoriales, entretenimiento',
+        hashtags: '3-5 hashtags en descripción',
+        engagement: 'suscripciones, likes, comentarios',
+        cta: 'suscribirse, campana de notificaciones'
+    }
+};
+
 // FUNCIÓN PRINCIPAL DE API - ULTRA OPTIMIZADA
 exports.api = functions.runWith({
     timeoutSeconds: 300,
@@ -38,24 +132,104 @@ exports.api = functions.runWith({
         
         console.log(`[API] 📱 Generando ${ideaCount} ideas para redes: ${platforms.join(', ')}`);
         
-        // Prompt OPTIMIZADO para múltiples redes sociales
-        let prompt = `Genera ${ideaCount} posts de copywriting para "${keyword}":
+        // NUEVO: Prompt específico para cada red social
+        let prompt;
+        
+        if (platforms.length === 1) {
+            // Generar 3 variaciones para una sola red social
+            const platform = platforms[0];
+            const spec = SOCIAL_NETWORK_SPECS[platform];
+            
+            if (spec) {
+                prompt = `Genera 3 variaciones de copywriting profesional para ${spec.name} sobre "${keyword}".
+
+ESPECIFICACIONES PARA ${spec.name.toUpperCase()}:
+- Longitud óptima: ${spec.optimalLength}
+- Tono: ${spec.tone}
+- Características clave: ${spec.features}
+- Hashtags: ${spec.hashtags}
+- Engagement: ${spec.engagement}
+- Call-to-action: ${spec.cta}
+
+INSTRUCCIONES:
+1. Crea 3 enfoques diferentes pero todos optimizados para ${spec.name}
+2. Respeta las características específicas de la plataforma
+3. Cada variación debe tener un hook diferente
+4. Incluye emojis apropiados para el tono de ${spec.name}
+5. Asegúrate de que el call-to-action sea específico para esta plataforma
+
+FORMATO DE RESPUESTA EXACTO:
+🎯 Gancho: [gancho principal]
+📝 Texto: [texto completo del post]
+🏷️ Hashtags: [hashtags específicos]
+📞 CTA: [call-to-action]
+🎨 Visual: [sugerencia visual]
+---FIN---
+
+🎯 Gancho: [gancho diferente]
+📝 Texto: [texto completo del post]
+🏷️ Hashtags: [hashtags específicos]
+📞 CTA: [call-to-action]
+🎨 Visual: [sugerencia visual]
+---FIN---
+
+🎯 Gancho: [gancho diferente]
+📝 Texto: [texto completo del post]
+🏷️ Hashtags: [hashtags específicos]
+📞 CTA: [call-to-action]
+🎨 Visual: [sugerencia visual]
+---FIN---`;
+            } else {
+                // Fallback para redes no especificadas
+                prompt = `Genera 3 variaciones de copywriting para ${platform} sobre "${keyword}".`;
+            }
+        } else {
+            // Generar 1 copy específico para cada red social
+            prompt = `Genera copywriting específico y optimizado para cada red social sobre "${keyword}".
+
+GENERA UN COPY ÚNICO Y ESPECÍFICO PARA CADA PLATAFORMA:
 
 `;
 
-        // Generar template para cada red social
-        platforms.forEach((platform, index) => {
-            prompt += `---IDEA_${index + 1}---
-Red: ${platform}
-Texto: [post específico para ${platform}]
-Hashtags: [tags relevantes para ${platform}]
-CTA: [call-to-action apropiado]
----FIN_IDEA_${index + 1}---
-
+            platforms.forEach(platform => {
+                const spec = SOCIAL_NETWORK_SPECS[platform];
+                if (spec) {
+                    prompt += `
+${spec.name.toUpperCase()}:
+- Longitud: ${spec.optimalLength}
+- Tono: ${spec.tone}
+- Enfoque: ${spec.features}
+- Hashtags: ${spec.hashtags}
+- CTA: ${spec.cta}
 `;
-        });
+                }
+            });
 
-        prompt += `RESPUESTA DIRECTA. ADAPTA CADA POST AL FORMATO Y AUDIENCIA DE CADA RED SOCIAL.`;
+            prompt += `
+INSTRUCCIONES CRÍTICAS:
+1. Cada copy debe ser COMPLETAMENTE DIFERENTE y adaptado a su plataforma
+2. LinkedIn: Profesional con insights de valor
+3. Twitter: Conciso, impactante, trending
+4. Facebook: Conversacional, storytelling
+5. WhatsApp: Directo, personal, urgente
+6. Instagram: Visual, aspiracional, lifestyle
+7. TikTok: Trendy, joven, viral
+8. Telegram: Informativo, técnico
+9. Reddit: Auténtico, comunitario
+10. YouTube: Educativo, descriptivo
+
+FORMATO DE RESPUESTA EXACTO:
+🎯 Gancho: [gancho específico para la red]
+📝 Texto: [copy completo adaptado a la plataforma]
+🏷️ Hashtags: [hashtags específicos para esta red]
+📞 CTA: [call-to-action específico]
+🎨 Visual: [sugerencia visual]
+---FIN---
+
+(Repetir para cada red social)`;
+        }
+
+        console.log(`[API] 🚀 Prompt específico generado para ${platforms.join(', ')}`);
 
         // CAMBIO CRÍTICO: SECUENCIAL en lugar de PARALELO para evitar problemas de timing
         console.log(`[API] 🔍 PASO 1: Validando usuario PRIMERO de forma secuencial...`);
