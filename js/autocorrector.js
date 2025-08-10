@@ -1,23 +1,21 @@
 /**
- * Autocorrector intuitivo con sugerencias visuales
- * Subraya errores y muestra opciones de corrección
+ * Autocorrector simple y funcional
+ * Detecta errores y muestra sugerencias al hacer clic
  */
 
 // Base de datos de correcciones
 const CORRECCIONES = {
-    // Errores comunes de tipeo
-    'marketting': ['marketing', 'market'],
+    // Marketing y copywriting
+    'marketting': ['marketing'],
     'marketin': ['marketing'],
     'merketing': ['marketing'],
-    'copywrite': ['copywriting', 'copy'],
+    'copywrite': ['copywriting'],
     'copywrting': ['copywriting'],
     'copywritng': ['copywriting'],
-    'redes socales': ['redes sociales'],
-    'redes sosiales': ['redes sociales'],
     
-    // Tecnología
+    // Redes sociales
     'facebook': ['Facebook'],
-    'instagram': ['Instagram'],
+    'instagram': ['Instagram'],  
     'twitter': ['Twitter'],
     'linkedin': ['LinkedIn'],
     'whatsapp': ['WhatsApp'],
@@ -25,368 +23,262 @@ const CORRECCIONES = {
     'tiktok': ['TikTok'],
     'telegram': ['Telegram'],
     'reddit': ['Reddit'],
+    
+    // Tecnología
     'iphone': ['iPhone'],
     'ipad': ['iPad'],
-    'macbook': ['MacBook'],
     'android': ['Android'],
-    'windows': ['Windows'],
     'apple': ['Apple'],
     'google': ['Google'],
     'microsoft': ['Microsoft'],
     'samsung': ['Samsung'],
     
-    // Acentos y gramática
+    // Acentos comunes
     'cafe': ['café'],
     'menu': ['menú'],
     'peru': ['Perú'],
     'mexico': ['México'],
     'bogota': ['Bogotá'],
-    'medellin': ['Medellín'],
     'mas': ['más'],
     'tambien': ['también'],
     'facil': ['fácil'],
     'dificil': ['difícil'],
     'util': ['útil'],
-    'movil': ['móvil'],
-    'debil': ['débil'],
+    
+    // Errores frecuentes
     'aver': ['a ver'],
     'ay': ['hay'],
     'ahi': ['ahí'],
-    'asia': ['hacia'],
-    'asta': ['hasta'],
     'echo': ['hecho'],
     'aora': ['ahora'],
     'despues': ['después'],
     'si': ['sí'],
-    'solo': ['sólo'],
-    
-    // Errores de escritura rápida
-    'q': ['que'],
-    'x': ['por'],
-    'xq': ['porque'],
-    'xk': ['porque'],
-    'tb': ['también'],
-    'tmb': ['también'],
-    'tbn': ['también'],
-    'pq': ['porque'],
-    'porq': ['porque']
+    'solo': ['sólo']
 };
 
-let currentField = null;
 let suggestionBox = null;
+let currentField = null;
+let currentWordSpan = null;
 
-// Inicializar cuando el DOM esté listo
+// Inicializar
 document.addEventListener('DOMContentLoaded', function() {
-    initializeIntuitiveAutocorrector();
+    initializeAutocorrector();
 });
 
-function initializeIntuitiveAutocorrector() {
+function initializeAutocorrector() {
     const fields = document.querySelectorAll('input[type="text"], textarea');
     
     fields.forEach(field => {
-        // Remover atributos nativos para control manual
-        field.removeAttribute('spellcheck');
-        field.removeAttribute('autocorrect');
-        
-        // Añadir eventos
-        field.addEventListener('input', handleFieldInput);
-        field.addEventListener('blur', handleFieldBlur);
-        field.addEventListener('click', handleFieldClick);
-        field.addEventListener('keydown', handleFieldKeydown);
-        
-        // Marcar como inicializado
-        field.setAttribute('data-autocorrector-active', 'true');
+        field.addEventListener('input', debounce(() => checkSpelling(field), 500));
+        field.addEventListener('click', () => handleFieldClick(field));
+        field.addEventListener('focus', () => currentField = field);
     });
     
-    // Crear el contenedor de sugerencias
     createSuggestionBox();
-    
-    console.log('🔤 Autocorrector intuitivo inicializado en', fields.length, 'campos');
+    console.log('🔤 Autocorrector inicializado en', fields.length, 'campos');
 }
 
 function createSuggestionBox() {
     suggestionBox = document.createElement('div');
-    suggestionBox.className = 'autocorrector-suggestions';
     suggestionBox.style.cssText = `
-        position: absolute;
+        position: fixed;
         background: white;
-        border: 1px solid #ddd;
-        border-radius: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         z-index: 10000;
         display: none;
-        max-width: 200px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 14px;
+        min-width: 150px;
+        max-width: 250px;
     `;
     document.body.appendChild(suggestionBox);
-}
-
-function handleFieldInput(event) {
-    const field = event.target;
-    currentField = field;
     
-    // Retrasar el análisis para evitar lag
-    clearTimeout(field.analysisTimeout);
-    field.analysisTimeout = setTimeout(() => {
-        analyzeText(field);
-    }, 300);
+    // Cerrar al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!suggestionBox.contains(e.target) && e.target !== currentWordSpan) {
+            hideSuggestions();
+        }
+    });
 }
 
-function handleFieldBlur(event) {
-    // Ocultar sugerencias al perder foco
-    setTimeout(() => {
-        hideSuggestions();
-    }, 200);
-}
-
-function handleFieldClick(event) {
-    const field = event.target;
-    const clickPosition = getCaretPosition(field);
-    const word = getWordAtPosition(field, clickPosition);
+function checkSpelling(field) {
+    if (!field.value) return;
     
-    if (word && hasError(word.text)) {
-        showSuggestions(word, field);
+    const words = field.value.split(/(\s+)/);
+    let hasErrors = false;
+    
+    // Limpiar spans anteriores
+    clearErrorSpans(field);
+    
+    words.forEach((word, index) => {
+        const cleanWord = word.trim().toLowerCase();
+        if (cleanWord && CORRECCIONES[cleanWord]) {
+            hasErrors = true;
+            markWordAsError(field, word, index);
+        }
+    });
+}
+
+function clearErrorSpans(field) {
+    // Remover los spans de error anteriores
+    field.style.background = '';
+    field.style.backgroundImage = '';
+}
+
+function markWordAsError(field, word, index) {
+    // En lugar de overlay, usar un enfoque más simple con eventos
+    field.setAttribute('data-has-errors', 'true');
+    
+    // Añadir un indicador visual simple
+    if (!field.style.borderBottom.includes('wavy')) {
+        field.style.borderBottom = '2px solid #e5e7eb';
+        field.style.borderBottomColor = field.style.borderBottomColor || '#e5e7eb';
+    }
+}
+
+function handleFieldClick(field) {
+    if (!field.getAttribute('data-has-errors')) return;
+    
+    const cursorPosition = field.selectionStart;
+    const text = field.value;
+    const wordInfo = getWordAtCursor(text, cursorPosition);
+    
+    if (wordInfo && CORRECCIONES[wordInfo.word.toLowerCase()]) {
+        showSuggestionsForWord(field, wordInfo);
     } else {
         hideSuggestions();
     }
 }
 
-function handleFieldKeydown(event) {
-    // ESC para cerrar sugerencias
-    if (event.key === 'Escape') {
-        hideSuggestions();
-    }
-}
-
-function analyzeText(field) {
-    const text = field.value;
-    const words = getWordsWithPositions(text);
+function getWordAtCursor(text, position) {
+    // Encontrar la palabra en la posición del cursor
+    let start = position;
+    let end = position;
     
-    // Limpiar marcas anteriores
-    clearErrorHighlights(field);
-    
-    // Marcar palabras con errores
-    words.forEach(word => {
-        if (hasError(word.text)) {
-            highlightError(field, word);
-        }
-    });
-}
-
-function getWordsWithPositions(text) {
-    const words = [];
-    const regex = /\b\w+\b/g;
-    let match;
-    
-    while ((match = regex.exec(text)) !== null) {
-        words.push({
-            text: match[0],
-            start: match.index,
-            end: match.index + match[0].length
-        });
+    // Buscar el inicio de la palabra
+    while (start > 0 && /\w/.test(text[start - 1])) {
+        start--;
     }
     
-    return words;
-}
-
-function hasError(word) {
-    const lowerWord = word.toLowerCase();
-    return CORRECCIONES.hasOwnProperty(lowerWord);
-}
-
-function highlightError(field, word) {
-    // Crear un overlay para mostrar el subrayado
-    let overlay = field.parentNode.querySelector('.autocorrector-overlay');
-    
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.className = 'autocorrector-overlay';
-        overlay.style.cssText = `
-            position: absolute;
-            pointer-events: none;
-            font-family: inherit;
-            font-size: inherit;
-            padding: inherit;
-            border: inherit;
-            margin: inherit;
-            white-space: pre-wrap;
-            overflow: hidden;
-            z-index: 1;
-            color: transparent;
-        `;
-        
-        // Posicionar el overlay
-        const fieldRect = field.getBoundingClientRect();
-        const parentRect = field.parentNode.getBoundingClientRect();
-        
-        overlay.style.left = (fieldRect.left - parentRect.left) + 'px';
-        overlay.style.top = (fieldRect.top - parentRect.top) + 'px';
-        overlay.style.width = fieldRect.width + 'px';
-        overlay.style.height = fieldRect.height + 'px';
-        
-        field.parentNode.style.position = 'relative';
-        field.parentNode.appendChild(overlay);
+    // Buscar el final de la palabra
+    while (end < text.length && /\w/.test(text[end])) {
+        end++;
     }
     
-    // Añadir subrayado ondulado rojo
-    const text = field.value;
-    const beforeError = text.substring(0, word.start);
-    const errorText = text.substring(word.start, word.end);
-    const afterError = text.substring(word.end);
-    
-    overlay.innerHTML = `${beforeError}<span style="border-bottom: 2px wavy #ff4444; background: rgba(255,68,68,0.1);">${errorText}</span>${afterError}`;
-}
-
-function clearErrorHighlights(field) {
-    const overlay = field.parentNode.querySelector('.autocorrector-overlay');
-    if (overlay) {
-        overlay.remove();
+    if (start < end) {
+        return {
+            word: text.substring(start, end),
+            start: start,
+            end: end
+        };
     }
-}
-
-function getCaretPosition(field) {
-    return field.selectionStart;
-}
-
-function getWordAtPosition(field, position) {
-    const text = field.value;
-    const words = getWordsWithPositions(text);
     
-    return words.find(word => position >= word.start && position <= word.end);
+    return null;
 }
 
-function showSuggestions(word, field) {
-    const suggestions = CORRECCIONES[word.text.toLowerCase()];
-    if (!suggestions || suggestions.length === 0) return;
+function showSuggestionsForWord(field, wordInfo) {
+    const suggestions = CORRECCIONES[wordInfo.word.toLowerCase()];
+    if (!suggestions) return;
     
     // Limpiar contenido anterior
     suggestionBox.innerHTML = '';
     
-    // Crear encabezado
+    // Header
     const header = document.createElement('div');
     header.style.cssText = `
         padding: 8px 12px;
-        background: #f5f5f5;
-        border-bottom: 1px solid #ddd;
-        font-weight: bold;
-        color: #666;
+        background: #f8f9fa;
+        border-bottom: 1px solid #dee2e6;
+        font-weight: 600;
+        color: #495057;
         font-size: 12px;
     `;
-    header.textContent = `"${word.text}" - Sugerencias:`;
+    header.textContent = `"${wordInfo.word}" → Sugerencias:`;
     suggestionBox.appendChild(header);
     
-    // Crear opciones de sugerencias
-    suggestions.forEach((suggestion, index) => {
+    // Sugerencias
+    suggestions.forEach(suggestion => {
         const option = document.createElement('div');
-        option.className = 'suggestion-option';
         option.style.cssText = `
-            padding: 10px 12px;
+            padding: 8px 12px;
             cursor: pointer;
-            border-bottom: 1px solid #f0f0f0;
-            transition: background 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            transition: background-color 0.2s;
+            border-bottom: 1px solid #f1f3f4;
         `;
-        
-        option.innerHTML = `
-            <span style="font-weight: 500;">${suggestion}</span>
-            <span style="font-size: 11px; color: #999;">Click para cambiar</span>
-        `;
+        option.textContent = suggestion;
         
         option.addEventListener('mouseenter', () => {
-            option.style.background = '#f8f9fa';
+            option.style.backgroundColor = '#e9ecef';
         });
         
         option.addEventListener('mouseleave', () => {
-            option.style.background = 'transparent';
+            option.style.backgroundColor = 'transparent';
         });
         
         option.addEventListener('click', () => {
-            replaceWord(field, word, suggestion);
+            replaceWord(field, wordInfo, suggestion);
             hideSuggestions();
-            showCorrectionNotification(word.text, suggestion);
+            showNotification(`"${wordInfo.word}" → "${suggestion}"`);
         });
         
         suggestionBox.appendChild(option);
     });
     
-    // Añadir opción "Mantener original"
-    const keepOriginal = document.createElement('div');
-    keepOriginal.style.cssText = `
-        padding: 8px 12px;
+    // Opción "Mantener"
+    const keepOption = document.createElement('div');
+    keepOption.style.cssText = `
+        padding: 6px 12px;
         cursor: pointer;
-        background: #fff;
-        color: #666;
-        font-size: 12px;
+        font-size: 11px;
+        color: #6c757d;
+        background: #f8f9fa;
+        border-top: 1px solid #dee2e6;
         text-align: center;
-        border-top: 1px solid #ddd;
     `;
-    keepOriginal.textContent = 'Mantener "' + word.text + '"';
-    keepOriginal.addEventListener('click', () => {
-        hideSuggestions();
-    });
-    suggestionBox.appendChild(keepOriginal);
+    keepOption.textContent = `Mantener "${wordInfo.word}"`;
+    keepOption.addEventListener('click', hideSuggestions);
+    suggestionBox.appendChild(keepOption);
     
-    // Posicionar cerca del campo
-    positionSuggestionBox(field, word);
-    
-    // Mostrar
+    // Posicionar y mostrar
+    positionSuggestionBox(field);
     suggestionBox.style.display = 'block';
 }
 
-function positionSuggestionBox(field, word) {
-    const fieldRect = field.getBoundingClientRect();
-    const textMetrics = getTextMetrics(field, word.start);
+function positionSuggestionBox(field) {
+    const rect = field.getBoundingClientRect();
+    const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+    const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     
-    let left = fieldRect.left + textMetrics.width;
-    let top = fieldRect.bottom + 5;
+    let top = rect.bottom + scrollY + 5;
+    let left = rect.left + scrollX;
     
     // Ajustar si se sale de la pantalla
-    if (left + 200 > window.innerWidth) {
-        left = fieldRect.right - 200;
+    if (left + 250 > window.innerWidth) {
+        left = window.innerWidth - 250 - 10;
     }
     
-    if (top + 150 > window.innerHeight) {
-        top = fieldRect.top - 150;
+    if (top + 150 > window.innerHeight + scrollY) {
+        top = rect.top + scrollY - 150;
     }
     
-    suggestionBox.style.left = left + 'px';
     suggestionBox.style.top = top + 'px';
+    suggestionBox.style.left = left + 'px';
 }
 
-function getTextMetrics(field, position) {
-    // Crear un elemento temporal para medir texto
-    const measurer = document.createElement('span');
-    measurer.style.cssText = `
-        position: absolute;
-        visibility: hidden;
-        white-space: pre;
-        font: ${getComputedStyle(field).font};
-    `;
-    measurer.textContent = field.value.substring(0, position);
-    document.body.appendChild(measurer);
-    
-    const width = measurer.offsetWidth;
-    document.body.removeChild(measurer);
-    
-    return { width };
-}
-
-function replaceWord(field, word, replacement) {
+function replaceWord(field, wordInfo, replacement) {
     const text = field.value;
-    const newText = text.substring(0, word.start) + replacement + text.substring(word.end);
+    const newText = text.substring(0, wordInfo.start) + replacement + text.substring(wordInfo.end);
     
     field.value = newText;
     
-    // Posicionar cursor después de la palabra reemplazada
-    const newPosition = word.start + replacement.length;
+    // Posicionar cursor
+    const newPosition = wordInfo.start + replacement.length;
     field.setSelectionRange(newPosition, newPosition);
     
-    // Reanalizar después del cambio
-    setTimeout(() => {
-        analyzeText(field);
-    }, 100);
+    // Rechequear ortografía
+    setTimeout(() => checkSpelling(field), 100);
 }
 
 function hideSuggestions() {
@@ -395,21 +287,20 @@ function hideSuggestions() {
     }
 }
 
-function showCorrectionNotification(original, corrected) {
+function showNotification(message) {
     const notification = document.createElement('div');
-    notification.innerHTML = `✨ "${original}" → "${corrected}"`;
+    notification.textContent = `✓ ${message}`;
     notification.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: linear-gradient(135deg, #10b981, #059669);
+        background: #28a745;
         color: white;
         padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 12px;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        border-radius: 6px;
+        font-size: 13px;
         z-index: 10001;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         opacity: 0;
         transform: translateX(100%);
         transition: all 0.3s ease;
@@ -417,13 +308,11 @@ function showCorrectionNotification(original, corrected) {
     
     document.body.appendChild(notification);
     
-    // Animar entrada
     setTimeout(() => {
         notification.style.opacity = '1';
         notification.style.transform = 'translateX(0)';
     }, 10);
     
-    // Animar salida
     setTimeout(() => {
         notification.style.opacity = '0';
         notification.style.transform = 'translateX(100%)';
@@ -432,14 +321,20 @@ function showCorrectionNotification(original, corrected) {
                 document.body.removeChild(notification);
             }
         }, 300);
-    }, 2500);
+    }, 2000);
 }
 
-// Limpiar al salir de la página
-window.addEventListener('beforeunload', () => {
-    if (suggestionBox && document.body.contains(suggestionBox)) {
-        document.body.removeChild(suggestionBox);
-    }
-});
+// Función auxiliar para debounce
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
 
-console.log('🔤 Autocorrector intuitivo cargado con', Object.keys(CORRECCIONES).length, 'correcciones');
+console.log('🔤 Autocorrector simple inicializado con', Object.keys(CORRECCIONES).length, 'correcciones');
