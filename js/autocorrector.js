@@ -69,9 +69,25 @@ function initializeAutocorrector() {
     const fields = document.querySelectorAll('input[type="text"], textarea');
     
     fields.forEach(field => {
+        // Múltiples eventos para asegurar compatibilidad
         field.addEventListener('input', debounce(() => checkSpelling(field), 500));
-        field.addEventListener('click', () => handleFieldClick(field));
+        field.addEventListener('click', (e) => handleFieldClick(field, e));
+        field.addEventListener('mousedown', (e) => handleFieldClick(field, e));
+        field.addEventListener('dblclick', (e) => handleFieldClick(field, e)); // Doble clic
+        field.addEventListener('touchstart', (e) => handleFieldClick(field, e));
         field.addEventListener('focus', () => currentField = field);
+        
+        // Evento especial para cuando se selecciona texto
+        field.addEventListener('selectionchange', () => {
+            if (document.activeElement === field) {
+                handleFieldClick(field, { type: 'selectionchange' });
+            }
+        });
+        
+        // Debug: verificar que se detectan los eventos
+        field.addEventListener('click', () => {
+            console.log('🖱️ Click detectado en campo:', field.id || field.name || 'sin-id');
+        });
     });
     
     createSuggestionBox();
@@ -138,43 +154,89 @@ function markWordAsError(field, word, index) {
     }
 }
 
-function handleFieldClick(field) {
-    if (!field.getAttribute('data-has-errors')) return;
+function handleFieldClick(field, event) {
+    console.log('🎯 handleFieldClick ejecutado para:', field.id || 'campo-sin-id');
+    console.log('📍 Evento:', event.type);
     
-    const cursorPosition = field.selectionStart;
-    const text = field.value;
-    const wordInfo = getWordAtCursor(text, cursorPosition);
-    
-    if (wordInfo && CORRECCIONES[wordInfo.word.toLowerCase()]) {
-        showSuggestionsForWord(field, wordInfo);
-    } else {
-        hideSuggestions();
-    }
+    // Pequeño delay para asegurar que el cursor esté posicionado
+    setTimeout(() => {
+        const cursorPosition = field.selectionStart;
+        const text = field.value;
+        console.log('📝 Texto completo:', text);
+        console.log('📍 Posición cursor:', cursorPosition);
+        
+        // Buscar TODAS las palabras del texto, no solo en el cursor
+        const words = text.split(/\s+/);
+        console.log('📝 Palabras encontradas:', words);
+        
+        let foundErrorWord = null;
+        words.forEach(word => {
+            const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+            if (CORRECCIONES[cleanWord]) {
+                console.log('🔍 Palabra con error encontrada:', word, '→', CORRECCIONES[cleanWord]);
+                foundErrorWord = {
+                    word: cleanWord,
+                    original: word,
+                    start: text.indexOf(word),
+                    end: text.indexOf(word) + word.length
+                };
+            }
+        });
+        
+        if (foundErrorWord) {
+            console.log('✅ Mostrando sugerencias para:', foundErrorWord.word);
+            showSuggestionsForWord(field, foundErrorWord);
+        } else {
+            // Si no hay errores, buscar la palabra actual en el cursor
+            const wordInfo = getWordAtCursor(text, cursorPosition);
+            if (wordInfo && CORRECCIONES[wordInfo.word.toLowerCase()]) {
+                console.log('✅ Palabra en cursor con corrección:', wordInfo.word);
+                showSuggestionsForWord(field, wordInfo);
+            } else {
+                console.log('❌ No hay corrección disponible');
+                hideSuggestions();
+            }
+        }
+    }, 10);
 }
 
 function getWordAtCursor(text, position) {
+    console.log('🔍 getWordAtCursor - texto:', text.substring(Math.max(0, position-10), position+10));
+    console.log('📍 Posición:', position);
+    
+    if (!text || position < 0) return null;
+    
     // Encontrar la palabra en la posición del cursor
     let start = position;
     let end = position;
+    
+    // Si estamos en un espacio, buscar la palabra más cercana hacia atrás
+    if (position > 0 && /\s/.test(text[position])) {
+        start = position - 1;
+    }
     
     // Buscar el inicio de la palabra
     while (start > 0 && /\w/.test(text[start - 1])) {
         start--;
     }
     
-    // Buscar el final de la palabra
+    // Buscar el final de la palabra (desde la posición inicial)
+    end = Math.max(position, start);
     while (end < text.length && /\w/.test(text[end])) {
         end++;
     }
     
     if (start < end) {
-        return {
+        const wordFound = {
             word: text.substring(start, end),
             start: start,
             end: end
         };
+        console.log('✅ Palabra encontrada:', wordFound);
+        return wordFound;
     }
     
+    console.log('❌ No se encontró palabra válida');
     return null;
 }
 
