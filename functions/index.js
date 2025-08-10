@@ -99,73 +99,82 @@ const SOCIAL_NETWORK_SPECS = {
     }
 };
 
-// FUNCIÓN PARA LLAMAR A DEEPSEEK API
+// FUNCIÓN PARA LLAMAR A DEEPSEEK API CON MANEJO ROBUSTO DE ERRORES
 async function callDeepseekAPI(prompt) {
-    console.log(`[DEEPSEEK] 🚀 Iniciando llamada con timeout de 45 segundos...`);
+    console.log(`[DEEPSEEK] 🚀 Iniciando llamada con timeout de 30 segundos...`);
+    
+    // Implementar timeout manual más agresivo
+    const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+            reject(new Error('TIMEOUT_MANUAL: Deepseek API tardó más de 30 segundos'));
+        }, 30000); // 30 segundos más conservador
+    });
     
     const apiCall = async () => {
-        const response = await axios.post(`${DEEPSEEK_ENDPOINTS[0]}/chat/completions`, {
-            model: "deepseek-chat",
-            messages: [
-                {
-                    role: "system",
-                    content: "Eres un experto en copywriting para redes sociales. Genera contenido ÚNICO y ESPECÍFICO para cada plataforma, completamente diferente entre sí."
+        try {
+            console.log(`[DEEPSEEK] 📤 Enviando request...`);
+            const response = await axios.post(`${DEEPSEEK_ENDPOINTS[0]}/chat/completions`, {
+                model: "deepseek-chat",
+                messages: [
+                    {
+                        role: "system",
+                        content: "Eres un experto en copywriting para redes sociales. Genera contenido ÚNICO y ESPECÍFICO para cada plataforma, completamente diferente entre sí."
+                    },
+                    {
+                        role: "user", 
+                        content: prompt
+                    }
+                ],
+                max_tokens: 400, // Reducido para mayor velocidad
+                temperature: 0.2, // Más determinístico
+                stream: false
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+                    'Content-Type': 'application/json'
                 },
-                {
-                    role: "user", 
-                    content: prompt
-                }
-            ],
-            max_tokens: 600,
-            temperature: 0.3,
-            stream: false
-        }, {
-            headers: {
-                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            timeout: 45000 // 45 segundos optimizado
-        });
-
-        return response;
+                timeout: 25000 // 25 segundos en axios
+            });
+            
+            console.log(`[DEEPSEEK] 📥 Respuesta recibida`);
+            return response;
+        } catch (error) {
+            console.error(`[DEEPSEEK] ❌ Error en API call:`, error.message);
+            throw error;
+        }
     };
 
-    const result = await apiCall();
-    console.log(`[DEEPSEEK] ✅ Respuesta exitosa en ${Date.now()} ms`);
-    return result;
+    try {
+        const result = await Promise.race([apiCall(), timeoutPromise]);
+        console.log(`[DEEPSEEK] ✅ Respuesta exitosa`);
+        return result;
+    } catch (error) {
+        console.error(`[DEEPSEEK] ❌ Error final:`, error.message);
+        throw error;
+    }
 }
 
 // FUNCIÓN PARA GENERAR PROMPTS ULTRA-ESPECÍFICOS
+// FUNCIÓN PARA GENERAR PROMPTS OPTIMIZADOS (MÁS CORTOS)
 function generateUltraSpecificPrompt(keyword, platforms, userContext) {
-    console.log(`[PROMPT] 🎯 Generando prompt ultra-específico para: ${platforms.join(', ')}`);
+    console.log(`[PROMPT] 🎯 Generando prompt optimizado para: ${platforms.join(', ')}`);
     
-    const contextSection = userContext ? `CONTEXTO DEL USUARIO: ${userContext}\n\n` : '';
+    const contextSection = userContext ? `CONTEXTO: ${userContext}\n\n` : '';
     
     const specificInstructions = platforms.map(platform => {
         const spec = SOCIAL_NETWORK_SPECS[platform];
-        const example = getExamplesForNetwork(platform, keyword, userContext);
         
-        return `${platform.toUpperCase()} (${spec.tone}):
-- ${spec.optimalLength}, tono ${spec.tone}
-- EJEMPLO OBLIGATORIO: "${example}"
-- DIFERENCIA ABSOLUTA: NO repitas ni copies contenido de otras redes
-- ESPECÍFICO: Adapta completamente al estilo único de ${platform}`;
-    }).join('\n\n');
+        return `${platform.toUpperCase()}: ${spec.optimalLength}, tono ${spec.tone}`;
+    }).join('\n');
 
     return `${contextSection}TEMA: ${keyword}
 
-INSTRUCCIONES CRÍTICAS:
-- Genera contenido COMPLETAMENTE DIFERENTE para cada red social
-- NUNCA copies o adaptes ligeramente el mismo mensaje
-- Cada red debe tener SU PROPIO enfoque, estilo y estructura única
-- USA el ejemplo como guía pero crea tu propio contenido
+INSTRUCCIONES:
+- Genera contenido ÚNICO para cada red social
+- Diferente enfoque y estilo para cada plataforma
+- ${specificInstructions}
 
-${specificInstructions}
-
-IMPORTANTE: 
-- NO uses frases genéricas como "descubre", "transforma tu vida"
-- Cada red social debe tener contenido 100% único y específico
-- FORMATO: [Nombre Red]: [contenido específico único]
+FORMATO: [Red Social]: [contenido específico]
 
 Genera AHORA:`;
 }
@@ -210,10 +219,23 @@ exports.generateIdeas = functions
             // PASO 1: Validar usuario
             const userDoc = await userRef.get();
             
-            console.log(`[API] 🔍 PASO 2: Llamando a Deepseek API directamente...`);
+            console.log(`[API] 🔍 PASO 2: Llamando a Deepseek API con manejo robusto...`);
             
-            // PASO 2: Llamar a la API DIRECTAMENTE (SIN Promise.race)
-            const deepseekResponse = await callDeepseekAPI(prompt);
+            // PASO 2: Llamar a la API con manejo de errores robusto
+            let deepseekResponse;
+            let content;
+            
+            try {
+                deepseekResponse = await callDeepseekAPI(prompt);
+                content = deepseekResponse.data.choices[0].message.content;
+                console.log(`[API] ✅ Contenido API recibido: ${content.length} caracteres`);
+            } catch (apiError) {
+                console.error(`[API] ❌ Error en Deepseek API:`, apiError.message);
+                
+                // FALLBACK INMEDIATO: Si falla la API, usar ejemplos específicos
+                console.log(`[API] 🔄 Activando fallback inmediato con ejemplos específicos`);
+                content = null; // Marcador para usar fallback
+            }
             
             console.log(`[API] 🔍 PASO 3: Verificando documento de usuario...`);
             
@@ -239,23 +261,31 @@ exports.generateIdeas = functions
                 throw new functions.https.HttpsError('permission-denied', 'Límite de generaciones alcanzado. Upgrade a Premium para continuar.');
             }
 
-            // Extraer contenido de la respuesta
-            const content = deepseekResponse.data.choices[0].message.content;
-            console.log(`[API] 📝 Contenido generado con ${content.length} caracteres`);
-
-            // Parsear el contenido por redes sociales
+            // Parsear el contenido por redes sociales con fallback robusto
             const ideas = {};
-            platforms.forEach(platform => {
-                const regex = new RegExp(`${platform.replace('/', '\\/')}:?\\s*([\\s\\S]*?)(?=\\n(?:[A-Z]|$)|$)`, 'i');
-                const match = content.match(regex);
+            
+            if (content && content.length > 0) {
+                // Si tenemos contenido de la API, parsearlo
+                console.log(`[API] 📝 Parseando contenido API: ${content.length} caracteres`);
                 
-                if (match && match[1]) {
-                    ideas[platform] = match[1].trim();
-                } else {
-                    // Fallback específico por red
+                platforms.forEach(platform => {
+                    const regex = new RegExp(`${platform.replace('/', '\\/')}:?\\s*([\\s\\S]*?)(?=\\n(?:[A-Z]|$)|$)`, 'i');
+                    const match = content.match(regex);
+                    
+                    if (match && match[1]) {
+                        ideas[platform] = match[1].trim();
+                    } else {
+                        // Fallback específico por red si no se puede parsear
+                        ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                    }
+                });
+            } else {
+                // Si no hay contenido de API, usar fallback para todas las plataformas
+                console.log(`[API] 🔄 Usando fallback para todas las plataformas`);
+                platforms.forEach(platform => {
                     ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
-                }
-            });
+                });
+            }
 
             // Actualizar contador si no es admin
             if (!isAdmin) {
@@ -290,12 +320,26 @@ exports.generateIdeas = functions
         } catch (error) {
             console.error(`[API] ❌ Error en generateIdeas:`, error);
             
+            // Log específico para debugging deadline-exceeded
+            if (error.message && error.message.includes('deadline-exceeded')) {
+                console.error(`[API] ⏰ DEADLINE-EXCEEDED detectado. Detalles:`, {
+                    message: error.message,
+                    stack: error.stack,
+                    platforms: data.platforms,
+                    keyword: data.keyword
+                });
+            }
+            
             if (error.code && error.message) {
                 throw error;
             }
             
             if (error.response?.status === 401) {
                 throw new functions.https.HttpsError('internal', 'Error de autenticación con la API');
+            }
+            
+            if (error.message && (error.message.includes('timeout') || error.message.includes('TIMEOUT'))) {
+                throw new functions.https.HttpsError('deadline-exceeded', 'Timeout en la generación. Intenta con menos redes sociales o reintentar.');
             }
             
             throw new functions.https.HttpsError('internal', `Error interno: ${error.message}`);
