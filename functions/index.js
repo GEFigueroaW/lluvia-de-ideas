@@ -82,16 +82,51 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
 `;
                     });
                     
-                    resolve([
-                        userRef.get(),
-                        fallbackResponse
-                    ]);
+                    // Obtener usuario de forma síncrona para el fallback
+                    userRef.get().then(userSnapshot => {
+                        resolve([
+                            userSnapshot,
+                            fallbackResponse
+                        ]);
+                    }).catch(error => {
+                        console.error('[API] ❌ Error en fallback userRef.get():', error);
+                        // Crear un mock document si hay error
+                        const mockDoc = {
+                            exists: false,
+                            data: () => null
+                        };
+                        resolve([
+                            mockDoc,
+                            fallbackResponse
+                        ]);
+                    });
                 }, 15000)
             })
         ]);
         
-        // Validación y auto-creación de usuario si es necesario
-        let userData = userDoc.data();
+        // LÍNEA POR LÍNEA: Validación segura del documento antes de usar .data()
+        console.log(`[USER] 🔍 Verificando documento de usuario para ${uid}...`);
+        
+        // VERIFICACIÓN CRÍTICA: Asegurar que userDoc es un documento válido
+        if (!userDoc || typeof userDoc.data !== 'function') {
+            console.error(`[USER] ❌ CRÍTICO: userDoc no es un documento válido:`, { 
+                userDocType: typeof userDoc,
+                hasData: userDoc && typeof userDoc.data,
+                hasExists: userDoc && typeof userDoc.exists,
+                uid: uid
+            });
+            throw new functions.https.HttpsError('internal', 'Error crítico en documento de usuario');
+        }
+        
+        // LÍNEA POR LÍNEA: Obtener datos de forma segura
+        let userData = null;
+        try {
+            userData = userDoc.data();
+            console.log(`[USER] ✅ Datos de usuario obtenidos correctamente para ${uid}`);
+        } catch (error) {
+            console.error(`[USER] ❌ Error al obtener datos del usuario ${uid}:`, error);
+            throw new functions.https.HttpsError('internal', `Error accediendo a datos del usuario: ${error.message}`);
+        }
         
         // LÍNEA POR LÍNEA: Si el usuario no existe en Firestore, crearlo automáticamente
         if (!userDoc.exists) {
@@ -112,7 +147,7 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
             console.log(`[USER] ✅ Usuario ${uid} creado con 5 créditos gratuitos`);
         }
         // LÍNEA POR LÍNEA: Si existe pero le faltan propiedades, actualizarlas
-        else if (userData.generationCredits === undefined || userData.isPremium === undefined) {
+        else if (userData && (userData.generationCredits === undefined || userData.isPremium === undefined)) {
             console.log(`[USER] 🔧 Usuario ${uid} existe pero faltan propiedades. Actualizando...`);
             const updateData = {};
             
@@ -126,6 +161,33 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
             await userRef.update(updateData);
             userData = { ...userData, ...updateData };
             console.log(`[USER] ✅ Usuario ${uid} actualizado con propiedades faltantes`);
+        }
+        // LÍNEA POR LÍNEA: Si userData es null o inválido, crear usuario por defecto
+        else if (!userData) {
+            console.log(`[USER] 🔧 Usuario ${uid} tiene userData null. Creando datos por defecto...`);
+            const defaultUserData = {
+                email: context.auth.token.email || 'unknown@email.com',
+                displayName: context.auth.token.name || 'Usuario',
+                generationCredits: 5,
+                isPremium: false,
+                createdAt: admin.firestore.Timestamp.now(),
+                lastGenerationDate: null,
+                photoURL: context.auth.token.picture || null
+            };
+            
+            await userRef.set(defaultUserData);
+            userData = defaultUserData;
+            console.log(`[USER] ✅ Usuario ${uid} recreado con datos válidos`);
+        }
+        
+        // LÍNEA POR LÍNEA: Validación final de userData antes de usarlo
+        if (!userData || typeof userData !== 'object') {
+            console.error(`[USER] ❌ CRÍTICO: userData inválido después de todas las validaciones:`, {
+                userData: userData,
+                type: typeof userData,
+                uid: uid
+            });
+            throw new functions.https.HttpsError('internal', 'Error crítico: no se pudo obtener datos válidos del usuario');
         }
         
         // LÍNEA POR LÍNEA: Verificar acceso después de asegurar que el usuario existe
@@ -488,14 +550,40 @@ exports.debugUserStatus = functions.https.onCall(async (data, context) => {
     
     try {
         const userRef = db.collection('users').doc(uid);
+        
+        // Test paso a paso del proceso
+        console.log(`[DEBUG] Step 1: Obteniendo documento...`);
         const userDoc = await userRef.get();
+        
+        console.log(`[DEBUG] Step 2: Verificando documento...`);
+        const documentDebug = {
+            exists: userDoc.exists,
+            hasDataFunction: typeof userDoc.data === 'function',
+            documentType: typeof userDoc,
+            isValidDocument: userDoc && typeof userDoc.data === 'function'
+        };
+        
+        console.log(`[DEBUG] Step 3: Intentando obtener datos...`);
+        let userData = null;
+        let dataError = null;
+        
+        try {
+            if (userDoc && typeof userDoc.data === 'function') {
+                userData = userDoc.data();
+            } else {
+                dataError = 'userDoc.data is not a function';
+            }
+        } catch (error) {
+            dataError = error.message;
+        }
         
         const debugInfo = {
             uid: uid,
             email: context.auth.token.email,
             name: context.auth.token.name,
-            exists_in_firestore: userDoc.exists,
-            firestore_data: userDoc.exists ? userDoc.data() : null,
+            document: documentDebug,
+            userData: userData,
+            dataError: dataError,
             auth_token: {
                 email: context.auth.token.email,
                 name: context.auth.token.name,
@@ -510,7 +598,91 @@ exports.debugUserStatus = functions.https.onCall(async (data, context) => {
         
     } catch (error) {
         console.error(`[DEBUG] ❌ Error obteniendo estado:`, error.message);
-        throw new functions.https.HttpsError('internal', `Error de debug: ${error.message}`);
+        return { 
+            success: false, 
+            error: error.message,
+            errorType: error.constructor.name,
+            uid: uid
+        };
+    }
+});
+
+// FUNCIÓN DE TEST ESPECÍFICA PARA EL ERROR userDoc.data
+exports.testUserDocError = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
+    }
+
+    const uid = context.auth.uid;
+    console.log(`[TEST_ERROR] 🧪 Simulando el error userDoc.data para ${uid}...`);
+    
+    try {
+        const userRef = db.collection('users').doc(uid);
+        
+        // Simular el proceso exacto de la función principal
+        console.log(`[TEST_ERROR] Step 1: Promise.race simulation...`);
+        
+        const [userDoc, mockResponse] = await Promise.race([
+            // Proceso normal
+            Promise.all([
+                userRef.get(),
+                Promise.resolve('mock deepseek response')
+            ]),
+            // Emergency fallback
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    console.log('[TEST_ERROR] ⚠️ EMERGENCY FALLBACK activado en test');
+                    userRef.get().then(userSnapshot => {
+                        resolve([
+                            userSnapshot,
+                            'mock fallback response'
+                        ]);
+                    }).catch(error => {
+                        console.error('[TEST_ERROR] ❌ Error en fallback:', error);
+                        const mockDoc = {
+                            exists: false,
+                            data: () => null
+                        };
+                        resolve([
+                            mockDoc,
+                            'mock error fallback'
+                        ]);
+                    });
+                }, 1000) // 1 segundo para test rápido
+            })
+        ]);
+        
+        console.log(`[TEST_ERROR] Step 2: Verificando userDoc...`);
+        
+        // Validación exacta como en la función principal
+        if (!userDoc || typeof userDoc.data !== 'function') {
+            return {
+                success: false,
+                error: 'userDoc.data is not a function',
+                userDocType: typeof userDoc,
+                hasData: userDoc && typeof userDoc.data,
+                userDoc: userDoc ? 'object exists' : 'null or undefined'
+            };
+        }
+        
+        // Si llegamos aquí, no hay error
+        const userData = userDoc.data();
+        
+        return {
+            success: true,
+            message: 'No se detectó el error userDoc.data',
+            userDocValid: true,
+            userExists: userDoc.exists,
+            userData: userData
+        };
+        
+    } catch (error) {
+        console.error(`[TEST_ERROR] ❌ Error en test:`, error.message);
+        return {
+            success: false,
+            error: error.message,
+            errorType: error.constructor.name
+        };
     }
 });
 

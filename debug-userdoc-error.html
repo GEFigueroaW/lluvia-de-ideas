@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug userDoc.data Error - Brain Storm</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .button:hover {
+            background: #3367d6;
+        }
+        .button.danger {
+            background: #dc3545;
+        }
+        .button.success {
+            background: #28a745;
+        }
+        .button.warning {
+            background: #ffc107;
+            color: black;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .user-info {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+        .error-detail {
+            background: #fff2f2;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚨 Debug: userDoc.data is not a function</h1>
+    
+    <div class="container">
+        <h2>Estado de Autenticación</h2>
+        <div id="auth-status" class="status info">Verificando autenticación...</div>
+        <div id="user-info" class="user-info" style="display: none;"></div>
+        <button id="login-btn" class="button" onclick="signInWithGoogle()">Iniciar Sesión con Google</button>
+        <button id="logout-btn" class="button" onclick="signOut()" style="display: none;">Cerrar Sesión</button>
+    </div>
+
+    <div class="container">
+        <h2>Diagnóstico de Error</h2>
+        <div class="error-detail">
+            <strong>Error:</strong> userDoc.data is not a function<br>
+            <strong>Causa:</strong> El objeto userDoc no es un documento válido de Firestore<br>
+            <strong>Ubicación:</strong> Función api() línea ~88
+        </div>
+        
+        <button class="button danger" onclick="debugUserStatus()">🔍 Debug Estado Usuario</button>
+        <button class="button warning" onclick="testUserDocError()">🧪 Test Error userDoc.data</button>
+        <button class="button success" onclick="repairUserData()">🔧 Reparar Usuario</button>
+        <button class="button" onclick="testApiCall()">📝 Test API Call</button>
+    </div>
+
+    <div class="container">
+        <h2>Resultados de Debug</h2>
+        <div id="debug-output"></div>
+    </div>
+
+    <div class="container">
+        <h2>Logs Detallados</h2>
+        <div id="logs-output" class="result"></div>
+        <button class="button danger" onclick="clearLogs()">Limpiar Logs</button>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBDMsILOCy1V7m6qA-Jc6Dc0d-ULo4YyZc",
+            authDomain: "brain-storm-8f0d8.firebaseapp.com",
+            projectId: "brain-storm-8f0d8",
+            storageBucket: "brain-storm-8f0d8.firebasestorage.app",
+            messagingSenderId: "8834623316",
+            appId: "1:8834623316:web:f6baea9cbacb22df62b4c3",
+            measurementId: "G-PW5SQHLKS9"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const functions = firebase.functions();
+
+        let currentUser = null;
+
+        // Log helper
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logElement = document.getElementById('logs-output');
+            const colorClass = type === 'error' ? 'color: red;' : type === 'success' ? 'color: green;' : type === 'warning' ? 'color: orange;' : 'color: blue;';
+            logElement.innerHTML += `<div style="${colorClass}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs-output').innerHTML = '';
+        }
+
+        function showResult(title, data) {
+            const outputDiv = document.getElementById('debug-output');
+            outputDiv.innerHTML = `
+                <h3>${title}</h3>
+                <div class="result">${JSON.stringify(data, null, 2)}</div>
+            `;
+        }
+
+        // Autenticación
+        function signInWithGoogle() {
+            log('Iniciando autenticación con Google...');
+            const provider = new firebase.auth.GoogleAuthProvider();
+            provider.addScope('email');
+            provider.addScope('profile');
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    log('✅ Autenticación exitosa', 'success');
+                    updateAuthUI(result.user);
+                })
+                .catch((error) => {
+                    log(`❌ Error de autenticación: ${error.message}`, 'error');
+                });
+        }
+
+        function signOut() {
+            auth.signOut()
+                .then(() => {
+                    log('✅ Sesión cerrada', 'success');
+                    updateAuthUI(null);
+                })
+                .catch((error) => {
+                    log(`❌ Error cerrando sesión: ${error.message}`, 'error');
+                });
+        }
+
+        function updateAuthUI(user) {
+            currentUser = user;
+            const authStatus = document.getElementById('auth-status');
+            const userInfo = document.getElementById('user-info');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            if (user) {
+                authStatus.textContent = '✅ Usuario autenticado';
+                authStatus.className = 'status success';
+                
+                userInfo.innerHTML = `
+                    <strong>UID:</strong> <span>${user.uid}</span>
+                    <strong>Email:</strong> <span>${user.email}</span>
+                    <strong>Nombre:</strong> <span>${user.displayName || 'No disponible'}</span>
+                `;
+                userInfo.style.display = 'grid';
+                
+                loginBtn.style.display = 'none';
+                logoutBtn.style.display = 'inline-block';
+            } else {
+                authStatus.textContent = '❌ Usuario no autenticado';
+                authStatus.className = 'status error';
+                userInfo.style.display = 'none';
+                loginBtn.style.display = 'inline-block';
+                logoutBtn.style.display = 'none';
+            }
+        }
+
+        // Observer de autenticación
+        auth.onAuthStateChanged((user) => {
+            updateAuthUI(user);
+            if (user) {
+                log(`👤 Usuario cargado: ${user.email} (${user.uid})`);
+            }
+        });
+
+        // Funciones de debug
+        async function debugUserStatus() {
+            if (!currentUser) {
+                log('❌ Debes estar autenticado para ejecutar debug', 'error');
+                return;
+            }
+
+            log('🔍 Ejecutando debug completo de usuario...');
+            
+            try {
+                const debugFunction = functions.httpsCallable('debugUserStatus');
+                const result = await debugFunction();
+                
+                log('✅ Debug completado', 'success');
+                showResult('🔍 Debug Estado Usuario', result.data);
+                
+                if (result.data.debug && result.data.debug.dataError) {
+                    log(`⚠️ Error detectado: ${result.data.debug.dataError}`, 'warning');
+                }
+                
+            } catch (error) {
+                log(`❌ Error en debug: ${error.message}`, 'error');
+                showResult('❌ Error Debug', { error: error.message, code: error.code });
+            }
+        }
+
+        async function testUserDocError() {
+            if (!currentUser) {
+                log('❌ Debes estar autenticado para ejecutar test', 'error');
+                return;
+            }
+
+            log('🧪 Ejecutando test específico para error userDoc.data...');
+            
+            try {
+                const testFunction = functions.httpsCallable('testUserDocError');
+                const result = await testFunction();
+                
+                if (result.data.success) {
+                    log('✅ Test completado - No se detectó error', 'success');
+                } else {
+                    log(`⚠️ Error reproducido: ${result.data.error}`, 'warning');
+                }
+                
+                showResult('🧪 Test Error userDoc.data', result.data);
+                
+            } catch (error) {
+                log(`❌ Error en test: ${error.message}`, 'error');
+                showResult('❌ Error Test', { error: error.message, code: error.code });
+            }
+        }
+
+        async function repairUserData() {
+            if (!currentUser) {
+                log('❌ Debes estar autenticado para reparar datos', 'error');
+                return;
+            }
+
+            log('🔧 Reparando datos de usuario...');
+            
+            try {
+                const repairFunction = functions.httpsCallable('repairUserData');
+                const result = await repairFunction();
+                
+                log(`✅ Reparación completada: ${result.data.action}`, 'success');
+                showResult('🔧 Reparar Usuario', result.data);
+                
+            } catch (error) {
+                log(`❌ Error en reparación: ${error.message}`, 'error');
+                showResult('❌ Error Reparación', { error: error.message, code: error.code });
+            }
+        }
+
+        async function testApiCall() {
+            if (!currentUser) {
+                log('❌ Debes estar autenticado para probar API', 'error');
+                return;
+            }
+
+            log('📝 Probando llamada a API que puede generar el error...');
+            
+            try {
+                const apiFunction = functions.httpsCallable('api');
+                const testData = {
+                    generationMode: 'single',
+                    socialMedia: ['Facebook'],
+                    keyword: 'test error',
+                    copyType: 'promocional',
+                    language: 'es'
+                };
+                
+                const startTime = Date.now();
+                const result = await apiFunction(testData);
+                const duration = Date.now() - startTime;
+                
+                log(`✅ API call exitosa en ${duration}ms`, 'success');
+                showResult('📝 Test API Call', { 
+                    success: result.data.success,
+                    ideas: result.data.ideas?.length || 0,
+                    duration: duration
+                });
+                
+            } catch (error) {
+                log(`❌ Error en API call: ${error.message}`, 'error');
+                showResult('❌ Error API Call', { 
+                    error: error.message, 
+                    code: error.code,
+                    details: error.details 
+                });
+                
+                if (error.message.includes('userDoc.data is not a function')) {
+                    log('🚨 ERROR REPRODUCIDO: userDoc.data is not a function', 'error');
+                }
+            }
+        }
+
+        // Inicialización
+        log('🚨 Sistema de debug para error userDoc.data iniciado');
+    </script>
+</body>
+</html>
