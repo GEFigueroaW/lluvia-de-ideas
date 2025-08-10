@@ -185,48 +185,20 @@ FORMATO DE RESPUESTA EXACTO:
             }
         } else {
             // Generar 1 copy específico para cada red social
-            prompt = `Genera copywriting específico y optimizado para cada red social sobre "${keyword}".
+            prompt = `Crea contenido COMPLETAMENTE DIFERENTE para cada red social sobre "${keyword}":
 
-GENERA UN COPY ÚNICO Y ESPECÍFICO PARA CADA PLATAFORMA:
+LINKEDIN: Enfoque profesional B2B, insights de negocio, 100-150 palabras, hashtags profesionales
+FACEBOOK: Storytelling personal, conversacional, emocional, 50-80 palabras, máximo 3 hashtags
+TWITTER: Conciso, impactante, viral, máximo 180 caracteres, 2-3 hashtags trending
+WHATSAPP: Personal, urgente, directo, 30-60 palabras, sin hashtags
 
-`;
+CRÍTICO: Cada red debe tener contenido 100% ÚNICO. No repetir frases.
 
-            platforms.forEach(platform => {
-                const spec = SOCIAL_NETWORK_SPECS[platform];
-                if (spec) {
-                    prompt += `
-${spec.name.toUpperCase()}:
-- Longitud: ${spec.optimalLength}
-- Tono: ${spec.tone}
-- Enfoque: ${spec.features}
-- Hashtags: ${spec.hashtags}
-- CTA: ${spec.cta}
-`;
-                }
-            });
-
-            prompt += `
-INSTRUCCIONES CRÍTICAS:
-1. Cada copy debe ser COMPLETAMENTE DIFERENTE y adaptado a su plataforma
-2. LinkedIn: Profesional con insights de valor
-3. Twitter: Conciso, impactante, trending
-4. Facebook: Conversacional, storytelling
-5. WhatsApp: Directo, personal, urgente
-6. Instagram: Visual, aspiracional, lifestyle
-7. TikTok: Trendy, joven, viral
-8. Telegram: Informativo, técnico
-9. Reddit: Auténtico, comunitario
-10. YouTube: Educativo, descriptivo
-
-FORMATO DE RESPUESTA EXACTO:
-🎯 Gancho: [gancho específico para la red]
-📝 Texto: [copy completo adaptado a la plataforma]
-🏷️ Hashtags: [hashtags específicos para esta red]
-📞 CTA: [call-to-action específico]
-🎨 Visual: [sugerencia visual]
----FIN---
-
-(Repetir para cada red social)`;
+FORMATO:
+LinkedIn: [texto profesional único]
+Facebook: [historia personal única]  
+X / Twitter: [mensaje viral único]
+WhatsApp: [mensaje personal único]`;
         }
 
         console.log(`[API] 🚀 Prompt específico generado para ${platforms.join(', ')}`);
@@ -533,7 +505,8 @@ async function callDeepseekAPI(prompt, attempt = 1, maxAttempts = 3) {
 
 // PARSER ULTRA-EFICIENTE PARA MÚLTIPLES REDES SOCIALES
 function parseResponse(text) {
-    console.log('[PARSER] 🚀 Parse rápido para múltiples redes...');
+    console.log('[PARSER] 🚀 Parse específico para redes sociales...');
+    console.log('[PARSER] 📝 Texto recibido:', text.substring(0, 500) + '...');
     
     if (!text?.trim()) {
         return [createFallbackIdea()];
@@ -541,45 +514,115 @@ function parseResponse(text) {
     
     const ideas = [];
     
-    // Regex mejorada para capturar también la red social
-    const matches = text.matchAll(/---IDEA_\d+---\s*(?:Red:\s*([^\n]+?)\s*)?(?:Texto:\s*([^-]+?)\s*)?Hashtags:\s*([^-]+?)\s*CTA:\s*([^-]+?)\s*---FIN_IDEA_\d+---/gi);
+    // NUEVO: Parser para el formato específico por red social
+    const newFormatMatches = text.matchAll(/🎯\s*Gancho:\s*([^\n]+)\s*📝\s*Texto:\s*([^🏷️]+)🏷️\s*Hashtags:\s*([^📞]+)📞\s*CTA:\s*([^🎨]+)🎨\s*Visual:\s*([^-]+)---FIN---/gi);
     
-    for (const match of matches) {
-        const socialNetwork = match[1]?.trim();
-        const postText = (match[2] || match[1])?.trim(); // Si no hay texto separado, usar el campo que tenga contenido
+    console.log('[PARSER] 🔍 Buscando formato nuevo...');
+    
+    for (const match of newFormatMatches) {
+        const hook = match[1]?.trim();
+        const postText = match[2]?.trim();
         const hashtags = match[3]?.trim();
         const cta = match[4]?.trim();
+        const visual = match[5]?.trim();
+        
+        console.log('[PARSER] ✅ Match encontrado:', { hook, postText: postText?.substring(0, 50), hashtags, cta });
         
         if (postText && postText.length > 10) {
             ideas.push({
-                hook: postText.substring(0, 50) + (postText.length > 50 ? '...' : ''),
+                hook: hook || postText.substring(0, 50) + (postText.length > 50 ? '...' : ''),
                 postText: postText,
                 hashtags: hashtags?.split(/[,\s#]+/).filter(h => h.length > 1).slice(0, 5) || ['contenido'],
                 cta: cta || 'Interactúa',
-                visualFormat: 'Imagen atractiva',
-                socialNetwork: socialNetwork || 'General' // Agregar información de la red social
+                visualFormat: visual || 'Imagen atractiva',
+                socialNetwork: 'Específico'
             });
         }
     }
     
-    // Regex alternativa para el formato original (backward compatibility)
+    // Formato alternativo: buscar por red social específica
     if (ideas.length === 0) {
-        const oldMatches = text.matchAll(/---IDEA_\d+---\s*Texto:\s*([^-]+?)\s*Hashtags:\s*([^-]+?)\s*CTA:\s*([^-]+?)\s*---FIN_IDEA_\d+---/gi);
+        console.log('[PARSER] 🔍 Buscando por redes sociales específicas...');
         
-        for (const match of oldMatches) {
-            const postText = match[1]?.trim();
+        const socialNetworks = ['Facebook', 'LinkedIn', 'Twitter', 'X / Twitter', 'WhatsApp', 'Instagram', 'TikTok', 'Telegram', 'Reddit', 'YouTube'];
+        
+        for (const network of socialNetworks) {
+            const networkRegex = new RegExp(`${network}:?\\s*([^\\n]+(?:\\n[^\\n]+)*)`, 'gi');
+            const networkMatch = text.match(networkRegex);
+            
+            if (networkMatch && networkMatch[0]) {
+                const content = networkMatch[0].replace(new RegExp(`${network}:?\\s*`, 'i'), '').trim();
+                
+                if (content.length > 20) {
+                    // Extraer hashtags del contenido
+                    const hashtagMatches = content.match(/#\w+/g) || [];
+                    const cleanText = content.replace(/#\w+/g, '').trim();
+                    
+                    ideas.push({
+                        hook: `${network} específico`,
+                        postText: cleanText,
+                        hashtags: hashtagMatches.length > 0 ? hashtagMatches.map(h => h.replace('#', '')) : ['marketing', network.toLowerCase()],
+                        cta: 'Comparte tu experiencia',
+                        visualFormat: 'Imagen atractiva',
+                        socialNetwork: network
+                    });
+                    
+                    console.log('[PARSER] ✅ Contenido específico para', network, ':', cleanText.substring(0, 50));
+                }
+            }
+        }
+    }
+    
+    // Regex mejorada para capturar el formato original (backward compatibility)
+    if (ideas.length === 0) {
+        console.log('[PARSER] 🔍 Usando parser de respaldo...');
+        
+        const matches = text.matchAll(/---IDEA_\d+---\s*(?:Red:\s*([^\n]+?)\s*)?(?:Texto:\s*([^-]+?)\s*)?Hashtags:\s*([^-]+?)\s*CTA:\s*([^-]+?)\s*---FIN_IDEA_\d+---/gi);
+        
+        for (const match of matches) {
+            const socialNetwork = match[1]?.trim();
+            const postText = (match[2] || match[1])?.trim();
+            const hashtags = match[3]?.trim();
+            const cta = match[4]?.trim();
+            
             if (postText && postText.length > 10) {
                 ideas.push({
                     hook: postText.substring(0, 50) + (postText.length > 50 ? '...' : ''),
                     postText: postText,
-                    hashtags: match[2]?.split(/[,\s#]+/).filter(h => h.length > 1).slice(0, 5) || ['contenido'],
-                    cta: match[3]?.trim() || 'Interactúa',
+                    hashtags: hashtags?.split(/[,\s#]+/).filter(h => h.length > 1).slice(0, 5) || ['contenido'],
+                    cta: cta || 'Interactúa',
                     visualFormat: 'Imagen atractiva',
-                    socialNetwork: 'General'
+                    socialNetwork: socialNetwork || 'General'
                 });
             }
         }
     }
+    
+    // Fallback split básico si nada funciona
+    if (ideas.length === 0) {
+        console.log('[PARSER] 🔍 Usando split básico como último recurso...');
+        
+        const parts = text.split(/[\n\r]{2,}/).filter(part => part.trim().length > 20);
+        
+        parts.forEach((part, index) => {
+            const cleanPart = part.trim();
+            if (cleanPart.length > 20) {
+                const hashtagMatches = cleanPart.match(/#\w+/g) || [];
+                const cleanText = cleanPart.replace(/#\w+/g, '').trim();
+                
+                ideas.push({
+                    hook: `Idea ${index + 1}`,
+                    postText: cleanText,
+                    hashtags: hashtagMatches.length > 0 ? hashtagMatches.map(h => h.replace('#', '')) : ['marketing'],
+                    cta: 'Comparte',
+                    visualFormat: 'Imagen atractiva',
+                    socialNetwork: 'General'
+                });
+            }
+        });
+    }
+    
+    console.log('[PARSER] 📊 Total ideas parseadas:', ideas.length);
     
     // Fallback inmediato si no hay ideas
     if (ideas.length === 0) {
