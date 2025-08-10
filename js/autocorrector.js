@@ -33,6 +33,16 @@ const CORRECCIONES = {
     'microsoft': ['Microsoft'],
     'samsung': ['Samsung'],
     
+    // Palabras comunes mal escritas
+    'masibo': ['masivo'],
+    'masivo': ['masivo'], // por si está bien pero quieren verlo
+    'mama': ['mamá'],
+    'papa': ['papá'],
+    'maivo': ['masivo'],
+    'maibo': ['masivo'],
+    'cambaso': ['cambiazo'],
+    'cambiaso': ['cambiazo'],
+    
     // Acentos comunes
     'cafe': ['café'],
     'menu': ['menú'],
@@ -53,7 +63,13 @@ const CORRECCIONES = {
     'aora': ['ahora'],
     'despues': ['después'],
     'si': ['sí'],
-    'solo': ['sólo']
+    'solo': ['sólo'],
+    
+    // Palabras de prueba adicionales
+    'hola': ['hola'], // para testing
+    'mundo': ['mundo'], // para testing
+    'test': ['test'], // para testing
+    'prueba': ['prueba'] // para testing
 };
 
 let suggestionBox = null;
@@ -165,38 +181,42 @@ function handleFieldClick(field, event) {
         console.log('📝 Texto completo:', text);
         console.log('📍 Posición cursor:', cursorPosition);
         
-        // Buscar TODAS las palabras del texto, no solo en el cursor
-        const words = text.split(/\s+/);
-        console.log('📝 Palabras encontradas:', words);
+        // MÉTODO 1: Buscar palabra en el cursor
+        const wordAtCursor = getWordAtCursor(text, cursorPosition);
+        if (wordAtCursor) {
+            console.log('� Palabra en cursor:', wordAtCursor.word);
+            const corrections = CORRECCIONES[wordAtCursor.word.toLowerCase()];
+            if (corrections) {
+                console.log('✅ CORRECCIÓN ENCONTRADA para:', wordAtCursor.word, '→', corrections);
+                showSuggestionsForWord(field, wordAtCursor);
+                return;
+            }
+        }
         
-        let foundErrorWord = null;
-        words.forEach(word => {
+        // MÉTODO 2: Buscar CUALQUIER palabra con error en el texto
+        const words = text.split(/\s+/);
+        console.log('📝 Todas las palabras:', words);
+        
+        for (let word of words) {
             const cleanWord = word.toLowerCase().replace(/[^\w]/g, '');
+            console.log('🔍 Verificando palabra:', cleanWord);
+            
             if (CORRECCIONES[cleanWord]) {
-                console.log('🔍 Palabra con error encontrada:', word, '→', CORRECCIONES[cleanWord]);
-                foundErrorWord = {
+                console.log('✅ PALABRA CON ERROR ENCONTRADA:', cleanWord, '→', CORRECCIONES[cleanWord]);
+                const wordInfo = {
                     word: cleanWord,
                     original: word,
                     start: text.indexOf(word),
                     end: text.indexOf(word) + word.length
                 };
-            }
-        });
-        
-        if (foundErrorWord) {
-            console.log('✅ Mostrando sugerencias para:', foundErrorWord.word);
-            showSuggestionsForWord(field, foundErrorWord);
-        } else {
-            // Si no hay errores, buscar la palabra actual en el cursor
-            const wordInfo = getWordAtCursor(text, cursorPosition);
-            if (wordInfo && CORRECCIONES[wordInfo.word.toLowerCase()]) {
-                console.log('✅ Palabra en cursor con corrección:', wordInfo.word);
                 showSuggestionsForWord(field, wordInfo);
-            } else {
-                console.log('❌ No hay corrección disponible');
-                hideSuggestions();
+                return;
             }
         }
+        
+        console.log('❌ No se encontraron correcciones disponibles');
+        console.log('💡 Base de datos actual:', Object.keys(CORRECCIONES));
+        hideSuggestions();
     }, 10);
 }
 
