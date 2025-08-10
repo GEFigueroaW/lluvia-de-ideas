@@ -14,6 +14,34 @@ const DEEPSEEK_ENDPOINTS = [
 
 console.log('[INIT] Deepseek API configurado con múltiples endpoints');
 
+// FUNCIÓN SIMPLE PARA GENERAR EJEMPLOS ESPECÍFICOS POR RED SOCIAL
+function getExamplesForNetwork(networkName, keyword, userContext) {
+    const contextText = userContext ? ` (contexto: ${userContext})` : '';
+    
+    switch(networkName) {
+        case 'Facebook':
+            return `Historia personal: Ayer probé ${keyword}${contextText} y cambió todo. Mi familia está impresionada. ¿Alguien más lo ha intentado? Comenten 👇`;
+        case 'LinkedIn':
+            return `Análisis profesional: Tras implementar ${keyword} en 200+ proyectos${contextText}, confirmé ROI del 340%. Como estratega senior, estos son los KPIs críticos...`;
+        case 'X / Twitter':
+            return `🧵 THREAD: El secreto de ${keyword}${contextText} que cambió mi vida. Día 1: Escéptico, Día 30: Resultados, Día 90: Transformación ⬇️`;
+        case 'WhatsApp':
+            return `🚨 URGENTE sobre ${keyword}${contextText}. Últimos 3 cupos con 50% descuento. Solo hasta medianoche. ¿Te apuntas? Responde YA`;
+        case 'Instagram':
+            return `✨ La transformación con ${keyword}${contextText} que cambió todo 💫 Antes vs Después: Mindset limitado → Mentalidad ganadora ¿Ready? 💅`;
+        case 'TikTok':
+            return `POV: Intentas ${keyword}${contextText} por primera vez y... 🤯 VIDA = CAMBIADA ✨ No esperaba ESTO 👀`;
+        case 'Telegram':
+            return `📊 ANÁLISIS: ${keyword} en 2024${contextText}. Tendencias: +340% adopción, ROI 2.8x, implementación 15-30 días. Recomendación: implementar antes Q1 2025`;
+        case 'Reddit':
+            return `Mi experiencia REAL con ${keyword}${contextText} después de 18 meses. TL;DR: Cambió mi vida, pero no como esperaba. Story completo en comentarios...`;
+        case 'YouTube':
+            return `📺 TUTORIAL: ${keyword} desde CERO${contextText}. En este video: fundamentos, implementación paso a paso, errores comunes, plan 90 días. Links en descripción ⬇️`;
+        default:
+            return `Contenido específico para ${networkName} sobre ${keyword}${contextText}`;
+    }
+}
+
 // Configuraciones específicas para cada red social
 const SOCIAL_NETWORK_SPECS = {
     'Facebook': {
@@ -119,12 +147,20 @@ exports.api = functions.runWith({
         throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
     }
 
-    const { generationMode, socialMedia, keyword, copyType, language } = data;
+    const { generationMode, socialMedia, keyword, copyType, context: userContext, language } = data;
     const uid = context.auth.uid;
 
     try {
         // PARALELO: Validación + Prompt + API simultáneos con prompt ultra-optimizado
         const userRef = db.collection('users').doc(uid);
+        
+        console.log(`[API] 🔍 PARÁMETROS RECIBIDOS:`);
+        console.log(`[API] 📝 keyword: "${keyword}"`);
+        console.log(`[API] 🎭 copyType: "${copyType}"`);
+        console.log(`[API] 📱 socialMedia: ${JSON.stringify(socialMedia)}`);
+        console.log(`[API] 🎯 generationMode: "${generationMode}"`);
+        console.log(`[API] 📋 userContext: "${userContext}"`);
+        console.log(`[API] 🌍 language: "${language}"`);
         
         // CORRECCIÓN: Manejar múltiples redes sociales correctamente
         const platforms = Array.isArray(socialMedia) ? socialMedia : [socialMedia];
@@ -132,7 +168,7 @@ exports.api = functions.runWith({
         
         console.log(`[API] 📱 Generando ${ideaCount} ideas para redes: ${platforms.join(', ')}`);
         
-        // NUEVO: Prompt específico para cada red social
+        // NUEVO: Prompt específico para cada red social con contexto
         let prompt;
         
         if (platforms.length === 1) {
@@ -141,9 +177,12 @@ exports.api = functions.runWith({
             const spec = SOCIAL_NETWORK_SPECS[platform];
             
             if (spec) {
-                prompt = `Genera 3 variaciones de copywriting profesional para ${spec.name} sobre "${keyword}".
+                prompt = `MISIÓN: Crear 3 variaciones de copywriting COMPLETAMENTE DIFERENTES para ${spec.name} sobre "${keyword}".
 
-ESPECIFICACIONES PARA ${spec.name.toUpperCase()}:
+TIPO DE CONTENIDO: ${copyType}
+${userContext ? `CONTEXTO ESPECÍFICO DEL USUARIO: ${userContext}` : ''}
+
+ESPECIFICACIONES OBLIGATORIAS PARA ${spec.name.toUpperCase()}:
 - Longitud óptima: ${spec.optimalLength}
 - Tono: ${spec.tone}
 - Características clave: ${spec.features}
@@ -151,29 +190,32 @@ ESPECIFICACIONES PARA ${spec.name.toUpperCase()}:
 - Engagement: ${spec.engagement}
 - Call-to-action: ${spec.cta}
 
-INSTRUCCIONES:
-1. Crea 3 enfoques diferentes pero todos optimizados para ${spec.name}
-2. Respeta las características específicas de la plataforma
-3. Cada variación debe tener un hook diferente
-4. Incluye emojis apropiados para el tono de ${spec.name}
-5. Asegúrate de que el call-to-action sea específico para esta plataforma
+INSTRUCCIONES ULTRA-ESPECÍFICAS:
+1. Cada variación debe tener un ENFOQUE COMPLETAMENTE DIFERENTE (emocional, racional, urgente)
+2. Usa diferentes ángulos: estadísticas vs testimonios vs beneficios vs problemas vs soluciones
+3. Varía completamente el hook: pregunta vs afirmación vs dato vs historia vs problema
+4. Incluye emojis específicos para ${spec.name}
+5. CTA diferente en cada variación
+
+EJEMPLOS DE DIFERENCIACIÓN PARA ${spec.name}:
+${getExamplesForNetwork(platform, keyword, userContext)}
 
 FORMATO DE RESPUESTA EXACTO:
-🎯 Gancho: [gancho principal]
+🎯 Gancho: [gancho principal diferente]
 📝 Texto: [texto completo del post]
 🏷️ Hashtags: [hashtags específicos]
 📞 CTA: [call-to-action]
 🎨 Visual: [sugerencia visual]
 ---FIN---
 
-🎯 Gancho: [gancho diferente]
+🎯 Gancho: [gancho COMPLETAMENTE diferente]
 📝 Texto: [texto completo del post]
 🏷️ Hashtags: [hashtags específicos]
 📞 CTA: [call-to-action]
 🎨 Visual: [sugerencia visual]
 ---FIN---
 
-🎯 Gancho: [gancho diferente]
+🎯 Gancho: [gancho TOTALMENTE diferente]
 📝 Texto: [texto completo del post]
 🏷️ Hashtags: [hashtags específicos]
 📞 CTA: [call-to-action]
@@ -181,43 +223,116 @@ FORMATO DE RESPUESTA EXACTO:
 ---FIN---`;
             } else {
                 // Fallback para redes no especificadas
-                prompt = `Genera 3 variaciones de copywriting para ${platform} sobre "${keyword}".`;
+                prompt = `Genera 3 variaciones COMPLETAMENTE DIFERENTES de copywriting para ${platform} sobre "${keyword}".
+${userContext ? `Contexto: ${userContext}` : ''}
+Tipo: ${copyType}`;
             }
         } else {
             // Generar 1 copy específico para cada red social
-            prompt = `INSTRUCCIÓN ULTRA-ESPECÍFICA: Crea contenido TOTALMENTE DIFERENTE para cada red social.
+            prompt = `MISIÓN CRÍTICA: Crear contenido TOTALMENTE DIFERENTE para cada red social.
 
 Tema: "${keyword}"
+Tipo de contenido: ${copyType}
+${userContext ? `CONTEXTO ESPECÍFICO: ${userContext}` : ''}
 
-LINKEDIN (profesional B2B):
-Escribe como CEO/experto. Usa datos, estadísticas, insights de negocio. Menciona ROI, KPIs, estrategias empresariales. 100-150 palabras. Hashtags profesionales como #B2BStrategy #BusinessGrowth #ProfessionalInsights.
+INSTRUCCIONES ULTRA-ESPECÍFICAS POR PLATAFORMA:
 
-FACEBOOK (personal/emocional):
-Escribe como amigo contando una historia personal. Usa emociones, anécdotas, preguntas para generar conversación. Menciona familia, experiencias personales. 50-80 palabras. Pocos hashtags casuales.
+LINKEDIN (Profesional B2B):
+- Escribe como CEO/experto con 10+ años de experiencia
+- Usa datos reales, estadísticas, ROI, KPIs
+- Menciona insights empresariales, casos de éxito
+- 100-150 palabras, tono profesional pero humano
+- Hashtags: #BusinessStrategy #ProfessionalGrowth #Leadership
+- Hook: "Después de analizar X casos..." o "En mis X años como..."
 
-TWITTER (viral/conciso):
-Máximo 180 caracteres. Usa trends, números impactantes, preguntas provocativas. Estilo tipo "Thread revelador", "Nadie te cuenta esto", "Dato que te sorprenderá". 2-3 hashtags trending.
+FACEBOOK (Personal/Emocional):
+- Escribe como amigo cercano contando una historia personal
+- Usa emociones, anécdotas familiares, experiencias reales
+- Menciona situaciones cotidianas, familia, amigos
+- 50-80 palabras, tono conversacional y cálido
+- Hook: "Ayer me pasó algo increíble..." o "No van a creer lo que..."
 
-WHATSAPP (urgente/personal):
-Mensaje directo como si fuera para un amigo cercano. Urgencia real, llamada a la acción inmediata, tono confidencial. 30-50 palabras. SIN hashtags.
+TWITTER (Viral/Impactante):
+- Máximo 180 caracteres, mensaje ultra-conciso
+- Usa números impactantes, datos sorprendentes
+- Estilo: "Thread revelador", "Secreto que cambió mi vida"
+- Hook: "🧵 THREAD sobre..." o "Dato que te sorprenderá:"
+- 2-3 hashtags trending
 
-EJEMPLOS OBLIGATORIOS DE DIFERENCIACIÓN:
+WHATSAPP (Urgente/Directo):
+- Mensaje como si fuera para tu mejor amigo
+- Urgencia real, oportunidad limitada
+- Tono confidencial y exclusivo
+- 30-50 palabras máximo
+- Hook: "🚨 URGENTE:" o "Solo hasta mañana:"
+- SIN hashtags
 
-LINKEDIN: "Después de analizar 500+ campañas B2B, descubrí que el cambaceo masivo aumenta conversiones 40%. Los datos no mienten: empresas que implementan esta metodología ven ROI 300% superior. Como líder de marketing, estas son las 3 métricas que debes medir... #B2BMarketing #DataDriven #MarketingStrategy"
+INSTAGRAM (Visual/Aspiracional):
+- Contenido que inspire y motive visualmente
+- Lifestyle, aspiraciones, sueños
+- Tono joven, moderno, inspirador
+- 100-150 palabras
+- Hook: "✨ La transformación que..." o "💫 El secreto para..."
+- 5-8 hashtags lifestyle
 
-FACEBOOK: "Chicos, no van a creer lo que me pasó ayer 😱 Mi cuñado me enseñó esta técnica del 'cambaceo masivo' y EN SERIO que funciona. Ya vendí 5 productos más que el mes pasado. ¿Alguien más ha probado esto? Cuéntenme en los comentarios 👇"
+TIKTOK (Trendy/Joven):
+- Lenguaje generación Z, trends actuales
+- Contenido viral, challenges, tips rápidos
+- Tono divertido, enérgico, moderno
+- 50-100 palabras
+- Hook: "POV:" o "Life hack que nadie te cuenta:"
+- 3-5 hashtags trending
 
-TWITTER: "El 'cambaceo masivo' que usan las empresas Top 1% 🧵 (y que tu competencia NO quiere que sepas) Datos reales de 2024: +500% engagement Thread revelador ⬇️ #MarketingHacks #VentasDigitales"
+TELEGRAM (Informativo/Técnico):
+- Información detallada, análisis profundo
+- Tono educativo, recursos útiles
+- Canales especializados, comunidades
+- 80-120 palabras
+- Hook: "Análisis completo:" o "Guía definitiva:"
 
-WHATSAPP: "🚨 María, URGENTE ¿Viste los resultados del cambaceo masivo? +300% ventas en 24h Solo hasta mañana Responde YA si quieres que te explique"
+REDDIT (Auténtico/Comunitario):
+- Experiencia personal real, sin marketing obvio
+- Tono honesto, transparente, humilde
+- Subreddit específico, valor real para la comunidad
+- 150-300 palabras
+- Hook: "Mi experiencia real con..." o "Aprendí esto de la manera difícil:"
 
-GENERA AHORA contenido así de diferente para cada red. CADA UNA DEBE SER ÚNICA.
+YOUTUBE (Educativo/Descriptivo):
+- Descripción de video educativo, tutorial
+- Valor educativo claro, paso a paso
+- Tono profesional pero accesible
+- 200-400 palabras
+- Hook: "En este video aprenderás..." o "Tutorial completo sobre..."
+
+EJEMPLOS OBLIGATORIOS DE DIFERENCIACIÓN EXTREMA:
+
+LINKEDIN: "Después de implementar ${keyword} en 500+ empresas B2B, descubrí que el 89% mejora su ROI en los primeros 30 días. Como consultor estratégico, estos son los 3 frameworks que transforman resultados: [detalles técnicos]. ¿Cuál ha sido tu experiencia? #BusinessStrategy #ROI #Marketing"
+
+FACEBOOK: "Chicos, ayer probé ${keyword} por primera vez y estoy OBSESIONADO/A 😍 Mi hermana me lo recomendó y ahora entiendo por qué. La diferencia es increíble. ¿Alguien más lo ha probado? Cuéntenme en los comentarios 👇"
+
+TWITTER: "El secreto de ${keyword} que cambió mi vida en 30 días: 🧵
+• Día 1: Escéptico total
+• Día 15: Primeros resultados
+• Día 30: Transformación completa
+Thread con todo el proceso ⬇️ #Transformation #LifeHack"
+
+WHATSAPP: "🚨 María, URGENTE sobre ${keyword}
+Conseguí 3 cupos con 50% descuento
+Solo hasta las 11:59 PM de HOY
+¿Te interesa? Responde YA"
+
+GENERA AHORA contenido así de diferente para cada red seleccionada.
 
 FORMATO EXACTO:
-LinkedIn: [contenido profesional único]
-Facebook: [historia personal única]
-X / Twitter: [mensaje viral único]  
-WhatsApp: [mensaje urgente único]`;
+LinkedIn: [contenido profesional único con datos]
+Facebook: [historia personal única emocional]
+X / Twitter: [mensaje viral único con thread]  
+WhatsApp: [mensaje urgente único directo]
+Instagram: [contenido visual único aspiracional]
+TikTok: [contenido trendy único generación Z]
+Telegram: [contenido informativo único técnico]
+Reddit: [experiencia auténtica única comunitaria]
+YouTube: [descripción educativa única tutorial]`;
         }
 
         console.log(`[API] 🚀 Prompt específico generado para ${platforms.join(', ')}`);
@@ -559,34 +674,78 @@ function parseResponse(text) {
         }
     }
     
-    // Formato alternativo: buscar por red social específica
+    // NUEVO: Parser específico por red social (LinkedIn: texto, Facebook: texto, etc.)
     if (ideas.length === 0) {
         console.log('[PARSER] 🔍 Buscando por redes sociales específicas...');
         
-        const socialNetworks = ['Facebook', 'LinkedIn', 'Twitter', 'X / Twitter', 'WhatsApp', 'Instagram', 'TikTok', 'Telegram', 'Reddit', 'YouTube'];
+        const socialNetworks = ['LinkedIn', 'Facebook', 'Twitter', 'X / Twitter', 'WhatsApp', 'Instagram', 'TikTok', 'Telegram', 'Reddit', 'YouTube'];
         
         for (const network of socialNetworks) {
-            const networkRegex = new RegExp(`${network}:?\\s*([^\\n]+(?:\\n[^\\n]+)*)`, 'gi');
+            // Buscar patrón: "Red Social: contenido"
+            const networkRegex = new RegExp(`${network}\\s*:([^\\n]+(?:\\n(?!(?:${socialNetworks.join('|')})\\s*:)[^\\n]*)*)`, 'gi');
             const networkMatch = text.match(networkRegex);
             
             if (networkMatch && networkMatch[0]) {
-                const content = networkMatch[0].replace(new RegExp(`${network}:?\\s*`, 'i'), '').trim();
+                const content = networkMatch[0].replace(new RegExp(`${network}\\s*:\\s*`, 'i'), '').trim();
                 
                 if (content.length > 20) {
-                    // Extraer hashtags del contenido
+                    // Extraer hashtags del contenido si los hay
                     const hashtagMatches = content.match(/#\w+/g) || [];
                     const cleanText = content.replace(/#\w+/g, '').trim();
                     
+                    // Detectar CTA en el contenido
+                    const ctaIndicators = ['comenta', 'comparte', 'responde', 'sígueme', 'like', 'suscríbete', 'únete', 'regístrate'];
+                    let detectedCTA = 'Interactúa con el contenido';
+                    
+                    for (const indicator of ctaIndicators) {
+                        if (cleanText.toLowerCase().includes(indicator)) {
+                            detectedCTA = `${indicator.charAt(0).toUpperCase() + indicator.slice(1)} ahora`;
+                            break;
+                        }
+                    }
+                    
                     ideas.push({
-                        hook: `${network} específico`,
+                        hook: `Contenido para ${network}`,
                         postText: cleanText,
-                        hashtags: hashtagMatches.length > 0 ? hashtagMatches.map(h => h.replace('#', '')) : ['marketing', network.toLowerCase()],
-                        cta: 'Comparte tu experiencia',
-                        visualFormat: 'Imagen atractiva',
+                        hashtags: hashtagMatches.length > 0 ? hashtagMatches.map(h => h.replace('#', '')) : [network.toLowerCase().replace(/\s/g, ''), 'marketing'],
+                        cta: detectedCTA,
+                        visualFormat: getVisualSuggestion(network),
                         socialNetwork: network
                     });
                     
                     console.log('[PARSER] ✅ Contenido específico para', network, ':', cleanText.substring(0, 50));
+                }
+            }
+        }
+    }
+    
+    // NUEVO: Parser para formato de redes sociales con salto de línea
+    if (ideas.length === 0) {
+        console.log('[PARSER] 🔍 Buscando formato con saltos de línea...');
+        
+        // Dividir por redes sociales detectadas
+        const sections = text.split(/(?=(?:LinkedIn|Facebook|Twitter|X \/ Twitter|WhatsApp|Instagram|TikTok|Telegram|Reddit|YouTube)\s*:)/i);
+        
+        for (const section of sections) {
+            if (section.trim().length > 30) {
+                // Extraer el nombre de la red social
+                const networkMatch = section.match(/^(LinkedIn|Facebook|Twitter|X \/ Twitter|WhatsApp|Instagram|TikTok|Telegram|Reddit|YouTube)/i);
+                const network = networkMatch ? networkMatch[1] : 'General';
+                
+                const content = section.replace(/^[^:]*:\s*/, '').trim();
+                
+                if (content.length > 20) {
+                    const hashtagMatches = content.match(/#\w+/g) || [];
+                    const cleanText = content.replace(/#\w+/g, '').replace(/\n+/g, ' ').trim();
+                    
+                    ideas.push({
+                        hook: `Específico para ${network}`,
+                        postText: cleanText,
+                        hashtags: hashtagMatches.length > 0 ? hashtagMatches.map(h => h.replace('#', '')) : [network.toLowerCase().replace(/\s/g, ''), 'contenido'],
+                        cta: 'Comparte tu experiencia',
+                        visualFormat: getVisualSuggestion(network),
+                        socialNetwork: network
+                    });
                 }
             }
         }
@@ -610,35 +769,47 @@ function parseResponse(text) {
                     postText: postText,
                     hashtags: hashtags?.split(/[,\s#]+/).filter(h => h.length > 1).slice(0, 5) || ['contenido'],
                     cta: cta || 'Interactúa',
-                    visualFormat: 'Imagen atractiva',
+                    visualFormat: getVisualSuggestion(socialNetwork || 'General'),
                     socialNetwork: socialNetwork || 'General'
                 });
             }
         }
     }
     
-    // Fallback split básico si nada funciona
+    // Fallback split inteligente si nada funciona
     if (ideas.length === 0) {
-        console.log('[PARSER] 🔍 Usando split básico como último recurso...');
+        console.log('[PARSER] 🔍 Usando split inteligente como último recurso...');
         
-        const parts = text.split(/[\n\r]{2,}/).filter(part => part.trim().length > 20);
+        // Buscar patrones de contenido por estructura
+        const contentPatterns = [
+            /([^\.!?]*[\.!?])\s*(?:#\w+(?:\s+#\w+)*)?/g, // Oraciones completas con hashtags opcionales
+            /([^\.!?]{30,})/g, // Contenido de al menos 30 caracteres sin puntuación
+            /([^\n]{40,})/g  // Líneas de al menos 40 caracteres
+        ];
         
-        parts.forEach((part, index) => {
-            const cleanPart = part.trim();
-            if (cleanPart.length > 20) {
-                const hashtagMatches = cleanPart.match(/#\w+/g) || [];
-                const cleanText = cleanPart.replace(/#\w+/g, '').trim();
-                
-                ideas.push({
-                    hook: `Idea ${index + 1}`,
-                    postText: cleanText,
-                    hashtags: hashtagMatches.length > 0 ? hashtagMatches.map(h => h.replace('#', '')) : ['marketing'],
-                    cta: 'Comparte',
-                    visualFormat: 'Imagen atractiva',
-                    socialNetwork: 'General'
+        for (const pattern of contentPatterns) {
+            const matches = text.match(pattern);
+            if (matches && matches.length > 0) {
+                matches.forEach((match, index) => {
+                    const cleanMatch = match.trim();
+                    if (cleanMatch.length > 30 && ideas.length < 5) { // Máximo 5 ideas
+                        const hashtagMatches = cleanMatch.match(/#\w+/g) || [];
+                        const cleanText = cleanMatch.replace(/#\w+/g, '').trim();
+                        
+                        ideas.push({
+                            hook: `Idea ${ideas.length + 1}`,
+                            postText: cleanText,
+                            hashtags: hashtagMatches.length > 0 ? hashtagMatches.map(h => h.replace('#', '')) : ['marketing', 'contenido'],
+                            cta: 'Comparte si te gustó',
+                            visualFormat: 'Imagen atractiva',
+                            socialNetwork: 'General'
+                        });
+                    }
                 });
+                
+                if (ideas.length > 0) break; // Si encontramos contenido, salir del loop
             }
-        });
+        }
     }
     
     console.log('[PARSER] 📊 Total ideas parseadas:', ideas.length);
@@ -650,6 +821,24 @@ function parseResponse(text) {
     
     console.log(`[PARSER] ✅ ${ideas.length} ideas parseadas para múltiples redes`);
     return ideas;
+}
+
+// Función auxiliar para sugerir formato visual según la red social
+function getVisualSuggestion(network) {
+    const visualSuggestions = {
+        'LinkedIn': 'Gráfico profesional con datos',
+        'Facebook': 'Imagen emotiva o personal',
+        'Instagram': 'Foto estética lifestyle',
+        'TikTok': 'Video dinámico vertical',
+        'Twitter': 'Imagen con estadísticas',
+        'X / Twitter': 'Imagen con estadísticas',
+        'WhatsApp': 'Sin imagen o emoji simple',
+        'Telegram': 'Infografía informativa',
+        'Reddit': 'Screenshot o imagen contextual',
+        'YouTube': 'Thumbnail atractivo'
+    };
+    
+    return visualSuggestions[network] || 'Imagen llamativa';
 }
 
 // IDEA FALLBACK

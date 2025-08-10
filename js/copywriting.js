@@ -470,6 +470,7 @@ async function generateCopywriting(params) {
             socialMedia: params.socialNetworks.map(net => SOCIAL_NETWORKS[net] ? SOCIAL_NETWORKS[net].name : net), // Nombres de las redes
             keyword: params.keyword.trim(),
             copyType: COPY_TYPES[params.copyType] ? COPY_TYPES[params.copyType].name : params.copyType, // Nombre del tipo de copy
+            context: params.context || '', // CONTEXTO ADICIONAL DEL USUARIO
             language: 'es' // Español por defecto
         };
         
