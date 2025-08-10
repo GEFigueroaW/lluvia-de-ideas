@@ -17,13 +17,19 @@ exports.isUserAdmin = isUserAdmin;
 const DEEPSEEK_API_KEY = 'sk-97c8f4c543fa45acabaf02ebcac60f03';
 const DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1';
 
+// URLs de respaldo
+const DEEPSEEK_FALLBACK_URLS = [
+    'https://api.deepseek.com/v1',
+    'https://api.deepseek.com'
+];
+
 // Validar configuración al inicializar
 if (!DEEPSEEK_API_KEY || !DEEPSEEK_API_KEY.startsWith('sk-')) {
     console.error('[INIT] CRITICAL: Invalid Deepseek API key');
     throw new Error('Invalid Deepseek API key configuration');
 }
 
-console.log('[INIT] Deepseek API configurado correctamente');
+console.log('[INIT] Deepseek API configurado correctamente con URL:', DEEPSEEK_BASE_URL);
 
 // Objeto de traducciones para el prompt
 const translations = {
@@ -77,9 +83,164 @@ const copyTypes = [
     { name: "Venta directa o persuasivo", desc: "Convencimiento directo para cerrar ventas." }
 ];
 
+// Función de prueba para verificar conectividad con Deepseek
+// Nuevo endpoint de test avanzado
+exports.testDeepseekAdvanced = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
+    }
+
+    const results = [];
+
+    try {
+        console.log('[ADVANCED_TEST] Iniciando test avanzado de Deepseek...');
+        
+        // Test 1: Conectividad básica
+        try {
+            const basicResponse = await axios({
+                method: 'GET',
+                url: 'https://api.deepseek.com',
+                timeout: 10000,
+                headers: { 'User-Agent': 'Test/1.0' }
+            });
+            results.push({
+                test: 'basic_connectivity',
+                success: true,
+                status: basicResponse.status,
+                message: 'Conectividad básica OK'
+            });
+        } catch (error) {
+            results.push({
+                test: 'basic_connectivity',
+                success: false,
+                error: error.message,
+                code: error.code
+            });
+        }
+
+        // Test 2: Endpoint de modelos
+        try {
+            const modelsResponse = await axios({
+                method: 'GET',
+                url: 'https://api.deepseek.com/v1/models',
+                headers: {
+                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                timeout: 10000
+            });
+            results.push({
+                test: 'models_endpoint',
+                success: true,
+                status: modelsResponse.status,
+                message: 'Endpoint de modelos accesible'
+            });
+        } catch (error) {
+            results.push({
+                test: 'models_endpoint',
+                success: false,
+                error: error.message,
+                code: error.code,
+                status: error.response?.status
+            });
+        }
+
+        // Test 3: Chat completions
+        try {
+            const chatResponse = await axios({
+                method: 'POST',
+                url: 'https://api.deepseek.com/v1/chat/completions',
+                headers: {
+                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    model: "deepseek-chat",
+                    messages: [{ role: "user", content: "Responde solo: Test OK" }],
+                    max_tokens: 10,
+                    temperature: 0.1
+                },
+                timeout: 15000
+            });
+            
+            results.push({
+                test: 'chat_completions',
+                success: true,
+                status: chatResponse.status,
+                message: chatResponse.data.choices[0].message.content,
+                usage: chatResponse.data.usage
+            });
+        } catch (error) {
+            results.push({
+                test: 'chat_completions',
+                success: false,
+                error: error.message,
+                code: error.code,
+                status: error.response?.status,
+                data: error.response?.data
+            });
+        }
+
+        return { 
+            success: true, 
+            results,
+            summary: {
+                total_tests: results.length,
+                passed: results.filter(r => r.success).length,
+                failed: results.filter(r => !r.success).length
+            }
+        };
+
+    } catch (error) {
+        console.error('[ADVANCED_TEST] Error general:', error.message);
+        throw new functions.https.HttpsError('internal', `Advanced test failed: ${error.message}`);
+    }
+});
+
+exports.testDeepseekConnection = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
+    }
+
+    try {
+        console.log('[TEST] Iniciando prueba de conectividad con Deepseek...');
+        
+        // Prueba simple con prompt corto
+        const testPrompt = "Responde solo: 'Test exitoso'";
+        
+        const response = await axios({
+            method: 'POST',
+            url: `${DEEPSEEK_BASE_URL}/chat/completions`,
+            headers: {
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            data: {
+                model: "deepseek-chat",
+                messages: [{ role: "user", content: testPrompt }],
+                max_tokens: 50,
+                temperature: 0.1
+            },
+            timeout: 10000
+        });
+
+        console.log('[TEST] ✅ Conexión exitosa:', response.status);
+        return { 
+            success: true, 
+            status: response.status,
+            message: response.data.choices[0].message.content,
+            apiUrl: DEEPSEEK_BASE_URL
+        };
+
+    } catch (error) {
+        console.error('[TEST] ❌ Error de conectividad:', error.message);
+        throw new functions.https.HttpsError('internal', `Connection test failed: ${error.message}`);
+    }
+});
+
 exports.api = functions.runWith({
-    timeoutSeconds: 120,
-    memory: '256MB'
+    timeoutSeconds: 180, // Aumentado a 3 minutos
+    memory: '512MB' // Aumentado a 512MB
 }).https.onCall(async (data, context) => {
     // 1. Validación inicial más estricta
     console.log('[API] Inicio de función con datos:', JSON.stringify(data, null, 2));
@@ -255,84 +416,111 @@ El contenido generado siempre debe estar en ${language === 'es' ? 'español' : l
 
 // Función optimizada para llamar a Deepseek API
 async function callDeepseekAPI(prompt, retries = 2) {
+    console.log('[DEEPSEEK] Iniciando llamada a API con prompt longitud:', prompt.length);
+    
     for (let attempt = 1; attempt <= retries + 1; attempt++) {
         console.log(`[DEEPSEEK] Intento ${attempt}/${retries + 1}`);
         
         try {
-            // Configuración optimizada para evitar timeouts
-            const config = {
-                method: 'post',
+            // Test de conectividad básica primero
+            console.log('[DEEPSEEK] Verificando conectividad...');
+            
+            // Configuración simplificada y más robusta
+            const requestData = {
+                model: "deepseek-chat",
+                messages: [{
+                    role: "user",
+                    content: prompt
+                }],
+                temperature: 0.7,
+                max_tokens: 1200, // Reducido aún más
+                stream: false
+            };
+
+            console.log('[DEEPSEEK] Datos de request preparados');
+
+            // Configuración alternativa con User-Agent simple
+            const response = await axios({
+                method: 'POST',
                 url: `${DEEPSEEK_BASE_URL}/chat/completions`,
                 headers: {
                     'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'FeedFlow-App/1.0'
+                    'Content-Type': 'application/json'
                 },
-                data: {
-                    model: "deepseek-chat",
-                    messages: [{
-                        role: "user",
-                        content: prompt
-                    }],
-                    temperature: 0.7,
-                    max_tokens: 1500, // Reducido para evitar timeouts
-                    stream: false,
-                    top_p: 0.9
-                },
-                timeout: 15000, // Reducido a 15 segundos
-                validateStatus: function (status) {
-                    return status < 500; // Resuelve solo si status < 500
+                data: requestData,
+                timeout: 30000, // 30 segundos para dar más tiempo
+                httpAgent: false, // Deshabilitar keep-alive
+                httpsAgent: false,
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity
+            });
+            
+            console.log('[DEEPSEEK] Respuesta recibida con status:', response.status);
+            console.log('[DEEPSEEK] Headers de respuesta:', response.headers);
+            
+            if (response.status === 200) {
+                if (!response.data) {
+                    throw new Error('Respuesta vacía del servidor');
                 }
-            };
 
-            console.log('[DEEPSEEK] Enviando request a:', config.url);
-            const response = await axios(config);
-            
-            console.log('[DEEPSEEK] Status recibido:', response.status);
-            
-            if (response.status !== 200) {
-                throw new Error(`API returned status ${response.status}: ${JSON.stringify(response.data)}`);
+                if (!response.data.choices || !response.data.choices[0]) {
+                    throw new Error(`Estructura de respuesta inválida: ${JSON.stringify(response.data)}`);
+                }
+
+                const content = response.data.choices[0].message?.content;
+                if (!content) {
+                    throw new Error('Sin contenido en la respuesta');
+                }
+
+                console.log('[DEEPSEEK] ✅ Respuesta exitosa, longitud:', content.length);
+                return content;
+            } else {
+                throw new Error(`HTTP ${response.status}: ${JSON.stringify(response.data)}`);
             }
-
-            if (!response.data) {
-                throw new Error('Empty response from API');
-            }
-
-            if (!response.data.choices || !response.data.choices[0]) {
-                throw new Error(`Invalid response structure: ${JSON.stringify(response.data)}`);
-            }
-
-            const content = response.data.choices[0].message?.content;
-            if (!content) {
-                throw new Error('No content in response');
-            }
-
-            console.log('[DEEPSEEK] Respuesta exitosa, longitud:', content.length);
-            return content;
 
         } catch (error) {
-            console.error(`[DEEPSEEK] Error en intento ${attempt}:`, {
+            console.error(`[DEEPSEEK] ❌ Error en intento ${attempt}:`, {
                 message: error.message,
+                code: error.code,
                 status: error.response?.status,
+                statusText: error.response?.statusText,
                 data: error.response?.data,
-                code: error.code
+                isAxiosError: error.isAxiosError,
+                isTimeout: error.code === 'ECONNABORTED'
             });
 
-            // Si es el último intento, lanzar el error
+            // Si es el último intento, determinar el tipo de error específico
             if (attempt > retries) {
                 if (error.code === 'ECONNABORTED') {
-                    throw new Error('Connection timeout - API took too long to respond');
+                    throw new Error('Timeout - La API tardó demasiado en responder');
+                } else if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+                    throw new Error('No se puede conectar a la API de Deepseek - Verifica tu conexión');
+                } else if (error.code === 'ETIMEDOUT') {
+                    throw new Error('Timeout de conexión - La red está muy lenta');
                 } else if (error.response) {
-                    throw new Error(`API error ${error.response.status}: ${error.response.data?.error?.message || 'Unknown API error'}`);
+                    const status = error.response.status;
+                    const errorMsg = error.response.data?.error?.message || 'Error desconocido de API';
+                    
+                    if (status === 401) {
+                        throw new Error('API Key inválida o expirada');
+                    } else if (status === 403) {
+                        throw new Error('Sin permisos para usar esta API');
+                    } else if (status === 429) {
+                        throw new Error('Límite de rate excedido - Intenta más tarde');
+                    } else if (status >= 500) {
+                        throw new Error(`Error del servidor de Deepseek: ${errorMsg}`);
+                    } else {
+                        throw new Error(`Error de API (${status}): ${errorMsg}`);
+                    }
                 } else if (error.request) {
-                    throw new Error('Network error - unable to reach API');
+                    throw new Error('Sin respuesta del servidor - Verifica tu conexión a internet');
                 } else {
-                    throw new Error(`Request setup error: ${error.message}`);
+                    throw new Error(`Error de configuración: ${error.message}`);
                 }
             }
 
-            // Esperar antes del siguiente intento (backoff exponencial)
-            const delay = Math.pow(2, attempt - 1) * 1000; // 1s, 2s, 4s...
+            // Backoff exponencial para retry
+            const delay = Math.min(Math.pow(2, attempt) * 1000, 5000); // Max 5 segundos
             console.log(`[DEEPSEEK] Esperando ${delay}ms antes del siguiente intento...`);
             await new Promise(resolve => setTimeout(resolve, delay));
         }
