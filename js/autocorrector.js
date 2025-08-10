@@ -111,28 +111,39 @@ function initializeAutocorrector() {
 }
 
 function createSuggestionBox() {
+    console.log('🎨 Creando caja de sugerencias...');
+    
     suggestionBox = document.createElement('div');
+    suggestionBox.className = 'autocorrector-suggestions';
     suggestionBox.style.cssText = `
         position: fixed;
         background: white;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
+        border: 2px solid #007bff;
+        border-radius: 8px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        z-index: 99999;
         display: none;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         font-size: 14px;
-        min-width: 150px;
-        max-width: 250px;
+        min-width: 180px;
+        max-width: 280px;
+        max-height: 300px;
+        overflow-y: auto;
     `;
+    
+    // Añadir al body
     document.body.appendChild(suggestionBox);
+    console.log('✅ Caja de sugerencias creada y añadida al DOM');
     
     // Cerrar al hacer clic fuera
     document.addEventListener('click', (e) => {
-        if (!suggestionBox.contains(e.target) && e.target !== currentWordSpan) {
+        if (!suggestionBox.contains(e.target) && !e.target.matches('input, textarea')) {
+            console.log('🚫 Click fuera - cerrando sugerencias');
             hideSuggestions();
         }
     });
+    
+    console.log('🎯 Event listeners añadidos para cerrar caja');
 }
 
 function checkSpelling(field) {
@@ -261,8 +272,19 @@ function getWordAtCursor(text, position) {
 }
 
 function showSuggestionsForWord(field, wordInfo) {
+    console.log('🎨 showSuggestionsForWord INICIADO');
+    console.log('📝 WordInfo recibido:', wordInfo);
+    console.log('🔍 Buscando correcciones para:', wordInfo.word.toLowerCase());
+    
     const suggestions = CORRECCIONES[wordInfo.word.toLowerCase()];
-    if (!suggestions) return;
+    console.log('💡 Sugerencias encontradas:', suggestions);
+    
+    if (!suggestions) {
+        console.log('❌ No hay sugerencias disponibles');
+        return;
+    }
+    
+    console.log('🎯 Creando caja de sugerencias...');
     
     // Limpiar contenido anterior
     suggestionBox.innerHTML = '';
@@ -279,15 +301,19 @@ function showSuggestionsForWord(field, wordInfo) {
     `;
     header.textContent = `"${wordInfo.word}" → Sugerencias:`;
     suggestionBox.appendChild(header);
+    console.log('📋 Header añadido');
     
     // Sugerencias
-    suggestions.forEach(suggestion => {
+    suggestions.forEach((suggestion, index) => {
+        console.log(`➕ Añadiendo sugerencia ${index + 1}:`, suggestion);
+        
         const option = document.createElement('div');
         option.style.cssText = `
-            padding: 8px 12px;
+            padding: 10px 12px;
             cursor: pointer;
             transition: background-color 0.2s;
             border-bottom: 1px solid #f1f3f4;
+            font-size: 14px;
         `;
         option.textContent = suggestion;
         
@@ -300,6 +326,7 @@ function showSuggestionsForWord(field, wordInfo) {
         });
         
         option.addEventListener('click', () => {
+            console.log('🖱️ Click en sugerencia:', suggestion);
             replaceWord(field, wordInfo, suggestion);
             hideSuggestions();
             showNotification(`"${wordInfo.word}" → "${suggestion}"`);
@@ -320,33 +347,66 @@ function showSuggestionsForWord(field, wordInfo) {
         text-align: center;
     `;
     keepOption.textContent = `Mantener "${wordInfo.word}"`;
-    keepOption.addEventListener('click', hideSuggestions);
+    keepOption.addEventListener('click', () => {
+        console.log('🚫 Mantener palabra original');
+        hideSuggestions();
+    });
     suggestionBox.appendChild(keepOption);
+    console.log('🚫 Opción "mantener" añadida');
     
     // Posicionar y mostrar
+    console.log('📍 Posicionando caja de sugerencias...');
     positionSuggestionBox(field);
     suggestionBox.style.display = 'block';
+    
+    console.log('✅ Caja de sugerencias mostrada!');
+    console.log('📦 Estado de suggestionBox:', {
+        display: suggestionBox.style.display,
+        position: suggestionBox.style.position,
+        top: suggestionBox.style.top,
+        left: suggestionBox.style.left,
+        zIndex: suggestionBox.style.zIndex
+    });
 }
 
 function positionSuggestionBox(field) {
+    console.log('📍 positionSuggestionBox iniciado');
+    
     const rect = field.getBoundingClientRect();
     const scrollY = window.pageYOffset || document.documentElement.scrollTop;
     const scrollX = window.pageXOffset || document.documentElement.scrollLeft;
     
+    console.log('📏 Dimensiones del campo:', rect);
+    console.log('📜 Scroll Y:', scrollY, 'Scroll X:', scrollX);
+    
+    // Posición inicial: debajo del campo
     let top = rect.bottom + scrollY + 5;
     let left = rect.left + scrollX;
     
-    // Ajustar si se sale de la pantalla
-    if (left + 250 > window.innerWidth) {
-        left = window.innerWidth - 250 - 10;
+    console.log('📍 Posición inicial - Top:', top, 'Left:', left);
+    
+    // Ajustar si se sale de la pantalla por la derecha
+    if (left + 280 > window.innerWidth) {
+        left = window.innerWidth - 280 - 10;
+        console.log('⬅️ Ajustado por derecha - New Left:', left);
     }
     
-    if (top + 150 > window.innerHeight + scrollY) {
-        top = rect.top + scrollY - 150;
+    // Ajustar si se sale de la pantalla por abajo
+    if (top + 200 > window.innerHeight + scrollY) {
+        top = rect.top + scrollY - 200 - 5;
+        console.log('⬆️ Ajustado por abajo - New Top:', top);
     }
+    
+    // Asegurar que no sea negativo
+    top = Math.max(10, top);
+    left = Math.max(10, left);
+    
+    console.log('📍 Posición final - Top:', top, 'Left:', left);
     
     suggestionBox.style.top = top + 'px';
     suggestionBox.style.left = left + 'px';
+    
+    console.log('✅ Posición aplicada a suggestionBox');
 }
 
 function replaceWord(field, wordInfo, replacement) {
