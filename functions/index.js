@@ -68,11 +68,51 @@ CTA: ¡Comparte si te resultó útil!
             })
         ]);
         
-        // Validación rápida
-        const userData = userDoc.data();
-        if (!userDoc.exists || !(userData.generationCredits > 0 || userData.isPremium)) {
-            throw new functions.https.HttpsError('permission-denied', 'No access');
+        // Validación y auto-creación de usuario si es necesario
+        let userData = userDoc.data();
+        
+        // LÍNEA POR LÍNEA: Si el usuario no existe en Firestore, crearlo automáticamente
+        if (!userDoc.exists) {
+            console.log(`[USER] 🔧 Usuario ${uid} no existe en Firestore. Creando automáticamente...`);
+            const defaultUserData = {
+                email: context.auth.token.email || 'unknown@email.com',
+                displayName: context.auth.token.name || 'Usuario',
+                generationCredits: 5, // 5 créditos gratuitos iniciales
+                isPremium: false,
+                createdAt: admin.firestore.Timestamp.now(),
+                lastGenerationDate: null,
+                photoURL: context.auth.token.picture || null
+            };
+            
+            // Crear usuario en Firestore
+            await userRef.set(defaultUserData);
+            userData = defaultUserData;
+            console.log(`[USER] ✅ Usuario ${uid} creado con 5 créditos gratuitos`);
         }
+        // LÍNEA POR LÍNEA: Si existe pero le faltan propiedades, actualizarlas
+        else if (userData.generationCredits === undefined || userData.isPremium === undefined) {
+            console.log(`[USER] 🔧 Usuario ${uid} existe pero faltan propiedades. Actualizando...`);
+            const updateData = {};
+            
+            if (userData.generationCredits === undefined) {
+                updateData.generationCredits = 5; // 5 créditos gratuitos por defecto
+            }
+            if (userData.isPremium === undefined) {
+                updateData.isPremium = false;
+            }
+            
+            await userRef.update(updateData);
+            userData = { ...userData, ...updateData };
+            console.log(`[USER] ✅ Usuario ${uid} actualizado con propiedades faltantes`);
+        }
+        
+        // LÍNEA POR LÍNEA: Verificar acceso después de asegurar que el usuario existe
+        if (!(userData.generationCredits > 0 || userData.isPremium)) {
+            console.log(`[USER] ❌ Usuario ${uid} sin créditos ni premium. Créditos: ${userData.generationCredits}, Premium: ${userData.isPremium}`);
+            throw new functions.https.HttpsError('permission-denied', 'No tienes créditos disponibles. Considera upgradar a premium.');
+        }
+        
+        console.log(`[USER] ✅ Usuario ${uid} autorizado. Créditos: ${userData.generationCredits}, Premium: ${userData.isPremium}`);
 
         // Parse y respuesta inmediata
         const ideas = parseResponse(deepseekResponse);
@@ -88,8 +128,27 @@ CTA: ¡Comparte si te resultó útil!
         return { success: true, ideas };
 
     } catch (error) {
-        console.error('[API] ❌ ERROR:', error.message);
-        throw new functions.https.HttpsError('internal', `Error: ${error.message}`);
+        const totalTime = Date.now() - startTime;
+        console.error(`[API] ❌ ERROR en ${totalTime}ms:`, {
+            message: error.message,
+            code: error.code,
+            uid: uid,
+            hasAuth: !!context.auth,
+            email: context.auth?.token?.email,
+            errorType: error.constructor.name,
+            stack: error.stack?.substring(0, 500)
+        });
+        
+        // Error específicos más útiles para el usuario
+        if (error.message.includes('No tienes créditos')) {
+            throw new functions.https.HttpsError('permission-denied', 'No tienes créditos disponibles. Considera upgradar a premium.');
+        } else if (error.message.includes('API falló')) {
+            throw new functions.https.HttpsError('unavailable', 'Servicio temporalmente no disponible. Intenta nuevamente en unos momentos.');
+        } else if (error.code === 'permission-denied') {
+            throw error; // Re-lanzar errores de permisos tal como están
+        } else {
+            throw new functions.https.HttpsError('internal', `Error del sistema: ${error.message}`);
+        }
     }
 });
 
@@ -207,6 +266,121 @@ function createFallbackIdea() {
     };
 }
 
+// FUNCIÓN PARA AUTO-CREAR USUARIOS EN FIRESTORE
+exports.createUserDocument = functions.auth.user().onCreate(async (user) => {
+    const uid = user.uid;
+    const email = user.email;
+    const displayName = user.displayName || 'Usuario';
+    const photoURL = user.photoURL || null;
+    
+    console.log(`[AUTH_TRIGGER] 🔧 Nuevo usuario registrado: ${email} (${uid}). Creando documento en Firestore...`);
+    
+    try {
+        const userRef = db.collection('users').doc(uid);
+        
+        // Verificar si ya existe (por si acaso)
+        const existingDoc = await userRef.get();
+        if (existingDoc.exists) {
+            console.log(`[AUTH_TRIGGER] ✅ Usuario ${uid} ya existe en Firestore`);
+            return;
+        }
+        
+        // Crear documento con datos por defecto
+        const defaultUserData = {
+            email: email,
+            displayName: displayName,
+            generationCredits: 5, // 5 créditos gratuitos iniciales
+            isPremium: false,
+            createdAt: admin.firestore.Timestamp.now(),
+            lastGenerationDate: null,
+            photoURL: photoURL,
+            totalGenerations: 0,
+            lastLoginAt: admin.firestore.Timestamp.now()
+        };
+        
+        await userRef.set(defaultUserData);
+        console.log(`[AUTH_TRIGGER] ✅ Usuario ${uid} creado en Firestore con 5 créditos gratuitos`);
+        
+    } catch (error) {
+        console.error(`[AUTH_TRIGGER] ❌ Error creando usuario ${uid}:`, error.message);
+    }
+});
+
+// FUNCIÓN PARA VERIFICAR Y REPARAR USUARIOS EXISTENTES
+exports.repairUserData = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
+    }
+
+    const uid = context.auth.uid;
+    const userRef = db.collection('users').doc(uid);
+    
+    try {
+        console.log(`[REPAIR] 🔧 Verificando usuario ${uid}...`);
+        
+        const userDoc = await userRef.get();
+        
+        if (!userDoc.exists) {
+            // Crear usuario completo
+            const defaultUserData = {
+                email: context.auth.token.email || 'unknown@email.com',
+                displayName: context.auth.token.name || 'Usuario',
+                generationCredits: 5,
+                isPremium: false,
+                createdAt: admin.firestore.Timestamp.now(),
+                lastGenerationDate: null,
+                photoURL: context.auth.token.picture || null,
+                totalGenerations: 0,
+                lastLoginAt: admin.firestore.Timestamp.now()
+            };
+            
+            await userRef.set(defaultUserData);
+            console.log(`[REPAIR] ✅ Usuario ${uid} creado con datos completos`);
+            return { success: true, action: 'created', data: defaultUserData };
+        } else {
+            // Verificar y completar propiedades faltantes
+            const userData = userDoc.data();
+            const updates = {};
+            let needsUpdate = false;
+            
+            // Verificar cada propiedad esencial
+            if (userData.generationCredits === undefined) {
+                updates.generationCredits = 5;
+                needsUpdate = true;
+            }
+            if (userData.isPremium === undefined) {
+                updates.isPremium = false;
+                needsUpdate = true;
+            }
+            if (userData.totalGenerations === undefined) {
+                updates.totalGenerations = 0;
+                needsUpdate = true;
+            }
+            if (userData.email === undefined && context.auth.token.email) {
+                updates.email = context.auth.token.email;
+                needsUpdate = true;
+            }
+            if (userData.displayName === undefined && context.auth.token.name) {
+                updates.displayName = context.auth.token.name;
+                needsUpdate = true;
+            }
+            
+            if (needsUpdate) {
+                await userRef.update(updates);
+                console.log(`[REPAIR] ✅ Usuario ${uid} actualizado con propiedades faltantes:`, updates);
+                return { success: true, action: 'updated', updates: updates };
+            } else {
+                console.log(`[REPAIR] ✅ Usuario ${uid} ya tiene todos los datos necesarios`);
+                return { success: true, action: 'no_changes', data: userData };
+            }
+        }
+        
+    } catch (error) {
+        console.error(`[REPAIR] ❌ Error reparando usuario ${uid}:`, error.message);
+        throw new functions.https.HttpsError('internal', `Error reparando usuario: ${error.message}`);
+    }
+});
+
 // TEST DE VELOCIDAD
 exports.testSpeed = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -256,7 +430,44 @@ CTA: [cta]
     }
 });
 
-// TEST
+// FUNCIÓN DE DEBUG PARA REVISAR ESTADO DE USUARIO
+exports.debugUserStatus = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
+    }
+
+    const uid = context.auth.uid;
+    console.log(`[DEBUG] 🔍 Analizando estado de usuario ${uid}...`);
+    
+    try {
+        const userRef = db.collection('users').doc(uid);
+        const userDoc = await userRef.get();
+        
+        const debugInfo = {
+            uid: uid,
+            email: context.auth.token.email,
+            name: context.auth.token.name,
+            exists_in_firestore: userDoc.exists,
+            firestore_data: userDoc.exists ? userDoc.data() : null,
+            auth_token: {
+                email: context.auth.token.email,
+                name: context.auth.token.name,
+                picture: context.auth.token.picture,
+                email_verified: context.auth.token.email_verified
+            },
+            timestamp: new Date().toISOString()
+        };
+        
+        console.log(`[DEBUG] 📊 Estado completo:`, debugInfo);
+        return { success: true, debug: debugInfo };
+        
+    } catch (error) {
+        console.error(`[DEBUG] ❌ Error obteniendo estado:`, error.message);
+        throw new functions.https.HttpsError('internal', `Error de debug: ${error.message}`);
+    }
+});
+
+// TEST DE CONEXIÓN DEEPSEEK
 exports.testDeepseekConnection = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
