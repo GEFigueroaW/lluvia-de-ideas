@@ -31,19 +31,31 @@ exports.api = functions.runWith({
     try {
         // PARALELO: Validación + Prompt + API simultáneos con prompt ultra-optimizado
         const userRef = db.collection('users').doc(uid);
-        const platform = Array.isArray(socialMedia) ? socialMedia[0] : socialMedia;
-        const ideaCount = generationMode === 'multi' ? '1' : '2';
         
-        // Prompt MÍNIMO para máxima velocidad de respuesta
-        const prompt = `${ideaCount} post ${platform}: "${keyword}"
+        // CORRECCIÓN: Manejar múltiples redes sociales correctamente
+        const platforms = Array.isArray(socialMedia) ? socialMedia : [socialMedia];
+        const ideaCount = platforms.length; // Una idea por cada red social
+        
+        console.log(`[API] 📱 Generando ${ideaCount} ideas para redes: ${platforms.join(', ')}`);
+        
+        // Prompt OPTIMIZADO para múltiples redes sociales
+        let prompt = `Genera ${ideaCount} posts de copywriting para "${keyword}":
 
----IDEA_1---
-Texto: [post]
-Hashtags: [tags]
-CTA: [acción]
----FIN_IDEA_1---
+`;
 
-RESPUESTA DIRECTA SIN EXPLICACIONES.`;
+        // Generar template para cada red social
+        platforms.forEach((platform, index) => {
+            prompt += `---IDEA_${index + 1}---
+Red: ${platform}
+Texto: [post específico para ${platform}]
+Hashtags: [tags relevantes para ${platform}]
+CTA: [call-to-action apropiado]
+---FIN_IDEA_${index + 1}---
+
+`;
+        });
+
+        prompt += `RESPUESTA DIRECTA. ADAPTA CADA POST AL FORMATO Y AUDIENCIA DE CADA RED SOCIAL.`;
 
         // PARALELO: Validar usuario Y llamar API simultáneamente CON EMERGENCY FALLBACK
         const [userDoc, deepseekResponse] = await Promise.race([
@@ -56,13 +68,23 @@ RESPUESTA DIRECTA SIN EXPLICACIONES.`;
             new Promise((resolve) => {
                 setTimeout(() => {
                     console.log('[API] ⚠️ EMERGENCY FALLBACK activado');
+                    
+                    // Generar fallback para cada red social
+                    let fallbackResponse = '';
+                    platforms.forEach((platform, index) => {
+                        fallbackResponse += `---IDEA_${index + 1}---
+Red: ${platform}
+Texto: ¡Descubre el poder de ${keyword}! Contenido estratégico diseñado específicamente para ${platform}. ${copyType ? `Perfecto para campañas de ${copyType.toLowerCase()}.` : 'Ideal para maximizar tu alcance.'} Te compartimos insights clave para implementar en tu estrategia.
+Hashtags: #${keyword.replace(/\s+/g, '')} #${platform.toLowerCase()} #marketing #estrategia #contenido
+CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn' ? 'Comparte tu experiencia en los comentarios' : platform === 'TikTok' ? '¡Síguenos para más tips!' : '¡Comparte si te resultó útil!'}
+---FIN_IDEA_${index + 1}---
+
+`;
+                    });
+                    
                     resolve([
                         userRef.get(),
-                        `---IDEA_1---
-Texto: ¡Descubre el poder de ${keyword}! Una estrategia que está transformando la forma de hacer ${copyType?.toLowerCase() || 'marketing'}. Te compartimos insights clave para implementar en tu negocio.
-Hashtags: #${keyword.replace(/\s+/g, '')} #marketing #estrategia #negocio #contenido
-CTA: ¡Comparte si te resultó útil!
----FIN_IDEA_1---`
+                        fallbackResponse
                     ]);
                 }, 15000)
             })
@@ -220,9 +242,9 @@ async function callDeepseekAPI(prompt, attempt = 1, maxAttempts = 3) {
     }
 }
 
-// PARSER ULTRA-EFICIENTE
+// PARSER ULTRA-EFICIENTE PARA MÚLTIPLES REDES SOCIALES
 function parseResponse(text) {
-    console.log('[PARSER] 🚀 Parse rápido...');
+    console.log('[PARSER] 🚀 Parse rápido para múltiples redes...');
     
     if (!text?.trim()) {
         return [createFallbackIdea()];
@@ -230,39 +252,64 @@ function parseResponse(text) {
     
     const ideas = [];
     
-    // Regex optimizada para velocidad máxima
-    const matches = text.matchAll(/---IDEA_\d+---\s*Texto:\s*([^-]+?)\s*Hashtags:\s*([^-]+?)\s*CTA:\s*([^-]+?)\s*---FIN_IDEA_\d+---/gi);
+    // Regex mejorada para capturar también la red social
+    const matches = text.matchAll(/---IDEA_\d+---\s*(?:Red:\s*([^\n]+?)\s*)?(?:Texto:\s*([^-]+?)\s*)?Hashtags:\s*([^-]+?)\s*CTA:\s*([^-]+?)\s*---FIN_IDEA_\d+---/gi);
     
     for (const match of matches) {
-        const postText = match[1]?.trim();
+        const socialNetwork = match[1]?.trim();
+        const postText = (match[2] || match[1])?.trim(); // Si no hay texto separado, usar el campo que tenga contenido
+        const hashtags = match[3]?.trim();
+        const cta = match[4]?.trim();
+        
         if (postText && postText.length > 10) {
             ideas.push({
                 hook: postText.substring(0, 50) + (postText.length > 50 ? '...' : ''),
                 postText: postText,
-                hashtags: match[2]?.split(/[,\s#]+/).filter(h => h.length > 1).slice(0, 5) || ['contenido'],
-                cta: match[3]?.trim() || 'Interactúa',
-                visualFormat: 'Imagen atractiva'
+                hashtags: hashtags?.split(/[,\s#]+/).filter(h => h.length > 1).slice(0, 5) || ['contenido'],
+                cta: cta || 'Interactúa',
+                visualFormat: 'Imagen atractiva',
+                socialNetwork: socialNetwork || 'General' // Agregar información de la red social
             });
+        }
+    }
+    
+    // Regex alternativa para el formato original (backward compatibility)
+    if (ideas.length === 0) {
+        const oldMatches = text.matchAll(/---IDEA_\d+---\s*Texto:\s*([^-]+?)\s*Hashtags:\s*([^-]+?)\s*CTA:\s*([^-]+?)\s*---FIN_IDEA_\d+---/gi);
+        
+        for (const match of oldMatches) {
+            const postText = match[1]?.trim();
+            if (postText && postText.length > 10) {
+                ideas.push({
+                    hook: postText.substring(0, 50) + (postText.length > 50 ? '...' : ''),
+                    postText: postText,
+                    hashtags: match[2]?.split(/[,\s#]+/).filter(h => h.length > 1).slice(0, 5) || ['contenido'],
+                    cta: match[3]?.trim() || 'Interactúa',
+                    visualFormat: 'Imagen atractiva',
+                    socialNetwork: 'General'
+                });
+            }
         }
     }
     
     // Fallback inmediato si no hay ideas
     if (ideas.length === 0) {
-        ideas.push(createFallbackIdea());
+        ideas.push(createFallbackIdea('General'));
     }
     
-    console.log(`[PARSER] ✅ ${ideas.length} ideas en modo rápido`);
+    console.log(`[PARSER] ✅ ${ideas.length} ideas parseadas para múltiples redes`);
     return ideas;
 }
 
 // IDEA FALLBACK
-function createFallbackIdea() {
+function createFallbackIdea(socialNetwork = 'General') {
     return {
         hook: '¡Contenido interesante!',
-        postText: 'Contenido de copywriting generado para tus redes sociales.',
+        postText: `Contenido de copywriting generado para ${socialNetwork}. Estrategias efectivas para maximizar tu alcance y engagement.`,
         hashtags: ['contenido', 'marketing', 'redes'],
         cta: 'Comparte si te gustó',
-        visualFormat: 'Imagen llamativa'
+        visualFormat: 'Imagen llamativa',
+        socialNetwork: socialNetwork
     };
 }
 
