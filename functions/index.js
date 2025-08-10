@@ -185,20 +185,39 @@ FORMATO DE RESPUESTA EXACTO:
             }
         } else {
             // Generar 1 copy específico para cada red social
-            prompt = `Crea contenido COMPLETAMENTE DIFERENTE para cada red social sobre "${keyword}":
+            prompt = `INSTRUCCIÓN ULTRA-ESPECÍFICA: Crea contenido TOTALMENTE DIFERENTE para cada red social.
 
-LINKEDIN: Enfoque profesional B2B, insights de negocio, 100-150 palabras, hashtags profesionales
-FACEBOOK: Storytelling personal, conversacional, emocional, 50-80 palabras, máximo 3 hashtags
-TWITTER: Conciso, impactante, viral, máximo 180 caracteres, 2-3 hashtags trending
-WHATSAPP: Personal, urgente, directo, 30-60 palabras, sin hashtags
+Tema: "${keyword}"
 
-CRÍTICO: Cada red debe tener contenido 100% ÚNICO. No repetir frases.
+LINKEDIN (profesional B2B):
+Escribe como CEO/experto. Usa datos, estadísticas, insights de negocio. Menciona ROI, KPIs, estrategias empresariales. 100-150 palabras. Hashtags profesionales como #B2BStrategy #BusinessGrowth #ProfessionalInsights.
 
-FORMATO:
-LinkedIn: [texto profesional único]
-Facebook: [historia personal única]  
-X / Twitter: [mensaje viral único]
-WhatsApp: [mensaje personal único]`;
+FACEBOOK (personal/emocional):
+Escribe como amigo contando una historia personal. Usa emociones, anécdotas, preguntas para generar conversación. Menciona familia, experiencias personales. 50-80 palabras. Pocos hashtags casuales.
+
+TWITTER (viral/conciso):
+Máximo 180 caracteres. Usa trends, números impactantes, preguntas provocativas. Estilo tipo "Thread revelador", "Nadie te cuenta esto", "Dato que te sorprenderá". 2-3 hashtags trending.
+
+WHATSAPP (urgente/personal):
+Mensaje directo como si fuera para un amigo cercano. Urgencia real, llamada a la acción inmediata, tono confidencial. 30-50 palabras. SIN hashtags.
+
+EJEMPLOS OBLIGATORIOS DE DIFERENCIACIÓN:
+
+LINKEDIN: "Después de analizar 500+ campañas B2B, descubrí que el cambaceo masivo aumenta conversiones 40%. Los datos no mienten: empresas que implementan esta metodología ven ROI 300% superior. Como líder de marketing, estas son las 3 métricas que debes medir... #B2BMarketing #DataDriven #MarketingStrategy"
+
+FACEBOOK: "Chicos, no van a creer lo que me pasó ayer 😱 Mi cuñado me enseñó esta técnica del 'cambaceo masivo' y EN SERIO que funciona. Ya vendí 5 productos más que el mes pasado. ¿Alguien más ha probado esto? Cuéntenme en los comentarios 👇"
+
+TWITTER: "El 'cambaceo masivo' que usan las empresas Top 1% 🧵 (y que tu competencia NO quiere que sepas) Datos reales de 2024: +500% engagement Thread revelador ⬇️ #MarketingHacks #VentasDigitales"
+
+WHATSAPP: "🚨 María, URGENTE ¿Viste los resultados del cambaceo masivo? +300% ventas en 24h Solo hasta mañana Responde YA si quieres que te explique"
+
+GENERA AHORA contenido así de diferente para cada red. CADA UNA DEBE SER ÚNICA.
+
+FORMATO EXACTO:
+LinkedIn: [contenido profesional único]
+Facebook: [historia personal única]
+X / Twitter: [mensaje viral único]  
+WhatsApp: [mensaje urgente único]`;
         }
 
         console.log(`[API] 🚀 Prompt específico generado para ${platforms.join(', ')}`);
