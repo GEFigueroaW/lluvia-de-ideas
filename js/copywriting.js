@@ -537,6 +537,118 @@ async function generateCopywriting(params) {
     }
 }
 
+// Configuraciones específicas para cada red social
+const SOCIAL_NETWORK_SPECS = {
+    facebook: {
+        name: 'Facebook',
+        characteristics: {
+            maxLength: 2200,
+            optimalLength: '50-80 palabras',
+            tone: 'conversacional y personal',
+            features: 'storytelling, emociones, comunidad',
+            hashtags: 'máximo 2-3 hashtags',
+            engagement: 'preguntas, polls, contenido que genere conversación',
+            cta: 'botones de acción, enlaces externos'
+        }
+    },
+    linkedin: {
+        name: 'LinkedIn',
+        characteristics: {
+            maxLength: 3000,
+            optimalLength: '100-150 palabras',
+            tone: 'profesional pero humano',
+            features: 'insights profesionales, networking, valor educativo',
+            hashtags: '3-5 hashtags profesionales',
+            engagement: 'comentarios reflexivos, conexiones profesionales',
+            cta: 'invitaciones a conectar, compartir experiencias'
+        }
+    },
+    twitter: {
+        name: 'X / Twitter',
+        characteristics: {
+            maxLength: 280,
+            optimalLength: '120-180 caracteres',
+            tone: 'directo y conciso',
+            features: 'trending topics, tiempo real, viralidad',
+            hashtags: '2-3 hashtags estratégicos',
+            engagement: 'retweets, menciones, hilos',
+            cta: 'enlaces cortos, menciones a usuarios'
+        }
+    },
+    whatsapp: {
+        name: 'WhatsApp',
+        characteristics: {
+            maxLength: 4096,
+            optimalLength: '30-60 palabras',
+            tone: 'personal e íntimo',
+            features: 'mensajería directa, urgencia, exclusividad',
+            hashtags: 'no son efectivos',
+            engagement: 'respuestas directas, llamadas a la acción',
+            cta: 'números de teléfono, enlaces directos'
+        }
+    },
+    telegram: {
+        name: 'Telegram',
+        characteristics: {
+            maxLength: 4096,
+            optimalLength: '80-120 palabras',
+            tone: 'informativo y técnico',
+            features: 'canales, bots, comunidades especializadas',
+            hashtags: 'uso moderado',
+            engagement: 'forwards, reacciones, polls',
+            cta: 'enlaces a canales, bots interactivos'
+        }
+    },
+    reddit: {
+        name: 'Reddit',
+        characteristics: {
+            maxLength: 40000,
+            optimalLength: '150-300 palabras',
+            tone: 'auténtico y comunitario',
+            features: 'subreddits especializados, discusiones profundas',
+            hashtags: 'no se usan',
+            engagement: 'upvotes, comentarios detallados',
+            cta: 'discusión, AMA, recursos útiles'
+        }
+    },
+    instagram: {
+        name: 'Instagram',
+        characteristics: {
+            maxLength: 2200,
+            optimalLength: '100-150 palabras',
+            tone: 'visual y aspiracional',
+            features: 'contenido visual, stories, reels',
+            hashtags: '5-10 hashtags relevantes',
+            engagement: 'likes, shares, saves',
+            cta: 'enlaces en bio, stories interactivas'
+        }
+    },
+    tiktok: {
+        name: 'TikTok',
+        characteristics: {
+            maxLength: 2200,
+            optimalLength: '50-100 palabras',
+            tone: 'joven y trendy',
+            features: 'videos cortos, trends, música',
+            hashtags: '3-5 hashtags trending',
+            engagement: 'duetos, challenges, comentarios',
+            cta: 'follow, like, share'
+        }
+    },
+    youtube: {
+        name: 'YouTube',
+        characteristics: {
+            maxLength: 5000,
+            optimalLength: '200-400 palabras',
+            tone: 'educativo y entretenido',
+            features: 'videos largos, tutoriales, entretenimiento',
+            hashtags: '3-5 hashtags en descripción',
+            engagement: 'suscripciones, likes, comentarios',
+            cta: 'suscribirse, campana de notificaciones'
+        }
+    }
+};
+
 /**
  * Construye el prompt para la IA según los parámetros
  */
@@ -544,33 +656,80 @@ function buildCopywritingPrompt(params) {
     const { keyword, copyType, context, socialNetworks, generationMode } = params;
     const copyTypeInfo = COPY_TYPES[copyType];
     
-    let prompt = `Genera copywriting profesional para redes sociales con las siguientes especificaciones:
-
-PALABRA CLAVE/TEMA: ${keyword}
-TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}`;
-
     if (generationMode === 'single') {
-        const networkName = SOCIAL_NETWORKS[socialNetworks[0]].name;
-        prompt += `\n\nGENERA 3 VARIACIONES diferentes para ${networkName}, cada una con un enfoque único pero manteniendo el tipo de copy especificado.`;
+        // Generar 3 variaciones para una sola red social
+        const networkKey = socialNetworks[0];
+        const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
+        
+        return `Genera 3 variaciones de copywriting profesional para ${networkSpec.name} sobre "${keyword}".
+
+TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}
+
+ESPECIFICACIONES PARA ${networkSpec.name.toUpperCase()}:
+- Longitud óptima: ${networkSpec.characteristics.optimalLength}
+- Tono: ${networkSpec.characteristics.tone}
+- Características clave: ${networkSpec.characteristics.features}
+- Hashtags: ${networkSpec.characteristics.hashtags}
+- Engagement: ${networkSpec.characteristics.engagement}
+- Call-to-action: ${networkSpec.characteristics.cta}
+
+${context ? `CONTEXTO ADICIONAL: ${context}\n` : ''}
+
+INSTRUCCIONES:
+1. Crea 3 enfoques diferentes pero todos optimizados para ${networkSpec.name}
+2. Respeta las características específicas de la plataforma
+3. Cada variación debe tener un hook diferente
+4. Incluye emojis apropiados para el tono de ${networkSpec.name}
+5. Asegúrate de que el call-to-action sea específico para esta plataforma
+
+FORMATO DE RESPUESTA:
+Variación 1: [texto completo]
+Variación 2: [texto completo]
+Variación 3: [texto completo]`;
+
     } else {
-        const networkNames = socialNetworks.map(net => SOCIAL_NETWORKS[net].name).join(', ');
-        prompt += `\n\nGENERA 1 COPY específicamente optimizado para cada una de estas redes sociales: ${networkNames}`;
-        prompt += `\nAdapta el tono, longitud y formato según las características de cada plataforma.`;
+        // Generar 1 copy específico para cada red social
+        let prompt = `Genera copywriting específico y optimizado para cada red social sobre "${keyword}".
+
+TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}
+${context ? `CONTEXTO: ${context}\n` : ''}
+
+GENERA UN COPY ÚNICO Y ESPECÍFICO PARA CADA PLATAFORMA:
+
+`;
+
+        socialNetworks.forEach(networkKey => {
+            const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
+            prompt += `
+${networkSpec.name.toUpperCase()}:
+- Longitud: ${networkSpec.characteristics.optimalLength}
+- Tono: ${networkSpec.characteristics.tone}
+- Enfoque: ${networkSpec.characteristics.features}
+- Hashtags: ${networkSpec.characteristics.hashtags}
+- CTA: ${networkSpec.characteristics.cta}
+`;
+        });
+
+        prompt += `
+INSTRUCCIONES CRÍTICAS:
+1. Cada copy debe ser COMPLETAMENTE DIFERENTE y adaptado a su plataforma
+2. LinkedIn: Profesional con insights de valor
+3. Twitter: Conciso, impactante, trending
+4. Facebook: Conversacional, storytelling
+5. WhatsApp: Directo, personal, urgente
+6. Instagram: Visual, aspiracional, lifestyle
+7. TikTok: Trendy, joven, viral
+8. Telegram: Informativo, técnico
+9. Reddit: Auténtico, comunitario
+10. YouTube: Educativo, descriptivo
+
+FORMATO DE RESPUESTA:
+[Red Social]: [copy específico completamente adaptado]
+[Red Social]: [copy específico completamente adaptado]
+...`;
+
+        return prompt;
     }
-
-    if (context) {
-        prompt += `\n\nCONTEXTO ADICIONAL: ${context}`;
-    }
-
-    prompt += `\n\nREQUISITOS:
-- Texto atractivo y persuasivo
-- Adecuado para la plataforma específica
-- Incluye emojis relevantes cuando sea apropiado
-- Longitud apropiada para cada red social
-- Call-to-action claro cuando corresponda
-- Tono profesional pero enganchador`;
-
-    return prompt;
 }
 
 /**
