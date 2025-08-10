@@ -134,34 +134,56 @@ let isUserPremium = false; // Se actualizará con el estado real del usuario
 
 // Permitir que el main.js actualice el estado premium y refresque la UI
 window.setCopywritingPremiumStatus = function(premium) {
+    console.log('[COPYWRITING] setCopywritingPremiumStatus llamado con:', premium);
     isUserPremium = premium;
-    setupSocialNetworks();
-    setupCopyTypes();
-    updateUserStatus && updateUserStatus();
+    
+    // Si el DOM ya está listo, actualizar inmediatamente
+    if (document.readyState === 'loading') {
+        console.log('[COPYWRITING] DOM aún cargando, esperando...');
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('[COPYWRITING] DOM listo, actualizando redes sociales...');
+            setupSocialNetworks();
+            setupCopyTypes();
+            updateUserStatus && updateUserStatus();
+        });
+    } else {
+        console.log('[COPYWRITING] DOM listo, actualizando inmediatamente...');
+        setupSocialNetworks();
+        setupCopyTypes();
+        updateUserStatus && updateUserStatus();
+    }
 };
 
 /**
  * Inicializa el módulo de copywriting
  */
 function initializeCopywriting() {
+    console.log('[COPYWRITING] Inicializando módulo de copywriting...');
+    console.log('[COPYWRITING] isUserPremium inicial:', isUserPremium);
     setupSocialNetworks();
     setupCopyTypes();
     setupEventListeners();
     updateUserStatus();
+    console.log('[COPYWRITING] Módulo inicializado');
 }
 
 /**
  * Configura la grilla de redes sociales
  */
 function setupSocialNetworks() {
+    console.log('[COPYWRITING] setupSocialNetworks iniciado, isUserPremium:', isUserPremium);
     const container = document.getElementById('socialNetworksContainer');
-    if (!container) return;
+    if (!container) {
+        console.log('[COPYWRITING] ERROR: No se encontró socialNetworksContainer');
+        return;
+    }
 
     container.innerHTML = '';
 
     Object.entries(SOCIAL_NETWORKS).forEach(([key, network]) => {
         const item = document.createElement('div');
-        item.className = `social-network-item ${!isUserPremium && network.premium ? 'disabled' : ''}`;
+        const isDisabled = !isUserPremium && network.premium;
+        item.className = `social-network-item ${isDisabled ? 'disabled' : ''}`;
         item.dataset.network = key;
 
         if (key === 'facebook') {
@@ -178,7 +200,10 @@ function setupSocialNetworks() {
         }
 
         container.appendChild(item);
+        console.log(`[COPYWRITING] Red ${network.name}: ${isDisabled ? 'DESHABILITADA' : 'HABILITADA'}`);
     });
+    
+    console.log('[COPYWRITING] setupSocialNetworks completado');
 }
 
 /**
