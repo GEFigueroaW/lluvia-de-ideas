@@ -144,15 +144,35 @@ window.setCopywritingPremiumStatus = function(premium) {
             console.log('[COPYWRITING] DOM listo, actualizando redes sociales...');
             setupSocialNetworks();
             setupCopyTypes();
-            updateUserStatus && updateUserStatus();
+            updatePremiumNotifications();
         });
     } else {
         console.log('[COPYWRITING] DOM listo, actualizando inmediatamente...');
         setupSocialNetworks();
         setupCopyTypes();
-        updateUserStatus && updateUserStatus();
+        updatePremiumNotifications();
     }
 };
+
+/**
+ * Actualiza solo las notificaciones de premium sin alterar el estado
+ */
+function updatePremiumNotifications() {
+    console.log('[COPYWRITING] updatePremiumNotifications llamado, isUserPremium:', isUserPremium);
+    
+    const notes = document.querySelectorAll('#socialNetworkNote, #copyTypeNote');
+    notes.forEach(note => {
+        if (isUserPremium) {
+            note.textContent = '👑 Usuario Premium - Acceso completo a todas las funciones';
+            note.style.color = '#10b981';
+        } else {
+            note.textContent = 'Usuario gratuito - Funciones limitadas';
+            note.style.color = '#6b7280';
+        }
+    });
+    
+    console.log('[COPYWRITING] Notificaciones actualizadas');
+}
 
 /**
  * Inicializa el módulo de copywriting
@@ -160,11 +180,14 @@ window.setCopywritingPremiumStatus = function(premium) {
 function initializeCopywriting() {
     console.log('[COPYWRITING] Inicializando módulo de copywriting...');
     console.log('[COPYWRITING] isUserPremium inicial:', isUserPremium);
-    setupSocialNetworks();
-    setupCopyTypes();
+    
+    // Solo configurar elementos básicos aquí
     setupEventListeners();
-    updateUserStatus();
-    console.log('[COPYWRITING] Módulo inicializado');
+    
+    // Las redes sociales y tipos de copy se configurarán cuando se reciba el estado premium
+    // desde main.js a través de setCopywritingPremiumStatus()
+    
+    console.log('[COPYWRITING] Módulo inicializado - esperando estado premium desde main.js');
 }
 
 /**
@@ -186,6 +209,7 @@ function setupSocialNetworks() {
         item.className = `social-network-item ${isDisabled ? 'disabled' : ''}`;
         item.dataset.network = key;
 
+        // Facebook siempre seleccionado por defecto
         if (key === 'facebook') {
             item.classList.add('selected');
         }
@@ -200,7 +224,11 @@ function setupSocialNetworks() {
         }
 
         container.appendChild(item);
-        console.log(`[COPYWRITING] Red ${network.name}: ${isDisabled ? 'DESHABILITADA' : 'HABILITADA'}`);
+        
+        // Log específico para depuración
+        if (network.premium) {
+            console.log(`[COPYWRITING] Red ${network.name}: ${isDisabled ? 'DESHABILITADA' : 'HABILITADA'}`);
+        }
     });
     
     console.log('[COPYWRITING] setupSocialNetworks completado');
@@ -347,23 +375,20 @@ function showCopyTypeDescription(copyTypeKey) {
 }
 
 /**
- * Actualiza el estado del usuario (premium/gratuito)
+ * Actualiza el estado del usuario internamente (solo cuando sea necesario)
+ * NOTA: No debe sobrescribir isUserPremium cuando viene desde main.js
  */
-function updateUserStatus() {
-    // Aquí se integraría con el sistema de autenticación existente
-    // Por ahora simulamos que es un usuario gratuito
-    isUserPremium = false; // TODO: Obtener del estado real del usuario
+function updateUserStatusInternal() {
+    console.log('[COPYWRITING] updateUserStatusInternal llamado, isUserPremium actual:', isUserPremium);
+    
+    // NO sobrescribir isUserPremium aquí, ya viene actualizado desde main.js
+    // isUserPremium ya fue establecido por setCopywritingPremiumStatus()
     
     setupSocialNetworks();
     setupCopyTypes();
+    updatePremiumNotifications();
     
-    const notes = document.querySelectorAll('#socialNetworkNote, #copyTypeNote');
-    notes.forEach(note => {
-        if (isUserPremium) {
-            note.textContent = '👑 Usuario Premium - Acceso completo a todas las funciones';
-            note.style.color = '#10b981';
-        }
-    });
+    console.log('[COPYWRITING] Estado interno actualizado - isUserPremium:', isUserPremium);
 }
 
 /**
