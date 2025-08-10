@@ -496,12 +496,8 @@ async function generateCopywriting(params) {
         const ideas = result.data.ideas;
         console.log('[COPYWRITING] Ideas generadas:', ideas);
         
-        // Convertir el objeto de ideas a array para compatibilidad
-        const copies = Object.entries(ideas).map(([platform, content]) => ({
-            platform,
-            content,
-            description: content
-        }));
+        // Procesar y formatear las ideas para copywriting
+        const copies = processCopywritingResponse(ideas, params);
         
         console.log('[COPYWRITING] Copies formateados:', copies);
         
@@ -659,6 +655,163 @@ const SOCIAL_NETWORK_SPECS = {
 };
 
 /**
+ * Procesa la respuesta de la IA para copywriting
+ */
+function processCopywritingResponse(ideas, params) {
+    const { socialNetworks, generationMode } = params;
+    const copies = [];
+    
+    // Si la respuesta es un objeto con plataformas como claves
+    if (typeof ideas === 'object' && !Array.isArray(ideas)) {
+        Object.entries(ideas).forEach(([platform, content]) => {
+            if (typeof content === 'string') {
+                // Procesar el texto para extraer estructura
+                const processedCopy = parseAICopyContent(content, platform);
+                copies.push({
+                    platform,
+                    ...processedCopy
+                });
+            } else if (typeof content === 'object') {
+                // Si ya viene estructurado
+                copies.push({
+                    platform,
+                    ...content
+                });
+            }
+        });
+    } 
+    // Si la respuesta es texto plano
+    else if (typeof ideas === 'string') {
+        if (generationMode === 'single' && socialNetworks.length === 1) {
+            // Dividir en variaciones para una sola plataforma
+            const variations = parseVariations(ideas);
+            variations.forEach((variation, index) => {
+                copies.push({
+                    platform: socialNetworks[0],
+                    variation: index + 1,
+                    ...parseAICopyContent(variation, socialNetworks[0])
+                });
+            });
+        } else {
+            // Dividir por plataformas
+            socialNetworks.forEach((platform, index) => {
+                const platformSection = extractPlatformContent(ideas, platform);
+                copies.push({
+                    platform,
+                    ...parseAICopyContent(platformSection, platform)
+                });
+            });
+        }
+    }
+    
+    return copies;
+}
+
+/**
+ * Parsea el contenido de texto de IA para extraer estructura
+ */
+function parseAICopyContent(content, platform) {
+    const result = {
+        hook: '',
+        postText: '',
+        hashtags: [],
+        cta: '',
+        visualFormat: '',
+        rawContent: content
+    };
+    
+    // Buscar patrones comunes en el texto
+    const lines = content.split('\n').filter(line => line.trim());
+    
+    lines.forEach(line => {
+        const cleanLine = line.trim();
+        
+        // Detectar ganchos/hooks
+        if (cleanLine.match(/^(🎯|Gancho:|Hook:|Título:|HOOK:)/i)) {
+            result.hook = cleanLine.replace(/^(🎯|Gancho:|Hook:|Título:|HOOK:)\s*/i, '');
+        }
+        // Detectar CTAs
+        else if (cleanLine.match(/^(📢|CTA:|Call to action:|Llamada a la acción:)/i)) {
+            result.cta = cleanLine.replace(/^(📢|CTA:|Call to action:|Llamada a la acción:)\s*/i, '');
+        }
+        // Detectar hashtags
+        else if (cleanLine.match(/^(#️⃣|Hashtags:|#)/i) || cleanLine.includes('#')) {
+            const hashtags = cleanLine.match(/#\w+/g) || [];
+            result.hashtags = hashtags;
+        }
+        // Detectar formato visual
+        else if (cleanLine.match(/^(🎨|Visual:|Imagen:|Formato visual:)/i)) {
+            result.visualFormat = cleanLine.replace(/^(🎨|Visual:|Imagen:|Formato visual:)\s*/i, '');
+        }
+        // El resto va al texto principal
+        else if (!cleanLine.match(/^(Variación|===|---)/i)) {
+            if (!result.postText) {
+                result.postText = cleanLine;
+            } else {
+                result.postText += '\n' + cleanLine;
+            }
+        }
+    });
+    
+    // Si no se detectó estructura, usar todo como texto principal
+    if (!result.hook && !result.postText && !result.cta) {
+        result.postText = content.trim();
+        
+        // Intentar extraer un gancho del primer párrafo
+        const firstSentence = content.split(/[.!?]/)[0];
+        if (firstSentence && firstSentence.length < 100) {
+            result.hook = firstSentence.trim();
+            result.postText = content.replace(firstSentence, '').trim();
+        }
+    }
+    
+    return result;
+}
+
+/**
+ * Divide el texto en variaciones
+ */
+function parseVariations(text) {
+    const variations = [];
+    const sections = text.split(/Variación \d+:|Variación \d+\:/i);
+    
+    sections.forEach(section => {
+        const trimmed = section.trim();
+        if (trimmed) {
+            variations.push(trimmed);
+        }
+    });
+    
+    // Si no se encontraron variaciones marcadas, dividir por párrafos largos
+    if (variations.length <= 1) {
+        const paragraphs = text.split(/\n\s*\n/);
+        return paragraphs.filter(p => p.trim().length > 50);
+    }
+    
+    return variations;
+}
+
+/**
+ * Extrae contenido específico para una plataforma
+ */
+function extractPlatformContent(text, platform) {
+    const platformName = SOCIAL_NETWORKS[platform]?.name;
+    if (!platformName) return text;
+    
+    // Buscar secciones marcadas por plataforma
+    const regex = new RegExp(`(${platformName}|${platform}):?([\\s\\S]*?)(?=(?:Facebook|LinkedIn|Twitter|Instagram|TikTok|YouTube|===)|$)`, 'i');
+    const match = text.match(regex);
+    
+    if (match && match[2]) {
+        return match[2].trim();
+    }
+    
+    // Si no se encuentra, retornar una porción del texto
+    const sentences = text.split(/[.!?]/).filter(s => s.trim());
+    return sentences.slice(0, 3).join('. ') + '.';
+}
+
+/**
  * Construye el prompt para la IA según los parámetros
  */
 function buildCopywritingPrompt(params) {
@@ -776,28 +929,47 @@ function displayCopywritingResults(copies, params) {
                         <i class="${network.icon}" style="color: ${network.color}"></i>
                         <span>${network.name}</span>
                     </div>
-                    ${generationMode === 'single' ? `<span class="variation-badge">Variación ${index + 1}</span>` : ''}
+                    ${copy.variation ? `<span class="variation-badge">Variación ${copy.variation}</span>` : ''}
                 </div>
                 <div class="copywriting-content">
-                    <div class="copy-section">
-                        <strong>🎯 Gancho:</strong> ${copy.hook || copy.description || copy}
-                    </div>
-                    ${copy.postText ? `<div class="copy-section">
-                        <strong>📝 Texto:</strong> ${copy.postText}
+                    ${copy.hook ? `<div class="copy-section hook-section">
+                        <div class="section-label">🎯 Gancho Principal</div>
+                        <div class="section-content">${copy.hook}</div>
                     </div>` : ''}
-                    ${copy.hashtags && copy.hashtags.length > 0 ? `<div class="copy-section">
-                        <strong>#️⃣ Hashtags:</strong> ${copy.hashtags.join(' ')}
+                    
+                    ${copy.postText ? `<div class="copy-section content-section">
+                        <div class="section-label">📝 Contenido</div>
+                        <div class="section-content">${copy.postText.replace(/\n/g, '<br>')}</div>
                     </div>` : ''}
-                    ${copy.cta ? `<div class="copy-section">
-                        <strong>📢 CTA:</strong> ${copy.cta}
+                    
+                    ${copy.hashtags && copy.hashtags.length > 0 ? `<div class="copy-section hashtags-section">
+                        <div class="section-label">#️⃣ Hashtags</div>
+                        <div class="section-content hashtags-list">
+                            ${copy.hashtags.map(tag => `<span class="hashtag">${tag}</span>`).join('')}
+                        </div>
                     </div>` : ''}
-                    ${copy.visualFormat ? `<div class="copy-section">
-                        <strong>🎨 Visual:</strong> ${copy.visualFormat}
+                    
+                    ${copy.cta ? `<div class="copy-section cta-section">
+                        <div class="section-label">📢 Call to Action</div>
+                        <div class="section-content cta-text">${copy.cta}</div>
+                    </div>` : ''}
+                    
+                    ${copy.visualFormat ? `<div class="copy-section visual-section">
+                        <div class="section-label">🎨 Sugerencia Visual</div>
+                        <div class="section-content">${copy.visualFormat}</div>
+                    </div>` : ''}
+                    
+                    ${!copy.hook && !copy.postText && copy.rawContent ? `<div class="copy-section content-section">
+                        <div class="section-label">📝 Contenido Completo</div>
+                        <div class="section-content">${copy.rawContent.replace(/\n/g, '<br>')}</div>
                     </div>` : ''}
                 </div>
                 <div class="copywriting-actions">
-                    <button class="copy-btn" onclick="copySingleCopy(${JSON.stringify(copy).replace(/"/g, '&quot;')}, '${network.name}')">
+                    <button class="copy-btn primary" onclick="copySingleCopy(${JSON.stringify(copy).replace(/"/g, '&quot;')}, '${network.name}')">
                         <i class="fas fa-copy"></i> Copiar
+                    </button>
+                    <button class="copy-btn secondary" onclick="editCopy(${index})">
+                        <i class="fas fa-edit"></i> Editar
                     </button>
                 </div>
             </div>
@@ -846,22 +1018,109 @@ function copySingleCopy(copyObject, networkName) {
     if (typeof copyObject === 'string') {
         copyText = copyObject;
     } else {
-        // Formatear el objeto de copy
-        if (copyObject.hook) copyText += `🎯 ${copyObject.hook}\n\n`;
-        if (copyObject.postText) copyText += `📝 ${copyObject.postText}\n\n`;
-        if (copyObject.hashtags && copyObject.hashtags.length > 0) {
-            copyText += `#️⃣ ${copyObject.hashtags.join(' ')}\n\n`;
+        // Formatear el objeto de copy de manera más profesional
+        if (copyObject.hook) {
+            copyText += `🎯 GANCHO:\n${copyObject.hook}\n\n`;
         }
-        if (copyObject.cta) copyText += `📢 ${copyObject.cta}\n\n`;
-        if (copyObject.visualFormat) copyText += `🎨 ${copyObject.visualFormat}`;
+        
+        if (copyObject.postText) {
+            copyText += `📝 CONTENIDO:\n${copyObject.postText}\n\n`;
+        }
+        
+        if (copyObject.hashtags && copyObject.hashtags.length > 0) {
+            copyText += `#️⃣ HASHTAGS:\n${copyObject.hashtags.join(' ')}\n\n`;
+        }
+        
+        if (copyObject.cta) {
+            copyText += `📢 CALL TO ACTION:\n${copyObject.cta}\n\n`;
+        }
+        
+        if (copyObject.visualFormat) {
+            copyText += `🎨 SUGERENCIA VISUAL:\n${copyObject.visualFormat}\n\n`;
+        }
+        
+        // Si no hay estructura, usar el contenido raw
+        if (!copyText && copyObject.rawContent) {
+            copyText = copyObject.rawContent;
+        }
     }
     
     navigator.clipboard.writeText(copyText.trim()).then(() => {
-        showNotification(`Copy de ${networkName} copiado al portapapeles`, 'success');
+        showNotification(`✅ Copy de ${networkName} copiado al portapapeles`, 'success');
     }).catch(err => {
         console.error('Error al copiar:', err);
-        showNotification('Error al copiar el copy', 'error');
+        showNotification('❌ Error al copiar el copy', 'error');
     });
+}
+
+/**
+ * Permite editar un copy específico
+ */
+function editCopy(copyIndex) {
+    const copyItems = document.querySelectorAll('.copywriting-result-item');
+    const copyItem = copyItems[copyIndex];
+    
+    if (!copyItem) return;
+    
+    const contentDiv = copyItem.querySelector('.copywriting-content');
+    const isEditing = contentDiv.classList.contains('editing');
+    
+    if (isEditing) {
+        // Guardar cambios
+        saveCopyEdits(copyIndex);
+    } else {
+        // Entrar en modo edición
+        enterEditMode(copyIndex);
+    }
+}
+
+/**
+ * Entra en modo edición para un copy
+ */
+function enterEditMode(copyIndex) {
+    const copyItems = document.querySelectorAll('.copywriting-result-item');
+    const copyItem = copyItems[copyIndex];
+    const contentDiv = copyItem.querySelector('.copywriting-content');
+    const editBtn = copyItem.querySelector('.copy-btn.secondary');
+    
+    // Marcar como editando
+    contentDiv.classList.add('editing');
+    editBtn.innerHTML = '<i class="fas fa-save"></i> Guardar';
+    editBtn.classList.add('save-mode');
+    
+    // Hacer editables todas las secciones de contenido
+    const sections = contentDiv.querySelectorAll('.section-content');
+    sections.forEach(section => {
+        const currentText = section.innerText || section.textContent;
+        section.innerHTML = `<textarea class="edit-textarea">${currentText}</textarea>`;
+    });
+    
+    showNotification('✏️ Modo edición activado. Modifica el texto y guarda los cambios.', 'info');
+}
+
+/**
+ * Guarda las ediciones realizadas
+ */
+function saveCopyEdits(copyIndex) {
+    const copyItems = document.querySelectorAll('.copywriting-result-item');
+    const copyItem = copyItems[copyIndex];
+    const contentDiv = copyItem.querySelector('.copywriting-content');
+    const editBtn = copyItem.querySelector('.copy-btn.secondary');
+    
+    // Obtener los nuevos valores
+    const textareas = contentDiv.querySelectorAll('.edit-textarea');
+    textareas.forEach(textarea => {
+        const newText = textarea.value;
+        const sectionContent = textarea.parentElement;
+        sectionContent.innerHTML = newText.replace(/\n/g, '<br>');
+    });
+    
+    // Salir del modo edición
+    contentDiv.classList.remove('editing');
+    editBtn.innerHTML = '<i class="fas fa-edit"></i> Editar';
+    editBtn.classList.remove('save-mode');
+    
+    showNotification('✅ Cambios guardados correctamente', 'success');
 }
 
 /**

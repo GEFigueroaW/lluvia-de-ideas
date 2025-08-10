@@ -3,6 +3,332 @@
    ========================================= */
 
 /* =========================================
+   COPYWRITING RESULTS STYLING
+   ========================================= */
+
+.modern-copywriting-results {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: var(--card-bg-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--card-shadow);
+}
+
+.copywriting-results-grid {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.copywriting-result-item {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: var(--transition);
+}
+
+.copywriting-result-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    border-color: var(--primary-color);
+}
+
+.copywriting-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+}
+
+.social-network-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.social-network-badge i {
+    font-size: 1.2rem;
+}
+
+.variation-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.copywriting-content {
+    padding: 1.5rem;
+}
+
+.copy-section {
+    margin-bottom: 1.5rem;
+}
+
+.copy-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-content {
+    background: rgba(var(--primary-color-rgb), 0.05);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+    line-height: 1.6;
+}
+
+.hook-section .section-content {
+    background: linear-gradient(135deg, rgba(255,107,107,0.1) 0%, rgba(255,156,156,0.1) 100%);
+    border-left-color: #ff6b6b;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.content-section .section-content {
+    background: linear-gradient(135deg, rgba(74,144,226,0.1) 0%, rgba(144,224,255,0.1) 100%);
+    border-left-color: #4a90e2;
+}
+
+.hashtags-section .section-content {
+    background: linear-gradient(135deg, rgba(156,39,176,0.1) 0%, rgba(186,104,200,0.1) 100%);
+    border-left-color: #9c27b0;
+}
+
+.hashtags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.hashtag {
+    background: var(--primary-color);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.cta-section .section-content {
+    background: linear-gradient(135deg, rgba(255,152,0,0.1) 0%, rgba(255,193,7,0.1) 100%);
+    border-left-color: #ff9800;
+    font-weight: 600;
+}
+
+.cta-text {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.cta-text::before {
+    content: '👉';
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 1.2rem;
+}
+
+.visual-section .section-content {
+    background: linear-gradient(135deg, rgba(76,175,80,0.1) 0%, rgba(129,199,132,0.1) 100%);
+    border-left-color: #4caf50;
+    font-style: italic;
+}
+
+.copywriting-actions {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: rgba(var(--text-color-rgb), 0.05);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.copy-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.copy-btn.primary {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.copy-btn.primary:hover {
+    background: var(--accent-gradient);
+    transform: translateY(-1px);
+}
+
+.copy-btn.secondary {
+    background: transparent;
+    color: var(--text-color);
+    border: 2px solid var(--primary-color);
+}
+
+.copy-btn.secondary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.copywriting-global-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.copywriting-global-actions .modern-btn {
+    min-width: 150px;
+}
+
+@media (max-width: 768px) {
+    .copywriting-header {
+        flex-direction: column;
+        gap: 0.5rem;
+        text-align: center;
+    }
+    
+    .copywriting-actions {
+        flex-direction: column;
+    }
+    
+    .copywriting-global-actions {
+        flex-direction: column;
+    }
+    
+    .copywriting-global-actions .modern-btn {
+        width: 100%;
+    }
+}
+
+/* =========================================
+   MODO EDICIÓN
+   ========================================= */
+
+.copywriting-content.editing .section-content {
+    padding: 0;
+    background: transparent;
+    border: none;
+}
+
+.edit-textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 1rem;
+    border: 2px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    background: rgba(var(--primary-color-rgb), 0.05);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: inherit;
+    line-height: 1.6;
+    resize: vertical;
+    transition: var(--transition);
+}
+
+.edit-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2);
+}
+
+.copy-btn.save-mode {
+    background: var(--success-gradient);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* =========================================
+   MEJORAS ADICIONALES
+   ========================================= */
+
+.copywriting-results-grid {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.copywriting-result-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.copywriting-result-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-gradient);
+    transition: var(--transition);
+}
+
+.copywriting-result-item:hover::before {
+    left: 0;
+}
+
+/* Indicador de caracteres */
+.character-count {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.character-count.warning {
+    background: #ff9800;
+}
+
+.character-count.error {
+    background: #f44336;
+}
+
+/* =========================================
    CARDS
    ========================================= */
 .card {
