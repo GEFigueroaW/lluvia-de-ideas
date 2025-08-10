@@ -16,7 +16,7 @@ exports.api = functions.runWith({
     timeoutSeconds: 300,
     memory: '1GB'
 }).https.onCall(async (data, context) => {
-    console.log('[API] ⚡ INICIO OPTIMIZADO');
+    const startTime = Date.now();
     
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
@@ -26,56 +26,46 @@ exports.api = functions.runWith({
     const uid = context.auth.uid;
 
     try {
-        // 1. Validación de usuario
-        console.log('[API] Validando usuario...');
+        // PARALELO: Validación + Prompt + API simultáneos
         const userRef = db.collection('users').doc(uid);
-        const userDoc = await userRef.get();
-        
-        if (!userDoc.exists) {
-            throw new functions.https.HttpsError('not-found', 'User not found');
-        }
-
-        const userData = userDoc.data();
-        const hasCredits = userData.generationCredits > 0 || userData.isPremium;
-        
-        if (!hasCredits) {
-            throw new functions.https.HttpsError('permission-denied', 'No credits available');
-        }
-
-        // 2. Prompt ultra-simple
-        console.log('[API] Creando prompt...');
         const platform = Array.isArray(socialMedia) ? socialMedia[0] : socialMedia;
         const ideaCount = generationMode === 'multi' ? '1 idea' : '2 ideas';
         
-        const prompt = `Crea ${ideaCount} para ${platform} sobre "${keyword}" en ${language || 'español'}.
+        // Prompt ultra-compacto
+        const prompt = `${ideaCount} para ${platform}: "${keyword}" (${language || 'es'})
 
-Formato EXACTO:
+FORMATO:
 ---IDEA_1---
-Texto: [post completo para redes sociales]
-Hashtags: [5 hashtags relevantes]
-CTA: [llamada a acción clara]
+Texto: [post completo]
+Hashtags: [5 hashtags]
+CTA: [acción]
 ---FIN_IDEA_1---
 
-Responde SOLO en ese formato. Sé breve y directo.`;
+RESPUESTA DIRECTA.`;
 
-        console.log('[API] Prompt:', prompt.length, 'chars');
+        // PARALELO: Validar usuario Y llamar API simultáneamente
+        const [userDoc, deepseekResponse] = await Promise.all([
+            userRef.get(),
+            callDeepseekAPI(prompt)
+        ]);
+        
+        // Validación rápida
+        const userData = userDoc.data();
+        if (!userDoc.exists || !(userData.generationCredits > 0 || userData.isPremium)) {
+            throw new functions.https.HttpsError('permission-denied', 'No access');
+        }
 
-        // 3. Llamada a Deepseek
-        console.log('[API] Llamando Deepseek...');
-        const response = await callDeepseekAPI(prompt);
-        console.log('[API] ✅ Respuesta obtenida');
+        // Parse y respuesta inmediata
+        const ideas = parseResponse(deepseekResponse);
 
-        // 4. Parse
-        const ideas = parseResponse(response);
-        console.log('[API] ✅ Ideas parseadas:', ideas.length);
-
-        // 5. Actualizar usuario
-        await userRef.update({
+        // Actualizar usuario en background (no bloquear)
+        userRef.update({
             generationCredits: userData.isPremium ? userData.generationCredits : Math.max(0, userData.generationCredits - 1),
             lastGenerationDate: admin.firestore.Timestamp.now()
-        });
+        }).catch(() => {}); // Ignorar errores para no bloquear
 
-        console.log('[API] ✅ COMPLETADO');
+        const totalTime = Date.now() - startTime;
+        console.log(`[API] ✅ Completado en ${totalTime}ms`);
         return { success: true, ideas };
 
     } catch (error) {
@@ -84,9 +74,10 @@ Responde SOLO en ese formato. Sé breve y directo.`;
     }
 });
 
-// FUNCIÓN DEEPSEEK
+// FUNCIÓN DEEPSEEK ULTRA-RÁPIDA
 async function callDeepseekAPI(prompt) {
-    console.log('[DEEPSEEK] Llamada...');
+    const startTime = Date.now();
+    console.log('[DEEPSEEK] 🚀 Llamada ULTRA-RÁPIDA...');
     
     try {
         const response = await axios({
@@ -99,53 +90,64 @@ async function callDeepseekAPI(prompt) {
             data: {
                 model: "deepseek-chat",
                 messages: [{ role: "user", content: prompt }],
-                temperature: 0.5,
-                max_tokens: 500,
-                stream: false
+                temperature: 0.3, // Reducido para respuestas más rápidas y consistentes
+                max_tokens: 400, // Reducido para velocidad
+                stream: false,
+                top_p: 0.9, // Optimizado para velocidad
+                frequency_penalty: 0,
+                presence_penalty: 0
             },
-            timeout: 20000
+            timeout: 10000, // Reducido a 10 segundos máximo
+            headers: {
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+                'Content-Type': 'application/json',
+                'Connection': 'close' // Evitar keep-alive para reducir latencia
+            }
         });
         
-        console.log('[DEEPSEEK] ✅ Status:', response.status);
+        const duration = Date.now() - startTime;
+        console.log(`[DEEPSEEK] ✅ Respuesta en ${duration}ms`);
         return response.data?.choices?.[0]?.message?.content || '';
         
     } catch (error) {
-        console.error('[DEEPSEEK] ❌ Error:', error.message);
-        throw new Error(`Deepseek error: ${error.message}`);
+        const duration = Date.now() - startTime;
+        console.error(`[DEEPSEEK] ❌ Error en ${duration}ms:`, error.message);
+        throw new Error(`API timeout en ${duration}ms: ${error.message}`);
     }
 }
 
-// PARSER
+// PARSER ULTRA-EFICIENTE
 function parseResponse(text) {
-    console.log('[PARSER] Parsing...');
+    console.log('[PARSER] 🚀 Parse rápido...');
     
     if (!text?.trim()) {
         return [createFallbackIdea()];
     }
     
     const ideas = [];
-    const pattern = /---IDEA_(\d+)---\s*Texto:\s*(.*?)\s*Hashtags:\s*(.*?)\s*CTA:\s*(.*?)\s*---FIN_IDEA_\d+---/gis;
     
-    let match;
-    while ((match = pattern.exec(text)) !== null) {
-        const idea = {
-            hook: match[2]?.substring(0, 50) || 'Hook',
-            postText: match[2] || '',
-            hashtags: (match[3] || '').split(/[,\s#]+/).filter(h => h.length > 0).slice(0, 5),
-            cta: match[4] || 'Interactúa',
-            visualFormat: 'Imagen atractiva'
-        };
-        
-        if (idea.postText.length > 10) {
-            ideas.push(idea);
+    // Regex optimizada para velocidad máxima
+    const matches = text.matchAll(/---IDEA_\d+---\s*Texto:\s*([^-]+?)\s*Hashtags:\s*([^-]+?)\s*CTA:\s*([^-]+?)\s*---FIN_IDEA_\d+---/gi);
+    
+    for (const match of matches) {
+        const postText = match[1]?.trim();
+        if (postText && postText.length > 10) {
+            ideas.push({
+                hook: postText.substring(0, 50) + (postText.length > 50 ? '...' : ''),
+                postText: postText,
+                hashtags: match[2]?.split(/[,\s#]+/).filter(h => h.length > 1).slice(0, 5) || ['contenido'],
+                cta: match[3]?.trim() || 'Interactúa',
+                visualFormat: 'Imagen atractiva'
+            });
         }
     }
     
+    // Fallback inmediato si no hay ideas
     if (ideas.length === 0) {
         ideas.push(createFallbackIdea());
     }
     
-    console.log('[PARSER] ✅ Ideas:', ideas.length);
+    console.log(`[PARSER] ✅ ${ideas.length} ideas en modo rápido`);
     return ideas;
 }
 
@@ -159,6 +161,55 @@ function createFallbackIdea() {
         visualFormat: 'Imagen llamativa'
     };
 }
+
+// TEST DE VELOCIDAD
+exports.testSpeed = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
+    }
+
+    const startTime = Date.now();
+    console.log('[SPEED_TEST] 🚀 Iniciando test de velocidad...');
+
+    try {
+        // Test con prompt minimalista
+        const testPrompt = `1 idea Instagram: "marketing" (es)
+
+---IDEA_1---
+Texto: [post]
+Hashtags: [hashtags]
+CTA: [cta]
+---FIN_IDEA_1---`;
+
+        const apiStart = Date.now();
+        const response = await callDeepseekAPI(testPrompt);
+        const apiTime = Date.now() - apiStart;
+
+        const parseStart = Date.now();
+        const ideas = parseResponse(response);
+        const parseTime = Date.now() - parseStart;
+
+        const totalTime = Date.now() - startTime;
+
+        console.log(`[SPEED_TEST] ✅ Completado en ${totalTime}ms`);
+        
+        return { 
+            success: true, 
+            timing: {
+                total: totalTime,
+                api: apiTime,
+                parse: parseTime
+            },
+            ideas: ideas.length,
+            message: `Generación completada en ${totalTime}ms`
+        };
+
+    } catch (error) {
+        const totalTime = Date.now() - startTime;
+        console.error(`[SPEED_TEST] ❌ Error en ${totalTime}ms:`, error.message);
+        throw new functions.https.HttpsError('internal', `Speed test failed in ${totalTime}ms: ${error.message}`);
+    }
+});
 
 // TEST
 exports.testDeepseekConnection = functions.https.onCall(async (data, context) => {
