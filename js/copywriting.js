@@ -659,6 +659,14 @@ function displayCopywritingResults(copies, params) {
     `;
     
     container.innerHTML = html;
+    
+    // Hacer scroll automático a los resultados
+    setTimeout(() => {
+        container.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start' 
+        });
+    }, 500);
 }
 
 /**

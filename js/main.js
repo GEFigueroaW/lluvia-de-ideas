@@ -578,6 +578,28 @@ function displayIdeas(ideas, topic) {
     `;
     
     elements.ideasContainer.innerHTML = ideasHtml;
+    
+    // ✨ SCROLL AUTOMÁTICO A LOS RESULTADOS ✨
+    scrollToResults();
+}
+
+/**
+ * Función para hacer scroll suave hacia los resultados
+ */
+function scrollToResults() {
+    // Esperar un poco para que la animación se renderice
+    setTimeout(() => {
+        if (elements.ideasContainer) {
+            // Scroll suave al contenedor de ideas
+            elements.ideasContainer.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+                inline: 'nearest'
+            });
+            
+            console.log('🚀 Scroll automático a resultados ejecutado');
+        }
+    }, 500); // Delay para permitir que la animación CSS se complete
 }
 
 /**
