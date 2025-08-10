@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Premium Status</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .result { padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button { padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 10px 5px; }
+        button:hover { background: #0056b3; }
+        .user-data { background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0; }
+        .premium-status { font-weight: bold; font-size: 18px; }
+        .credits { color: #28a745; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Premium Status</h1>
+        <p>Esta herramienta verifica tu estado premium y créditos actuales.</p>
+        
+        <button onclick="checkUserStatus()">🔍 Verificar Estado del Usuario</button>
+        <button onclick="activatePremium()">⭐ Activar Premium (Forzado)</button>
+        <button onclick="addCredits()">💳 Añadir 100 Créditos</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWy1rFkFRB_MX8NxQdCVPWCQZKIlEqHM8",
+            authDomain: "brain-storm-8f0d8.firebaseapp.com",
+            projectId: "brain-storm-8f0d8",
+            storageBucket: "brain-storm-8f0d8.appspot.com",
+            messagingSenderId: "659020802774",
+            appId: "1:659020802774:web:ab0ee5c3b2e7f5e3b70ed1"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+
+        // Autenticación automática
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                addResult(`🔓 Usuario autenticado: ${user.email}`, 'success');
+                checkUserStatus();
+            } else {
+                // Auto login como admin
+                auth.signInWithEmailAndPassword('w.guillermoef@gmail.com', 'Willywonka1900')
+                    .then(() => {
+                        addResult('🔑 Login automático como admin exitoso', 'success');
+                    })
+                    .catch((error) => {
+                        addResult(`❌ Error en login automático: ${error.message}`, 'error');
+                    });
+            }
+        });
+
+        async function checkUserStatus() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    addResult('❌ No hay usuario autenticado', 'error');
+                    return;
+                }
+
+                addResult('🔍 Consultando datos del usuario...', 'info');
+                
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    addResult('❌ Documento de usuario no existe', 'error');
+                    return;
+                }
+
+                const userData = userDoc.data();
+                
+                addResult(`
+                    <div class="user-data">
+                        <h3>📋 Datos del Usuario</h3>
+                        <p><strong>UID:</strong> ${user.uid}</p>
+                        <p><strong>Email:</strong> ${user.email}</p>
+                        <p class="premium-status">⭐ <strong>Premium:</strong> ${userData.isPremium ? '✅ SÍ' : '❌ NO'}</p>
+                        <p class="credits">💳 <strong>Créditos:</strong> ${userData.generationCredits || 0}</p>
+                        <p><strong>Última generación:</strong> ${userData.lastGenerationDate ? new Date(userData.lastGenerationDate.toDate()).toLocaleString() : 'Nunca'}</p>
+                        <p><strong>Fecha de registro:</strong> ${userData.createdAt ? new Date(userData.createdAt.toDate()).toLocaleString() : 'No disponible'}</p>
+                        
+                        <h4>🔧 Datos completos:</h4>
+                        <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto;">${JSON.stringify(userData, null, 2)}</pre>
+                    </div>
+                `, 'info');
+
+                // Verificar la lógica de acceso
+                const hasAccess = userData.generationCredits > 0 || userData.isPremium;
+                if (hasAccess) {
+                    addResult('✅ ACCESO PERMITIDO: El usuario tiene créditos o es premium', 'success');
+                } else {
+                    addResult('❌ ACCESO DENEGADO: Sin créditos y no premium', 'error');
+                }
+
+            } catch (error) {
+                addResult(`❌ Error al verificar usuario: ${error.message}`, 'error');
+                console.error('Error completo:', error);
+            }
+        }
+
+        async function activatePremium() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    addResult('❌ No hay usuario autenticado', 'error');
+                    return;
+                }
+
+                addResult('⭐ Activando premium...', 'info');
+                
+                await db.collection('users').doc(user.uid).update({
+                    isPremium: true,
+                    premiumActivatedAt: firebase.firestore.Timestamp.now()
+                });
+
+                addResult('✅ Premium activado exitosamente', 'success');
+                setTimeout(checkUserStatus, 1000);
+
+            } catch (error) {
+                addResult(`❌ Error al activar premium: ${error.message}`, 'error');
+            }
+        }
+
+        async function addCredits() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    addResult('❌ No hay usuario autenticado', 'error');
+                    return;
+                }
+
+                addResult('💳 Añadiendo 100 créditos...', 'info');
+                
+                await db.collection('users').doc(user.uid).update({
+                    generationCredits: firebase.firestore.FieldValue.increment(100)
+                });
+
+                addResult('✅ 100 créditos añadidos exitosamente', 'success');
+                setTimeout(checkUserStatus, 1000);
+
+            } catch (error) {
+                addResult(`❌ Error al añadir créditos: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

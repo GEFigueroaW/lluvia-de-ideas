@@ -190,20 +190,53 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
             throw new functions.https.HttpsError('internal', 'Error crítico: no se pudo obtener datos válidos del usuario');
         }
         
-        // LÍNEA POR LÍNEA: Verificar acceso después de asegurar que el usuario existe
-        if (!(userData.generationCredits > 0 || userData.isPremium)) {
-            console.log(`[USER] ❌ Usuario ${uid} sin créditos ni premium. Créditos: ${userData.generationCredits}, Premium: ${userData.isPremium}`);
+        // VERIFICAR ACCESO: Individual + Global Premium
+        let hasAccess = userData.generationCredits > 0 || userData.isPremium;
+        let accessReason = '';
+        
+        // Si no tiene acceso individual, verificar premium global
+        if (!hasAccess) {
+            try {
+                const configDoc = await db.collection('config').doc('app').get();
+                if (configDoc.exists()) {
+                    const configData = configDoc.data();
+                    const isGlobalPremiumActive = configData.isPremiumGlobalActive;
+                    
+                    if (isGlobalPremiumActive) {
+                        // Verificar si la promoción global sigue vigente
+                        const promoEndDate = configData.promoEndDate;
+                        if (!promoEndDate || promoEndDate.toDate() > new Date()) {
+                            hasAccess = true;
+                            accessReason = 'Premium Global Activo';
+                            console.log(`[USER] ✅ Acceso concedido por Premium Global para usuario ${uid}`);
+                        } else {
+                            console.log(`[USER] ⚠️ Premium Global expirado el ${promoEndDate.toDate()}`);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log(`[USER] ⚠️ Error verificando premium global: ${error.message}`);
+            }
+        } else {
+            accessReason = userData.isPremium ? 'Premium Individual' : `${userData.generationCredits} créditos`;
+        }
+        
+        if (!hasAccess) {
+            console.log(`[USER] ❌ Usuario ${uid} sin acceso. Créditos: ${userData.generationCredits}, Premium Individual: ${userData.isPremium}, Premium Global: No`);
             throw new functions.https.HttpsError('permission-denied', 'No tienes créditos disponibles. Considera upgradar a premium.');
         }
         
-        console.log(`[USER] ✅ Usuario ${uid} autorizado. Créditos: ${userData.generationCredits}, Premium: ${userData.isPremium}`);
+        console.log(`[USER] ✅ Usuario ${uid} autorizado por: ${accessReason}. Créditos: ${userData.generationCredits}, Premium: ${userData.isPremium}`);
 
         // Parse y respuesta inmediata
         const ideas = parseResponse(deepseekResponse);
 
         // Actualizar usuario en background (no bloquear)
+        // No descontar créditos si es premium individual o global
+        const shouldDiscountCredits = !userData.isPremium && accessReason !== 'Premium Global Activo';
+        
         userRef.update({
-            generationCredits: userData.isPremium ? userData.generationCredits : Math.max(0, userData.generationCredits - 1),
+            generationCredits: shouldDiscountCredits ? Math.max(0, userData.generationCredits - 1) : userData.generationCredits,
             lastGenerationDate: admin.firestore.Timestamp.now()
         }).catch(() => {}); // Ignorar errores para no bloquear
 

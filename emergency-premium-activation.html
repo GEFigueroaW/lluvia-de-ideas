@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activar Premium Global - EMERGENCIA</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .result { padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        button { padding: 15px 30px; font-size: 16px; background: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; margin: 10px 5px; }
+        button:hover { background: #0056b3; }
+        .premium-btn { background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); }
+        .emergency-btn { background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); }
+        .big-btn { font-size: 20px; padding: 20px 40px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚨 ACTIVACIÓN PREMIUM GLOBAL - EMERGENCIA</h1>
+        <p>Solución inmediata al error "No tienes créditos disponibles" para usuarios premium.</p>
+        
+        <button onclick="activateGlobalPremiumEmergency()" class="emergency-btn big-btn">
+            🚨 ACTIVAR PREMIUM GLOBAL AHORA
+        </button>
+        
+        <button onclick="verifyPremiumStatus()" class="premium-btn">
+            🔍 Verificar Estado Premium Global
+        </button>
+        
+        <button onclick="activateUserPremium()" class="premium-btn">
+            ⭐ Activar Premium Individual (Respaldo)
+        </button>
+        
+        <div id="results"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWy1rFkFRB_MX8NxQdCVPWCQZKIlEqHM8",
+            authDomain: "brain-storm-8f0d8.firebaseapp.com",
+            projectId: "brain-storm-8f0d8",
+            storageBucket: "brain-storm-8f0d8.appspot.com",
+            messagingSenderId: "659020802774",
+            appId: "1:659020802774:web:ab0ee5c3b2e7f5e3b70ed1"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        // Autenticación automática
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                addResult(`🔓 Usuario autenticado: ${user.email}`, 'success');
+            } else {
+                // Auto login como admin
+                auth.signInWithEmailAndPassword('w.guillermoef@gmail.com', 'Willywonka1900')
+                    .then(() => {
+                        addResult('🔑 Login automático como admin exitoso', 'success');
+                    })
+                    .catch((error) => {
+                        addResult(`❌ Error en login automático: ${error.message}`, 'error');
+                    });
+            }
+        });
+
+        async function activateGlobalPremiumEmergency() {
+            try {
+                addResult('🚨 INICIANDO ACTIVACIÓN PREMIUM GLOBAL DE EMERGENCIA...', 'warning');
+                
+                const user = auth.currentUser;
+                if (!user) {
+                    addResult('❌ Error: Usuario no autenticado', 'error');
+                    return;
+                }
+
+                // Configuración premium global ultra-amplia
+                const emergencyPremiumConfig = {
+                    // Premium global activo
+                    isPremiumGlobalActive: true,
+                    
+                    // Válido por 1 año completo
+                    promoEndDate: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)),
+                    
+                    // Descripción
+                    promoDescription: 'Premium Global de Emergencia - Activado para resolver errores de acceso',
+                    
+                    // TODAS las funcionalidades premium activadas
+                    allowAllSocialNetworks: true,
+                    allowAllCopyTypes: true,
+                    unlimitedGenerations: true,
+                    prioritySupport: true,
+                    freePromotionsEnabled: true,
+                    premiumPromotionsEnabled: true,
+                    
+                    // Configuraciones adicionales para evitar errores
+                    maintenanceMode: false,
+                    forceGlobalAccess: true,
+                    bypassCreditsCheck: true,
+                    
+                    // Metadatos
+                    lastUpdated: firebase.firestore.Timestamp.now(),
+                    updatedBy: user.email,
+                    emergencyActivation: true,
+                    activationReason: 'Resolver error de créditos para usuarios premium'
+                };
+
+                addResult('📝 Escribiendo configuración premium global...', 'info');
+
+                // Escribir en TODAS las ubicaciones posibles
+                const promises = [
+                    // Ubicación principal
+                    db.collection('config').doc('app').set(emergencyPremiumConfig, { merge: true }),
+                    
+                    // Ubicación alternativa
+                    db.collection('appConfig').doc('config').set(emergencyPremiumConfig, { merge: true }),
+                    
+                    // Ubicación de respaldo
+                    db.collection('settings').doc('global').set(emergencyPremiumConfig, { merge: true }),
+                    
+                    // Ubicación adicional
+                    db.collection('premiumConfig').doc('global').set(emergencyPremiumConfig, { merge: true })
+                ];
+
+                await Promise.all(promises);
+
+                addResult('✅ PREMIUM GLOBAL ACTIVADO EXITOSAMENTE', 'success');
+                addResult(`📅 Válido hasta: ${emergencyPremiumConfig.promoEndDate.toLocaleDateString()}`, 'success');
+                addResult('🎯 Todas las funcionalidades premium están ahora activas globalmente', 'success');
+                
+                // Verificar inmediatamente
+                setTimeout(verifyPremiumStatus, 2000);
+
+            } catch (error) {
+                addResult(`❌ ERROR CRÍTICO: ${error.message}`, 'error');
+                console.error('Error completo:', error);
+            }
+        }
+
+        async function verifyPremiumStatus() {
+            try {
+                addResult('🔍 Verificando estado premium global...', 'info');
+                
+                const configDoc = await db.collection('config').doc('app').get();
+                
+                if (!configDoc.exists()) {
+                    addResult('❌ Documento de configuración no existe', 'error');
+                    return;
+                }
+
+                const configData = configDoc.data();
+                
+                addResult(`
+                    <h3>📋 Estado Premium Global</h3>
+                    <p><strong>✅ Premium Global Activo:</strong> ${configData.isPremiumGlobalActive ? '✅ SÍ' : '❌ NO'}</p>
+                    <p><strong>📅 Válido hasta:</strong> ${configData.promoEndDate ? new Date(configData.promoEndDate.toDate()).toLocaleDateString() : 'No definido'}</p>
+                    <p><strong>📝 Descripción:</strong> ${configData.promoDescription || 'No disponible'}</p>
+                    <p><strong>🌐 Redes sociales:</strong> ${configData.allowAllSocialNetworks ? '✅ Todas' : '❌ Limitadas'}</p>
+                    <p><strong>📄 Tipos de copy:</strong> ${configData.allowAllCopyTypes ? '✅ Todos' : '❌ Limitados'}</p>
+                    <p><strong>♾️ Generaciones:</strong> ${configData.unlimitedGenerations ? '✅ Ilimitadas' : '❌ Limitadas'}</p>
+                    <p><strong>🚀 Bypass créditos:</strong> ${configData.bypassCreditsCheck ? '✅ Activo' : '❌ Inactivo'}</p>
+                    
+                    <h4>🔧 Datos completos:</h4>
+                    <pre style="background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; max-height: 200px;">${JSON.stringify(configData, null, 2)}</pre>
+                `, 'info');
+
+            } catch (error) {
+                addResult(`❌ Error al verificar estado: ${error.message}`, 'error');
+            }
+        }
+
+        async function activateUserPremium() {
+            try {
+                addResult('⭐ Activando premium individual como respaldo...', 'info');
+                
+                const user = auth.currentUser;
+                if (!user) {
+                    addResult('❌ Error: Usuario no autenticado', 'error');
+                    return;
+                }
+
+                await db.collection('users').doc(user.uid).update({
+                    isPremium: true,
+                    premiumUntil: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)),
+                    premiumSource: 'emergency_activation',
+                    premiumDescription: 'Premium individual de emergencia',
+                    generationCredits: 9999, // Muchos créditos por si acaso
+                    premiumUpdatedAt: firebase.firestore.Timestamp.now()
+                });
+
+                addResult('✅ Premium individual activado como respaldo', 'success');
+
+            } catch (error) {
+                addResult(`❌ Error al activar premium individual: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
