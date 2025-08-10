@@ -337,39 +337,15 @@ YouTube: [descripción educativa única tutorial]`;
 
         console.log(`[API] 🚀 Prompt específico generado para ${platforms.join(', ')}`);
 
-        // CAMBIO CRÍTICO: SECUENCIAL en lugar de PARALELO para evitar problemas de timing
         console.log(`[API] 🔍 PASO 1: Validando usuario PRIMERO de forma secuencial...`);
         
         // PASO 1: Validar y crear usuario si es necesario (SECUENCIAL)
         const userDoc = await userRef.get();
         
-        console.log(`[API] 🔍 PASO 2: Llamando a Deepseek API...`);
+        console.log(`[API] 🔍 PASO 2: Llamando a Deepseek API directamente (SIN fallback problemático)...`);
         
-        // PASO 2: Llamar a la API (CON FALLBACK EMERGENCY)
-        const deepseekResponse = await Promise.race([
-            callDeepseekAPI(prompt),
-            // Emergency fallback después de 15 segundos SOLO para la API
-            new Promise((resolve) => {
-                setTimeout(() => {
-                    console.log('[API] ⚠️ EMERGENCY FALLBACK activado SOLO para API');
-                    
-                    // Generar fallback para cada red social
-                    let fallbackResponse = '';
-                    platforms.forEach((platform, index) => {
-                        fallbackResponse += `---IDEA_${index + 1}---
-Red: ${platform}
-Texto: ¡Descubre el poder de ${keyword}! Contenido estratégico diseñado específicamente para ${platform}. ${copyType ? `Perfecto para campañas de ${copyType.toLowerCase()}.` : 'Ideal para maximizar tu alcance.'} Te compartimos insights clave para implementar en tu estrategia.
-Hashtags: #${keyword.replace(/\s+/g, '')} #${platform.toLowerCase()} #marketing #estrategia #contenido
-CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn' ? 'Comparte tu experiencia en los comentarios' : platform === 'TikTok' ? '¡Síguenos para más tips!' : '¡Comparte si te resultó útil!'}
----FIN_IDEA_${index + 1}---
-
-`;
-                    });
-                    
-                    resolve(fallbackResponse);
-                }, 15000)
-            })
-        ]);
+        // PASO 2: Llamar a la API DIRECTAMENTE (SIN Promise.race que causa problemas)
+        const deepseekResponse = await callDeepseekAPI(prompt);
         
         // LÍNEA POR LÍNEA: Validación segura del documento antes de usar .data()
         console.log(`[USER] 🔍 PASO 3: Verificando documento de usuario para ${uid}...`);
@@ -588,14 +564,14 @@ async function callDeepseekAPI(prompt, attempt = 1, maxAttempts = 3) {
             data: {
                 model: "deepseek-chat",
                 messages: [{ role: "user", content: prompt }],
-                temperature: 0.1, // Muy bajo para respuestas rápidas y consistentes
-                max_tokens: 300, // Reducido aún más para máxima velocidad
+                temperature: 0.2, // Ligeramente más creativo pero controlado
+                max_tokens: 800, // Aumentado para contenido específico por red
                 stream: false,
                 top_p: 0.8,
                 frequency_penalty: 0.1,
                 presence_penalty: 0.1
             },
-            timeout: 25000, // Aumentado a 25 segundos
+            timeout: 35000, // Aumentado a 35 segundos para prompts complejos
             validateStatus: (status) => status >= 200 && status < 300,
             maxRedirects: 0, // Sin redirects para velocidad
             decompress: true,
