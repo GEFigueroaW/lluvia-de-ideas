@@ -57,17 +57,21 @@ CTA: [call-to-action apropiado]
 
         prompt += `RESPUESTA DIRECTA. ADAPTA CADA POST AL FORMATO Y AUDIENCIA DE CADA RED SOCIAL.`;
 
-        // PARALELO: Validar usuario Y llamar API simultáneamente CON EMERGENCY FALLBACK
-        const [userDoc, deepseekResponse] = await Promise.race([
-            // Respuesta normal
-            Promise.all([
-                userRef.get(),
-                callDeepseekAPI(prompt)
-            ]),
-            // Emergency fallback después de 15 segundos
+        // CAMBIO CRÍTICO: SECUENCIAL en lugar de PARALELO para evitar problemas de timing
+        console.log(`[API] 🔍 PASO 1: Validando usuario PRIMERO de forma secuencial...`);
+        
+        // PASO 1: Validar y crear usuario si es necesario (SECUENCIAL)
+        const userDoc = await userRef.get();
+        
+        console.log(`[API] 🔍 PASO 2: Llamando a Deepseek API...`);
+        
+        // PASO 2: Llamar a la API (CON FALLBACK EMERGENCY)
+        const deepseekResponse = await Promise.race([
+            callDeepseekAPI(prompt),
+            // Emergency fallback después de 15 segundos SOLO para la API
             new Promise((resolve) => {
                 setTimeout(() => {
-                    console.log('[API] ⚠️ EMERGENCY FALLBACK activado');
+                    console.log('[API] ⚠️ EMERGENCY FALLBACK activado SOLO para API');
                     
                     // Generar fallback para cada red social
                     let fallbackResponse = '';
@@ -82,30 +86,15 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
 `;
                     });
                     
-                    // Obtener usuario de forma síncrona para el fallback
-                    userRef.get().then(userSnapshot => {
-                        resolve([
-                            userSnapshot,
-                            fallbackResponse
-                        ]);
-                    }).catch(error => {
-                        console.error('[API] ❌ Error en fallback userRef.get():', error);
-                        // Crear un mock document si hay error
-                        const mockDoc = {
-                            exists: false,
-                            data: () => null
-                        };
-                        resolve([
-                            mockDoc,
-                            fallbackResponse
-                        ]);
-                    });
+                    resolve(fallbackResponse);
                 }, 15000)
             })
         ]);
         
         // LÍNEA POR LÍNEA: Validación segura del documento antes de usar .data()
-        console.log(`[USER] 🔍 Verificando documento de usuario para ${uid}...`);
+        console.log(`[USER] 🔍 PASO 3: Verificando documento de usuario para ${uid}...`);
+        console.log(`[USER] 📊 userDoc.exists: ${userDoc.exists}`);
+        console.log(`[USER] 📊 userDoc.data type: ${typeof userDoc.data}`);
         
         // VERIFICACIÓN CRÍTICA: Asegurar que userDoc es un documento válido
         if (!userDoc || typeof userDoc.data !== 'function') {
@@ -123,6 +112,13 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
         try {
             userData = userDoc.data();
             console.log(`[USER] ✅ Datos de usuario obtenidos correctamente para ${uid}`);
+            console.log(`[USER] 📊 userData:`, {
+                exists: !!userData,
+                generationCredits: userData?.generationCredits,
+                generationCreditsType: typeof userData?.generationCredits,
+                isPremium: userData?.isPremium,
+                isPremiumType: typeof userData?.isPremium
+            });
         } catch (error) {
             console.error(`[USER] ❌ Error al obtener datos del usuario ${uid}:`, error);
             throw new functions.https.HttpsError('internal', `Error accediendo a datos del usuario: ${error.message}`);
@@ -191,38 +187,64 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
         }
         
         // VERIFICAR ACCESO: Individual + Global Premium
+        console.log(`[USER] 🔍 PASO 4: Verificando acceso para usuario ${uid}...`);
+        
         let hasAccess = userData.generationCredits > 0 || userData.isPremium;
         let accessReason = '';
         
+        console.log(`[USER] 📊 Acceso individual: generationCredits=${userData.generationCredits} > 0: ${userData.generationCredits > 0}`);
+        console.log(`[USER] 📊 Acceso individual: isPremium=${userData.isPremium}`);
+        console.log(`[USER] 📊 hasAccess inicial: ${hasAccess}`);
+        
         // Si no tiene acceso individual, verificar premium global
         if (!hasAccess) {
+            console.log(`[USER] 🔍 Sin acceso individual, verificando premium global...`);
             try {
                 const configDoc = await db.collection('config').doc('app').get();
+                console.log(`[USER] 📊 configDoc.exists: ${configDoc.exists()}`);
+                
                 if (configDoc.exists()) {
                     const configData = configDoc.data();
+                    console.log(`[USER] 📊 configData.isPremiumGlobalActive: ${configData.isPremiumGlobalActive}`);
+                    
                     const isGlobalPremiumActive = configData.isPremiumGlobalActive;
                     
                     if (isGlobalPremiumActive) {
                         // Verificar si la promoción global sigue vigente
                         const promoEndDate = configData.promoEndDate;
-                        if (!promoEndDate || promoEndDate.toDate() > new Date()) {
+                        const currentDate = new Date();
+                        const isPromoValid = !promoEndDate || promoEndDate.toDate() > currentDate;
+                        
+                        console.log(`[USER] 📊 promoEndDate: ${promoEndDate ? promoEndDate.toDate() : 'No definida'}`);
+                        console.log(`[USER] 📊 currentDate: ${currentDate}`);
+                        console.log(`[USER] 📊 isPromoValid: ${isPromoValid}`);
+                        
+                        if (isPromoValid) {
                             hasAccess = true;
                             accessReason = 'Premium Global Activo';
                             console.log(`[USER] ✅ Acceso concedido por Premium Global para usuario ${uid}`);
                         } else {
                             console.log(`[USER] ⚠️ Premium Global expirado el ${promoEndDate.toDate()}`);
                         }
+                    } else {
+                        console.log(`[USER] ⚠️ Premium Global NO está activo`);
                     }
+                } else {
+                    console.log(`[USER] ⚠️ No existe documento de configuración global`);
                 }
             } catch (error) {
                 console.log(`[USER] ⚠️ Error verificando premium global: ${error.message}`);
+                console.error(`[USER] 📊 Error completo:`, error);
             }
         } else {
             accessReason = userData.isPremium ? 'Premium Individual' : `${userData.generationCredits} créditos`;
+            console.log(`[USER] ✅ Acceso concedido por acceso individual: ${accessReason}`);
         }
         
+        console.log(`[USER] 📊 RESULTADO FINAL: hasAccess=${hasAccess}, accessReason="${accessReason}"`);
+        
         if (!hasAccess) {
-            console.log(`[USER] ❌ Usuario ${uid} sin acceso. Créditos: ${userData.generationCredits}, Premium Individual: ${userData.isPremium}, Premium Global: No`);
+            console.log(`[USER] ❌ Usuario ${uid} SIN ACCESO FINAL. Créditos: ${userData.generationCredits}, Premium Individual: ${userData.isPremium}, Premium Global: No`);
             throw new functions.https.HttpsError('permission-denied', 'No tienes créditos disponibles. Considera upgradar a premium.');
         }
         
@@ -257,9 +279,7 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
         });
         
         // Error específicos más útiles para el usuario
-        if (error.message.includes('No tienes créditos')) {
-            throw new functions.https.HttpsError('permission-denied', 'No tienes créditos disponibles. Considera upgradar a premium.');
-        } else if (error.message.includes('API falló')) {
+        if (error.message.includes('API falló')) {
             throw new functions.https.HttpsError('unavailable', 'Servicio temporalmente no disponible. Intenta nuevamente en unos momentos.');
         } else if (error.code === 'permission-denied') {
             throw error; // Re-lanzar errores de permisos tal como están
