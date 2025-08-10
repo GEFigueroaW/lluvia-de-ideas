@@ -193,6 +193,9 @@ function initializeCopywriting() {
     // Las redes sociales y tipos de copy se configurarán cuando se reciba el estado premium
     // desde main.js a través de setCopywritingPremiumStatus()
     
+    // Inicializar vista previa de plantillas
+    updateTemplatePreview();
+    
     console.log('[COPYWRITING] Módulo inicializado - esperando estado premium desde main.js');
 }
 
@@ -236,6 +239,9 @@ function setupSocialNetworks() {
             console.log(`[COPYWRITING] Red ${network.name}: ${isDisabled ? 'DESHABILITADA' : 'HABILITADA'}`);
         }
     });
+    
+    // Actualizar vista previa de plantillas después de configurar las redes
+    updateTemplatePreview();
     
     console.log('[COPYWRITING] setupSocialNetworks completado');
 }
@@ -329,6 +335,7 @@ function toggleSocialNetwork(networkKey, element) {
     }
 
     updateSocialNetworkNote();
+    updateTemplatePreview(); // Actualizar la vista previa de plantillas
 }
 
 /**
@@ -543,65 +550,334 @@ async function generateCopywriting(params) {
 }
 
 // Configuraciones específicas para cada red social
+// Configuraciones profundas y psicológicamente optimizadas para cada red social
 const SOCIAL_NETWORK_SPECS = {
     facebook: {
         name: 'Facebook',
         characteristics: {
-            maxLength: 2200,
-            optimalLength: '50-80 palabras',
-            tone: 'conversacional y personal',
-            features: 'storytelling, emociones, comunidad',
-            hashtags: 'máximo 2-3 hashtags',
-            engagement: 'preguntas, polls, contenido que genere conversación',
-            cta: 'botones de acción, enlaces externos'
+            maxLength: 2000,
+            optimalLength: '50-150 palabras',
+            tone: 'emocional y conversacional',
+            features: 'historias personales, comunidad, engagement emocional',
+            hashtags: 'uso moderado (3-5)',
+            engagement: 'reacciones, comentarios, shares',
+            cta: 'preguntas directas, llamadas a la acción emocionales',
+            psychologyTriggers: 'nostalgia, pertenencia grupal, validación social',
+            contentDepth: 'historias que conecten emocionalmente, datos que sorprendan',
+            reflectionPrompts: 'preguntas que inviten a compartir experiencias personales'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'hook',
+                    label: '🎯 Gancho Inicial',
+                    description: 'Pregunta provocadora, dato sorprendente o frase emocional',
+                    examples: ['¿Sabías que el 87% de las personas...?', '🔥 Lo que descubrí ayer me dejó sin palabras...', '💡 Esta simple pregunta cambió mi perspectiva...']
+                },
+                {
+                    section: 'development',
+                    label: '📖 Desarrollo',
+                    description: 'Historia breve, explicación o propuesta de valor que profundice',
+                    examples: ['Hace una semana me encontré con...', 'Los estudios demuestran que...', 'Mi experiencia trabajando en... me enseñó que...']
+                },
+                {
+                    section: 'engagement',
+                    label: '✨ Conexión Emocional',
+                    description: 'Beneficio principal, insight valioso o momento de reflexión',
+                    examples: ['Esto me hizo reflexionar sobre...', 'La lección más importante fue...', 'Lo que realmente importa es...']
+                },
+                {
+                    section: 'cta',
+                    label: '💬 Call to Action',
+                    description: 'Pregunta que invite a comentar y compartir experiencias',
+                    examples: ['¿Tú qué opinas? 👇', '¿Has vivido algo similar?', '¿Cómo lo aplicarías en tu vida?']
+                }
+            ],
+            baseTemplate: `🎯 [GANCHO_PROVOCADOR]
+
+[HISTORIA_O_DESARROLLO_PROFUNDO]
+
+✨ [INSIGHT_VALIOSO_O_REFLEXION]
+
+💬 [PREGUNTA_REFLEXIVA] 👇
+
+#[hashtag1] #[hashtag2] #[hashtag3]`
+        }
+    },
+    twitter: {
+        name: 'Twitter/X',
+        characteristics: {
+            maxLength: 280,
+            optimalLength: '100-180 caracteres',
+            tone: 'directo y contundente',
+            features: 'brevedad, viralidad, debates, trending topics',
+            hashtags: 'estratégicos (1-3)',
+            engagement: 'retweets, likes, respuestas',
+            cta: 'RT, respuestas, hilos',
+            psychologyTriggers: 'urgencia, FOMO, controversia constructiva',
+            contentDepth: 'datos impactantes condensados, opiniones fundamentadas',
+            reflectionPrompts: 'statements que generen debate inteligente'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'hook',
+                    label: '🚀 Hook Directo',
+                    description: 'Dato impactante, opinión clara o pregunta contundente',
+                    examples: ['🚀 Dato: El 90% de startups...', '🔥 Unpopular opinion:', '⚡ Plot twist:']
+                },
+                {
+                    section: 'insight',
+                    label: '💡 Insight Clave',
+                    description: 'La esencia del mensaje, el punto más importante',
+                    examples: ['El verdadero problema es...', 'Lo que nadie te dice...', 'La diferencia real está en...']
+                },
+                {
+                    section: 'cta',
+                    label: '🔄 CTA Viral',
+                    description: 'Llamada a acción que fomente viralidad',
+                    examples: ['🔄 RT si estás de acuerdo', '💭 ¿Tú qué piensas?', '🧵 Abro hilo 👇']
+                }
+            ],
+            baseTemplate: `🚀 [DATO_IMPACTANTE] 
+
+💡 [INSIGHT_PROFUNDO]
+
+🔄 [CTA_VIRAL]
+
+#[hashtag] #[hashtag2]`
         }
     },
     linkedin: {
         name: 'LinkedIn',
         characteristics: {
             maxLength: 3000,
-            optimalLength: '100-150 palabras',
-            tone: 'profesional pero humano',
-            features: 'insights profesionales, networking, valor educativo',
-            hashtags: '3-5 hashtags profesionales',
-            engagement: 'comentarios reflexivos, conexiones profesionales',
-            cta: 'invitaciones a conectar, compartir experiencias'
-        }
-    },
-    twitter: {
-        name: 'X / Twitter',
-        characteristics: {
-            maxLength: 280,
-            optimalLength: '120-180 caracteres',
-            tone: 'directo y conciso',
-            features: 'trending topics, tiempo real, viralidad',
-            hashtags: '2-3 hashtags estratégicos',
-            engagement: 'retweets, menciones, hilos',
-            cta: 'enlaces cortos, menciones a usuarios'
+            optimalLength: '100-200 palabras',
+            tone: 'profesional y reflexivo',
+            features: 'networking, thought leadership, casos profesionales',
+            hashtags: 'profesionales (3-7)',
+            engagement: 'comentarios profesionales, conexiones',
+            cta: 'networking, debate profesional, conexiones',
+            psychologyTriggers: 'autoridad, credibilidad, crecimiento profesional',
+            contentDepth: 'casos reales, lecciones profesionales, insights de industria',
+            reflectionPrompts: 'preguntas sobre aplicación práctica en el trabajo'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'opener',
+                    label: '📊 Apertura Profesional',
+                    description: 'Dato relevante, experiencia o insight de industria',
+                    examples: ['📊 En mis 10 años en [industria]...', '💼 Algo que aprendí dirigiendo equipos...', '🎯 Los datos del último trimestre revelan...']
+                },
+                {
+                    section: 'development',
+                    label: '🔍 Desarrollo Estructurado',
+                    description: 'Explicación detallada, contexto y análisis profundo',
+                    examples: ['El contexto es importante porque...', 'Analizando los factores clave...', 'Mi experiencia me ha enseñado que...']
+                },
+                {
+                    section: 'case',
+                    label: '📈 Ejemplo Práctico',
+                    description: 'Caso real, ejemplo concreto o aplicación práctica',
+                    examples: ['Por ejemplo, en mi último proyecto...', 'Un caso que ilustra esto perfectamente...', 'Aplicamos esta estrategia en...']
+                },
+                {
+                    section: 'cta',
+                    label: '🤝 CTA de Networking',
+                    description: 'Pregunta que invite al debate profesional y conexión',
+                    examples: ['¿Cómo lo aplicas en tu industria?', '¿Qué estrategias han funcionado en tu experiencia?', '¿Estás de acuerdo con este enfoque?']
+                }
+            ],
+            baseTemplate: `📊 [APERTURA_PROFESIONAL]
+
+[DESARROLLO_Y_CONTEXTO_DETALLADO]
+
+📈 Ejemplo: [CASO_REAL_O_APLICACION]
+
+💡 [INSIGHT_PROFESIONAL]
+
+🤝 [PREGUNTA_NETWORKING]
+
+#[hashtag_profesional] #[industria] #[skill]`
         }
     },
     whatsapp: {
         name: 'WhatsApp',
         characteristics: {
-            maxLength: 4096,
-            optimalLength: '30-60 palabras',
-            tone: 'personal e íntimo',
-            features: 'mensajería directa, urgencia, exclusividad',
-            hashtags: 'no son efectivos',
-            engagement: 'respuestas directas, llamadas a la acción',
-            cta: 'números de teléfono, enlaces directos'
+            maxLength: 65536,
+            optimalLength: '1-3 líneas',
+            tone: 'directo y personal',
+            features: 'inmediatez, personalización, urgencia',
+            hashtags: 'no se usan',
+            engagement: 'respuestas directas, reenvíos',
+            cta: 'respuesta inmediata, acción específica',
+            psychologyTriggers: 'urgencia, exclusividad, personalización',
+            contentDepth: 'mensajes concisos pero impactantes',
+            reflectionPrompts: 'preguntas directas que requieran respuesta inmediata'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'attention',
+                    label: '🔥 Captador de Atención',
+                    description: 'Palabra o frase que genere urgencia o interés inmediato',
+                    examples: ['🔥 ¡URGENTE!', '💡 IMPORTANTE:', '🎯 Para ti específicamente:']
+                },
+                {
+                    section: 'benefit',
+                    label: '⚡ Beneficio/Urgencia',
+                    description: 'El valor o la urgencia explicada brevemente',
+                    examples: ['Tienes 24h para...', 'Descubrí algo que te interesa...', 'Oportunidad única para...']
+                },
+                {
+                    section: 'cta',
+                    label: '📲 CTA Inmediata',
+                    description: 'Acción específica y clara para responder ahora',
+                    examples: ['Responde con SÍ si te interesa', 'Envía tu pregunta ahora', '¿Nos vemos mañana a las 3?']
+                }
+            ],
+            baseTemplate: `🔥 [ATENCION_URGENTE]
+⚡ [BENEFICIO_O_RAZON]
+📲 [ACCION_INMEDIATA]`
         }
     },
     telegram: {
         name: 'Telegram',
         characteristics: {
             maxLength: 4096,
-            optimalLength: '80-120 palabras',
+            optimalLength: '30-60 palabras',
             tone: 'informativo y técnico',
             features: 'canales, bots, comunidades especializadas',
             hashtags: 'uso moderado',
             engagement: 'forwards, reacciones, polls',
-            cta: 'enlaces a canales, bots interactivos'
+            cta: 'enlaces a canales, bots interactivos',
+            psychologyTriggers: 'información exclusiva, comunidad especializada',
+            contentDepth: 'información valiosa y bien estructurada',
+            reflectionPrompts: 'invitaciones a profundizar en el canal'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'title',
+                    label: '📌 Titular Claro',
+                    description: 'Título que capture la esencia del mensaje',
+                    examples: ['📌 Guía Completa:', '🔧 Tutorial Rápido:', '📊 Análisis Semanal:']
+                },
+                {
+                    section: 'development',
+                    label: '💭 Desarrollo Conciso',
+                    description: 'Explicación breve pero completa del contenido',
+                    examples: ['Esta semana analizamos...', 'Los pasos son simples...', 'Los datos muestran...']
+                },
+                {
+                    section: 'cta',
+                    label: '👉 CTA Directo',
+                    description: 'Instrucción clara o enlace específico',
+                    examples: ['👉 Lee completo en:', '🔗 Descarga aquí:', '💬 Únete a la discusión:']
+                }
+            ],
+            baseTemplate: `📌 [TITULO_ATRACTIVO]
+
+[EXPLICACION_BREVE_PERO_VALIOSA]
+
+👉 [INSTRUCCION_O_ENLACE]`
+        }
+    },
+    instagram: {
+        name: 'Instagram',
+        characteristics: {
+            maxLength: 2200,
+            optimalLength: '50-100 palabras',
+            tone: 'visual y aspiracional',
+            features: 'contenido visual, stories, reels',
+            hashtags: '5-10 hashtags relevantes',
+            engagement: 'likes, shares, saves',
+            cta: 'enlaces en bio, stories interactivas',
+            psychologyTriggers: 'aspiración, inspiración, estética',
+            contentDepth: 'mensajes inspiradores con contexto visual',
+            reflectionPrompts: 'invitaciones a reflexionar sobre valores y aspiraciones'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'power_line',
+                    label: '💥 Primera Línea Poderosa',
+                    description: 'Frase que enganche visualmente y emocionalmente',
+                    examples: ['💥 La vida cambió cuando entendí esto...', '✨ El secreto que nadie te cuenta...', '🌟 Si pudiera regresar en el tiempo...']
+                },
+                {
+                    section: 'narrative',
+                    label: '📖 Cuerpo Narrativo',
+                    description: 'Historia, contexto o mensaje inspiracional',
+                    examples: ['Durante años pensé que...', 'Mi mentora me dijo algo que...', 'Cada mañana recuerdo que...']
+                },
+                {
+                    section: 'value',
+                    label: '💎 Valor o Reflexión',
+                    description: 'El mensaje principal, la lección o insight valioso',
+                    examples: ['Lo que realmente importa es...', 'La verdadera fuerza viene de...', 'El éxito se mide por...']
+                },
+                {
+                    section: 'cta',
+                    label: '❤️ CTA Emocional',
+                    description: 'Llamada a acción que conecte emocionalmente',
+                    examples: ['❤️ Guarda si esto resuena contigo', '✨ Etiqueta a quien necesita leer esto', '💫 ¿Qué te ha enseñado tu experiencia?']
+                }
+            ],
+            baseTemplate: `💥 [FRASE_PODEROSA]
+
+[HISTORIA_O_CONTEXTO_INSPIRACIONAL]
+
+💎 [VALOR_O_REFLEXION_PROFUNDA]
+
+❤️ [CTA_EMOCIONAL]
+
+#[hashtag1] #[hashtag2] #[hashtag3] #[hashtag4] #[hashtag5]`
+        }
+    },
+    tiktok: {
+        name: 'TikTok',
+        characteristics: {
+            maxLength: 2200,
+            optimalLength: '1-2 líneas + video',
+            tone: 'joven y trendy',
+            features: 'videos cortos, trends, música',
+            hashtags: '3-5 hashtags trending',
+            engagement: 'duetos, challenges, comentarios',
+            cta: 'follow, like, share',
+            psychologyTriggers: 'FOMO, trending, autenticidad',
+            contentDepth: 'mensajes rápidos pero impactantes',
+            reflectionPrompts: 'retos que inviten a la participación'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'hook',
+                    label: '🎯 Gancho Viral',
+                    description: 'Pregunta, reto o frase que enganche en los primeros segundos',
+                    examples: ['🎯 ¿Sabías que puedes...?', '😱 Esto te va a sorprender...', '🔥 El truco que nadie conoce...']
+                },
+                {
+                    section: 'content',
+                    label: '⚡ Contenido Rápido',
+                    description: 'Información valiosa entregada de forma dinámica',
+                    examples: ['En 30 segundos te explico...', 'Los 3 pasos son...', 'La diferencia está en...']
+                },
+                {
+                    section: 'cta',
+                    label: '📢 CTA Viral',
+                    description: 'Llamada a acción para engagement y viralidad',
+                    examples: ['📢 ¡Sígueme para más tips!', '🔄 Comparte si te gustó', '💬 ¿Tú qué opinas?']
+                }
+            ],
+            baseTemplate: `🎯 [GANCHO_VIRAL]
+
+⚡ [CONTENIDO_RAPIDO_VALIOSO]
+
+📢 [CTA_ENGAGEMENT]
+
+#[trend1] #[trend2] #[hashtag]`
         }
     },
     reddit: {
@@ -613,43 +889,106 @@ const SOCIAL_NETWORK_SPECS = {
             features: 'subreddits especializados, discusiones profundas',
             hashtags: 'no se usan',
             engagement: 'upvotes, comentarios detallados',
-            cta: 'discusión, AMA, recursos útiles'
-        }
-    },
-    instagram: {
-        name: 'Instagram',
-        characteristics: {
-            maxLength: 2200,
-            optimalLength: '100-150 palabras',
-            tone: 'visual y aspiracional',
-            features: 'contenido visual, stories, reels',
-            hashtags: '5-10 hashtags relevantes',
-            engagement: 'likes, shares, saves',
-            cta: 'enlaces en bio, stories interactivas'
-        }
-    },
-    tiktok: {
-        name: 'TikTok',
-        characteristics: {
-            maxLength: 2200,
-            optimalLength: '50-100 palabras',
-            tone: 'joven y trendy',
-            features: 'videos cortos, trends, música',
-            hashtags: '3-5 hashtags trending',
-            engagement: 'duetos, challenges, comentarios',
-            cta: 'follow, like, share'
+            cta: 'discusión, AMA, recursos útiles',
+            psychologyTriggers: 'autenticidad, conocimiento profundo, comunidad',
+            contentDepth: 'análisis detallados, experiencias genuinas',
+            reflectionPrompts: 'preguntas que generen discusión intelectual'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'title',
+                    label: '📰 Título Llamativo',
+                    description: 'Título que capture la atención y sea específico',
+                    examples: ['📰 [Serio] Mi experiencia con...', '🔍 Análisis profundo de...', '💡 LPT: Lo que aprendí después de...']
+                },
+                {
+                    section: 'content',
+                    label: '📝 Contenido Detallado',
+                    description: 'Historia, datos o guía con información valiosa',
+                    examples: ['Context: Trabajo en [industria] desde hace...', 'Después de investigar durante meses...', 'Mi experiencia de 5 años me ha enseñado...']
+                },
+                {
+                    section: 'insights',
+                    label: '🧠 Insights Profundos',
+                    description: 'Análisis, conclusiones o lecciones aprendidas',
+                    examples: ['Lo que descubrí es que...', 'Los puntos clave son...', 'Mi consejo después de todo esto...']
+                },
+                {
+                    section: 'discussion',
+                    label: '💭 Debate',
+                    description: 'Pregunta que invite a la discusión comunitaria',
+                    examples: ['¿Ustedes qué opinan?', '¿Alguien ha tenido experiencias similares?', '¿Estoy equivocado en algo?']
+                }
+            ],
+            baseTemplate: `📰 [TITULO_DESCRIPTIVO_Y_ESPECIFICO]
+
+[HISTORIA_DATO_O_GUIA_DETALLADA]
+
+🧠 Key insights:
+- [Punto 1]
+- [Punto 2] 
+- [Punto 3]
+
+💭 [PREGUNTA_PARA_DEBATE]
+
+Edit: [Aclaraciones si son necesarias]`
         }
     },
     youtube: {
         name: 'YouTube',
         characteristics: {
             maxLength: 5000,
-            optimalLength: '200-400 palabras',
+            optimalLength: '2-3 líneas (descripción)',
             tone: 'educativo y entretenido',
             features: 'videos largos, tutoriales, entretenimiento',
             hashtags: '3-5 hashtags en descripción',
             engagement: 'suscripciones, likes, comentarios',
-            cta: 'suscribirse, campana de notificaciones'
+            cta: 'suscribirse, campana de notificaciones',
+            psychologyTriggers: 'curiosidad, valor educativo, entertainment',
+            contentDepth: 'promesas de valor específicas y entrega real',
+            reflectionPrompts: 'invitaciones a continuar aprendiendo'
+        },
+        template: {
+            structure: [
+                {
+                    section: 'title',
+                    label: '🎥 Título Optimizado',
+                    description: 'Título que prometa valor específico y genere curiosidad',
+                    examples: ['🎥 Cómo [lograr resultado] en [tiempo específico]', '🔍 La verdad sobre [tema controversial]', '💡 [Número] secretos que [audiencia] necesita saber']
+                },
+                {
+                    section: 'summary',
+                    label: '📄 Resumen de Valor',
+                    description: 'Qué aprenderán y por qué es importante',
+                    examples: ['En este video aprenderás...', 'Te muestro paso a paso...', 'Descubrirás los secretos de...']
+                },
+                {
+                    section: 'structure',
+                    label: '📋 Estructura del Contenido',
+                    description: 'Lista de puntos principales o timestamps',
+                    examples: ['🕐 Timestamps:', '📝 Lo que cubrimos:', '🎯 Puntos clave:']
+                },
+                {
+                    section: 'cta',
+                    label: '🔔 CTA de Suscripción',
+                    description: 'Llamada a suscribirse y activar notificaciones',
+                    examples: ['🔔 Suscríbete y activa la campana', '👍 Dale like si te ayudó', '💬 Déjame tu pregunta en comentarios']
+                }
+            ],
+            baseTemplate: `🎥 [TITULO_CON_VALOR_ESPECIFICO]
+
+[RESUMEN_BREVE_DEL_VALOR]
+
+🎯 En este video:
+✅ [Punto 1]
+✅ [Punto 2] 
+✅ [Punto 3]
+
+🔔 Suscríbete y activa la campana para más contenido como este
+👉 Links útiles: [recursos]
+
+#[hashtag1] #[hashtag2] #[hashtag3]`
         }
     }
 };
@@ -819,79 +1158,212 @@ function buildCopywritingPrompt(params) {
     const copyTypeInfo = COPY_TYPES[copyType];
     
     if (generationMode === 'single') {
-        // Generar 3 variaciones para una sola red social
+        // Generar 3 variaciones profundas para una sola red social
         const networkKey = socialNetworks[0];
         const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
         
-        return `Genera 3 variaciones de copywriting profesional para ${networkSpec.name} sobre "${keyword}".
+        return `Actúa como un experto copywriter especializado en ${networkSpec.name} con conocimiento profundo en psicología del consumidor.
 
+TEMA: "${keyword}"
 TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}
+${context ? `CONTEXTO ESPECÍFICO: ${context}\n` : ''}
 
-ESPECIFICACIONES PARA ${networkSpec.name.toUpperCase()}:
-- Longitud óptima: ${networkSpec.characteristics.optimalLength}
-- Tono: ${networkSpec.characteristics.tone}
-- Características clave: ${networkSpec.characteristics.features}
-- Hashtags: ${networkSpec.characteristics.hashtags}
-- Engagement: ${networkSpec.characteristics.engagement}
-- Call-to-action: ${networkSpec.characteristics.cta}
+ESPECIFICACIONES PSICOLÓGICAS PARA ${networkSpec.name.toUpperCase()}:
+• Longitud óptima: ${networkSpec.characteristics.optimalLength}
+• Tono requerido: ${networkSpec.characteristics.tone}
+• Características clave: ${networkSpec.characteristics.features}
+• Hashtags: ${networkSpec.characteristics.hashtags}
+• Engagement: ${networkSpec.characteristics.engagement}
+• CTA específico: ${networkSpec.characteristics.cta}
+• Triggers psicológicos: ${networkSpec.characteristics.psychologyTriggers}
+• Profundidad de contenido: ${networkSpec.characteristics.contentDepth}
+• Prompts de reflexión: ${networkSpec.characteristics.reflectionPrompts}
 
-${context ? `CONTEXTO ADICIONAL: ${context}\n` : ''}
+ESTRUCTURA REQUERIDA PARA ${networkSpec.name}:
+${networkSpec.template.structure.map(section => 
+    `${section.label}: ${section.description}\n   Ejemplos: ${section.examples.join(' | ')}`
+).join('\n')}
 
-INSTRUCCIONES:
-1. Crea 3 enfoques diferentes pero todos optimizados para ${networkSpec.name}
-2. Respeta las características específicas de la plataforma
-3. Cada variación debe tener un hook diferente
-4. Incluye emojis apropiados para el tono de ${networkSpec.name}
-5. Asegúrate de que el call-to-action sea específico para esta plataforma
+PLANTILLA BASE:
+${networkSpec.template.baseTemplate}
+
+INSTRUCCIONES CRÍTICAS PARA GENERAR 3 VARIACIONES PROFUNDAS:
+1. VARIACIÓN 1 - ENFOQUE EMOCIONAL: Conecta profundamente con emociones, usa storytelling que haga reflexionar
+2. VARIACIÓN 2 - ENFOQUE RACIONAL: Presenta datos, estadísticas, argumentos lógicos que convenzan
+3. VARIACIÓN 3 - ENFOQUE ASPIRACIONAL: Inspira acción, muestra el futuro deseado, genera aspiración
+
+CRITERIOS DE CALIDAD OBLIGATORIOS:
+✅ Cada variación debe hacer que el lector PARE y REFLEXIONE
+✅ Debe generar una respuesta emocional o intelectual inmediata
+✅ El contenido debe ser VALIOSO y MEMORABLE
+✅ Debe invitar genuinamente a la interacción y participación
+✅ Optimizado específicamente para los triggers psicológicos de ${networkSpec.name}
 
 FORMATO DE RESPUESTA:
-Variación 1: [texto completo]
-Variación 2: [texto completo]
-Variación 3: [texto completo]`;
+Variación 1 - Emocional:
+[copy completo siguiendo la estructura requerida]
+
+Variación 2 - Racional:
+[copy completo siguiendo la estructura requerida]
+
+Variación 3 - Aspiracional:
+[copy completo siguiendo la estructura requerida]`;
 
     } else {
-        // Generar 1 copy específico para cada red social
-        let prompt = `Genera copywriting específico y optimizado para cada red social sobre "${keyword}".
+        // Generar 1 copy específico y profundo para cada red social
+        let prompt = `Actúa como un experto copywriter multiplatforma con conocimiento profundo en psicología del consumidor y especialización en cada red social.
 
+TEMA CENTRAL: "${keyword}"
 TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}
-${context ? `CONTEXTO: ${context}\n` : ''}
+${context ? `CONTEXTO ESPECÍFICO: ${context}\n` : ''}
 
-GENERA UN COPY ÚNICO Y ESPECÍFICO PARA CADA PLATAFORMA:
+MISIÓN: Crear copywriting que no solo venda, sino que haga PENSAR, REFLEXIONAR y genere conversaciones significativas.
+
+ESPECIFICACIONES DETALLADAS POR PLATAFORMA:
 
 `;
 
         socialNetworks.forEach(networkKey => {
             const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
             prompt += `
-${networkSpec.name.toUpperCase()}:
-- Longitud: ${networkSpec.characteristics.optimalLength}
-- Tono: ${networkSpec.characteristics.tone}
-- Enfoque: ${networkSpec.characteristics.features}
-- Hashtags: ${networkSpec.characteristics.hashtags}
-- CTA: ${networkSpec.characteristics.cta}
+🎯 ${networkSpec.name.toUpperCase()}:
+   • Longitud: ${networkSpec.characteristics.optimalLength}
+   • Tono: ${networkSpec.characteristics.tone}
+   • Enfoque: ${networkSpec.characteristics.features}
+   • Hashtags: ${networkSpec.characteristics.hashtags}
+   • CTA: ${networkSpec.characteristics.cta}
+   • Triggers psicológicos: ${networkSpec.characteristics.psychologyTriggers}
+   • Profundidad: ${networkSpec.characteristics.contentDepth}
+   • Reflexión: ${networkSpec.characteristics.reflectionPrompts}
+   
+   Estructura requerida:
+${networkSpec.template.structure.map(section => 
+    `   ${section.label}: ${section.description}`
+).join('\n')}
+   
+   Plantilla base:
+${networkSpec.template.baseTemplate.split('\n').map(line => `   ${line}`).join('\n')}
 `;
         });
 
         prompt += `
-INSTRUCCIONES CRÍTICAS:
-1. Cada copy debe ser COMPLETAMENTE DIFERENTE y adaptado a su plataforma
-2. LinkedIn: Profesional con insights de valor
-3. Twitter: Conciso, impactante, trending
-4. Facebook: Conversacional, storytelling
-5. WhatsApp: Directo, personal, urgente
-6. Instagram: Visual, aspiracional, lifestyle
-7. TikTok: Trendy, joven, viral
-8. Telegram: Informativo, técnico
-9. Reddit: Auténtico, comunitario
-10. YouTube: Educativo, descriptivo
 
-FORMATO DE RESPUESTA:
-[Red Social]: [copy específico completamente adaptado]
-[Red Social]: [copy específico completamente adaptado]
-...`;
+INSTRUCCIONES CRÍTICAS PARA CADA PLATAFORMA:
+
+📘 FACEBOOK: Historia personal que conecte emocionalmente, datos sorprendentes, pregunta que invite a compartir experiencias. Debe generar nostalgia o pertenencia grupal.
+
+🔗 LINKEDIN: Caso profesional real, insight de industria, aplicación práctica. Debe establecer autoridad y generar networking genuino.
+
+🐦 TWITTER/X: Opinión contundente con datos, declaración que genere debate inteligente. Debe ser retweeteable y memorable.
+
+💬 WHATSAPP: Mensaje directo con valor inmediato, sentido de urgencia personalizada. Debe generar respuesta inmediata.
+
+📱 TELEGRAM: Información técnica valiosa, análisis profundo pero conciso. Debe aportar conocimiento específico.
+
+📷 INSTAGRAM: Historia inspiracional con mensaje profundo, call-to-action emocional. Debe ser guardable y compartible.
+
+🎵 TIKTOK: Hook viral con valor rápido pero impactante. Debe ser tendencia y generar participación.
+
+🔴 REDDIT: Experiencia auténtica con análisis detallado, invitación a debate comunitario. Debe ser genuino y útil.
+
+🎬 YOUTUBE: Promesa de valor específica con estructura clara. Debe generar suscripción y engagement.
+
+CRITERIOS DE EXCELENCIA OBLIGATORIOS:
+✅ Cada copy debe ser ÚNICO y ESPECÍFICO para su plataforma
+✅ Debe hacer que la audiencia PARE su scroll y PRESTE ATENCIÓN
+✅ Contenido VALIOSO que la audiencia quiera guardar/compartir
+✅ Genera REFLEXIÓN y CONVERSACIÓN genuina
+✅ Optimizado para los triggers psicológicos específicos de cada red
+✅ Invita a la ACCIÓN de manera natural y convincente
+
+FORMATO DE RESPUESTA (por cada red social seleccionada):
+[Nombre de la Red Social]:
+[copy completo siguiendo su estructura específica y plantilla base]
+
+---
+
+[Siguiente Red Social]:
+[copy completo siguiendo su estructura específica y plantilla base]
+
+[continuar para todas las redes seleccionadas]`;
 
         return prompt;
     }
+}
+
+/**
+ * Muestra información detallada de la plantilla para una red social específica
+ */
+function showNetworkTemplate(networkKey) {
+    const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
+    if (!networkSpec || !networkSpec.template) return '';
+    
+    return `
+        <div class="network-template-info">
+            <div class="template-header">
+                <h4>📋 Plantilla para ${networkSpec.name}</h4>
+                <p class="template-description">Estructura psicológicamente optimizada</p>
+            </div>
+            
+            <div class="template-structure">
+                <h5>🏗️ Estructura Requerida:</h5>
+                ${networkSpec.template.structure.map(section => `
+                    <div class="structure-section">
+                        <div class="section-label">${section.label}</div>
+                        <div class="section-description">${section.description}</div>
+                        <div class="section-examples">
+                            <strong>Ejemplos:</strong>
+                            ${section.examples.map(example => `<span class="example-tag">${example}</span>`).join('')}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+            
+            <div class="template-psychology">
+                <h5>🧠 Triggers Psicológicos:</h5>
+                <p>${networkSpec.characteristics.psychologyTriggers}</p>
+                
+                <h5>💡 Profundidad de Contenido:</h5>
+                <p>${networkSpec.characteristics.contentDepth}</p>
+                
+                <h5>🤔 Prompts de Reflexión:</h5>
+                <p>${networkSpec.characteristics.reflectionPrompts}</p>
+            </div>
+            
+            <div class="template-base">
+                <h5>📝 Plantilla Base:</h5>
+                <pre class="base-template">${networkSpec.template.baseTemplate}</pre>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Actualiza la interfaz para mostrar plantillas cuando se selecciona una red social
+ */
+function updateTemplatePreview() {
+    const selectedNetworks = Array.from(document.querySelectorAll('.social-network-btn.selected'))
+        .map(btn => btn.dataset.network);
+    
+    const templateContainer = document.getElementById('templatePreview');
+    if (!templateContainer) return;
+    
+    if (selectedNetworks.length === 0) {
+        templateContainer.innerHTML = `
+            <div class="no-template-preview">
+                <p>📋 Selecciona una red social para ver su plantilla optimizada</p>
+            </div>
+        `;
+        return;
+    }
+    
+    templateContainer.innerHTML = `
+        <div class="templates-preview">
+            <h3>📋 Plantillas Optimizadas Seleccionadas</h3>
+            <p class="templates-intro">Estas son las estructuras psicológicamente optimizadas que se usarán:</p>
+            ${selectedNetworks.map(network => showNetworkTemplate(network)).join('')}
+        </div>
+    `;
 }
 
 /**
