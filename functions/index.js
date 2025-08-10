@@ -201,9 +201,9 @@ CTA: ${platform === 'Instagram' ? '¡Guarda este post!' : platform === 'LinkedIn
             console.log(`[USER] 🔍 Sin acceso individual, verificando premium global...`);
             try {
                 const configDoc = await db.collection('config').doc('app').get();
-                console.log(`[USER] 📊 configDoc.exists: ${configDoc.exists()}`);
+                console.log(`[USER] 📊 configDoc.exists: ${configDoc.exists}`);
                 
-                if (configDoc.exists()) {
+                if (configDoc.exists) {
                     const configData = configDoc.data();
                     console.log(`[USER] 📊 configData.isPremiumGlobalActive: ${configData.isPremiumGlobalActive}`);
                     

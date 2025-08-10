@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/modern.css">
+    <link rel="stylesheet" href="css/autocorrector.css">
     
     <!-- Meta tags para SEO -->
     <meta name="description" content="Generador de ideas inteligente impulsado por IA para potenciar tu creatividad">
@@ -133,7 +134,9 @@
                             <form id="registerForm">
                                 <div class="modern-field">
                                     <input id="registerName" class="modern-input" type="text" 
-                                           placeholder="👤 Tu nombre completo" required>
+                                           placeholder="👤 Tu nombre completo" 
+                                           spellcheck="true" autocomplete="name" autocorrect="on" 
+                                           autocapitalize="words" required>
                                 </div>
 
                                 <div class="modern-field">
@@ -273,7 +276,11 @@
                                     Palabra Clave / Tema Central
                                 </label>
                                 <input id="copyKeyword" class="modern-input" type="text" 
-                                       placeholder="Ej: iPhone 15, curso de marketing digital, restaurante vegano..." required>
+                                       placeholder="Ej: iPhone 15, curso de marketing digital, restaurante vegano..." 
+                                       spellcheck="true" autocomplete="on" autocorrect="on" 
+                                       autocapitalize="words" required
+                                       title="Autocorrector activado - Ctrl+Shift+L para limpiar texto">
+                                <div class="autocorrect-indicator">Autocorrector activado</div>
                                 <p class="field-note">
                                     ¡Sé lo más preciso posible! Cuanto más claro el tema, mejores serán las ideas.
                                 </p>
@@ -304,7 +311,11 @@
                                     Contexto Adicional (Opcional)
                                 </label>
                                 <textarea id="copyContext" class="modern-input" rows="3" 
-                                          placeholder="Audiencia objetivo, tono deseado, call-to-action específico..."></textarea>
+                                          placeholder="Audiencia objetivo, tono deseado, call-to-action específico..."
+                                          spellcheck="true" autocomplete="on" autocorrect="on" 
+                                          autocapitalize="sentences"
+                                          title="Autocorrector y gramática activados - Ctrl+Shift+L para limpiar texto"></textarea>
+                                <div class="autocorrect-indicator">Autocorrector y gramática activados</div>
                             </div>
 
                             <div class="modern-field">
@@ -340,6 +351,8 @@
                         <div class="modern-field">
                             <input id="searchInput" class="modern-input" type="text" 
                                    placeholder="🔍 Buscar en tu historial..."
+                                   spellcheck="true" autocomplete="on" autocorrect="on" 
+                                   autocapitalize="words"
                                    style="font-size: 0.875rem; padding: 0.75rem 1rem;">
                         </div>
                         
@@ -415,6 +428,7 @@
 
     <!-- Scripts -->
     <script type="module" src="js/main.js"></script>
+    <script src="js/autocorrector.js"></script>
     <script type="module" src="admin-email-bypass.js"></script>
     <script src="email-verification-bypass.js"></script>
     <script src="debug-helpers.js"></script>

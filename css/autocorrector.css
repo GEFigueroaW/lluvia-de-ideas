@@ -1,0 +1,168 @@
+/* Estilos para campos con autocorrector mejorado */
+
+/* Indicador visual para campos con autocorrector */
+.modern-input[spellcheck="true"],
+.modern-input[autocorrect="on"] {
+    position: relative;
+}
+
+/* Estilo mejorado para el indicador de autocorrección */
+.autocorrect-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #10b981;
+    margin-top: 4px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.autocorrect-indicator::before {
+    content: "🔤";
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+/* Efecto cuando el campo está enfocado */
+.modern-input[spellcheck="true"]:focus {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    border-color: #10b981;
+}
+
+.modern-input[spellcheck="true"]:focus + .autocorrect-indicator {
+    color: #059669;
+    font-weight: 600;
+}
+
+/* Clase para campo activo */
+.autocorrect-active {
+    background: linear-gradient(145deg, #ffffff, #f8fafc);
+}
+
+/* Validación en tiempo real */
+.field-validation {
+    font-size: 11px;
+    color: #f59e0b;
+    margin-top: 2px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.field-validation.show {
+    opacity: 1;
+}
+
+/* Mejorar el estilo de las palabras mal escritas */
+.modern-input:focus::spelling-error {
+    text-decoration: underline wavy #ef4444;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+}
+
+.modern-input:focus::grammar-error {
+    text-decoration: underline wavy #f59e0b;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 2px;
+}
+
+/* Estilo específico para textarea con autocorrector */
+textarea.modern-input[spellcheck="true"] {
+    resize: vertical;
+    min-height: 80px;
+    line-height: 1.6;
+}
+
+/* Mejorar la legibilidad en dispositivos móviles */
+@media (max-width: 768px) {
+    .modern-input[spellcheck="true"] {
+        font-size: 16px; /* Evita zoom en iOS */
+        -webkit-text-size-adjust: 100%;
+    }
+    
+    .autocorrect-indicator {
+        font-size: 10px;
+    }
+}
+
+/* Soporte para modo oscuro */
+@media (prefers-color-scheme: dark) {
+    .autocorrect-indicator {
+        color: #34d399;
+    }
+    
+    .field-validation {
+        color: #fbbf24;
+    }
+    
+    .autocorrect-active {
+        background: linear-gradient(145deg, #1f2937, #374151);
+    }
+}
+
+/* Animación sutil para el indicador de autocorrección */
+@keyframes autocorrect-pulse {
+    0%, 100% { 
+        opacity: 0.8;
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+.modern-input[spellcheck="true"]:focus + .autocorrect-indicator::before {
+    animation: autocorrect-pulse 2s ease-in-out infinite;
+}
+
+/* Estilo para el tooltip de acceso directo */
+.keyboard-shortcut-hint {
+    position: absolute;
+    background: #1f2937;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 10px;
+    white-space: nowrap;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+.keyboard-shortcut-hint::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border: 5px solid transparent;
+    border-top-color: #1f2937;
+}
+
+.modern-input[spellcheck="true"]:focus:hover + .autocorrect-indicator + .keyboard-shortcut-hint {
+    opacity: 1;
+}
+
+/* Estilo para la notificación de limpieza */
+.cleanup-notification {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.cleanup-notification::before {
+    content: "✨";
+    font-size: 12px;
+}
