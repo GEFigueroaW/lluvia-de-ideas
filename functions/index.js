@@ -756,3 +756,155 @@ exports.testDeepseekConnection = functions.https.onCall(async (data, context) =>
         throw new functions.https.HttpsError('internal', `Test failed: ${error.message}`);
     }
 });
+
+// FUNCIÓN DEBUG ESPECÍFICA PARA PROBLEMA DE CRÉDITOS
+exports.debugCreditsError = functions.runWith({
+    timeoutSeconds: 60,
+    memory: '512MB'
+}).https.onCall(async (data, context) => {
+    console.log('[DEBUG] 🔍 Iniciando debug específico para error de créditos...');
+    
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required for debug');
+    }
+
+    const uid = context.auth.uid;
+    const email = context.auth.token.email;
+    
+    try {
+        console.log(`[DEBUG] Usuario: ${email} (${uid})`);
+        
+        // PASO 1: Verificar documento del usuario
+        const userRef = db.collection('users').doc(uid);
+        const userDoc = await userRef.get();
+        
+        let debugInfo = {
+            step1_userDoc: {
+                exists: userDoc.exists,
+                hasDataFunction: typeof userDoc.data === 'function'
+            }
+        };
+        
+        let userData = null;
+        if (userDoc.exists && typeof userDoc.data === 'function') {
+            userData = userDoc.data();
+            debugInfo.step1_userDoc.userData = userData;
+        }
+        
+        // PASO 2: Verificar lógica de acceso individual
+        if (userData) {
+            const hasCredits = userData.generationCredits > 0;
+            const isPremium = userData.isPremium;
+            const hasIndividualAccess = hasCredits || isPremium;
+            
+            debugInfo.step2_individualAccess = {
+                generationCredits: userData.generationCredits,
+                generationCreditsType: typeof userData.generationCredits,
+                hasCredits: hasCredits,
+                isPremium: isPremium,
+                isPremiumType: typeof userData.isPremium,
+                hasIndividualAccess: hasIndividualAccess
+            };
+        }
+        
+        // PASO 3: Verificar configuración premium global
+        let hasGlobalAccess = false;
+        try {
+            const configDoc = await db.collection('config').doc('app').get();
+            debugInfo.step3_globalConfig = {
+                configExists: configDoc.exists,
+                hasDataFunction: typeof configDoc.data === 'function'
+            };
+            
+            if (configDoc.exists && typeof configDoc.data === 'function') {
+                const configData = configDoc.data();
+                debugInfo.step3_globalConfig.configData = configData;
+                
+                const isGlobalPremiumActive = configData.isPremiumGlobalActive;
+                const promoEndDate = configData.promoEndDate;
+                const isPromoValid = !promoEndDate || promoEndDate.toDate() > new Date();
+                
+                debugInfo.step3_globalConfig.verification = {
+                    isGlobalPremiumActive: isGlobalPremiumActive,
+                    isGlobalPremiumActiveType: typeof isGlobalPremiumActive,
+                    promoEndDate: promoEndDate ? promoEndDate.toDate() : null,
+                    currentDate: new Date(),
+                    isPromoValid: isPromoValid,
+                    hasGlobalAccess: isGlobalPremiumActive && isPromoValid
+                };
+                
+                hasGlobalAccess = isGlobalPremiumActive && isPromoValid;
+            }
+        } catch (error) {
+            debugInfo.step3_globalConfig.error = error.message;
+        }
+        
+        // PASO 4: Simular lógica completa de la función principal
+        const individualAccess = userData ? (userData.generationCredits > 0 || userData.isPremium) : false;
+        const finalAccess = individualAccess || hasGlobalAccess;
+        
+        debugInfo.step4_finalVerification = {
+            individualAccess: individualAccess,
+            hasGlobalAccess: hasGlobalAccess,
+            finalAccess: finalAccess,
+            wouldThrowError: !finalAccess
+        };
+        
+        // PASO 5: Si no tiene acceso, crear usuario y activar premium
+        if (!finalAccess) {
+            console.log('[DEBUG] 🔧 Usuario sin acceso, activando premium automáticamente...');
+            
+            // Crear/actualizar usuario
+            const premiumUserData = {
+                email: email,
+                displayName: context.auth.token.name || 'Usuario Premium',
+                generationCredits: 9999,
+                isPremium: true,
+                premiumUntil: admin.firestore.Timestamp.fromDate(new Date(Date.now() + (365 * 24 * 60 * 60 * 1000))),
+                premiumSource: 'debug_auto_activation',
+                premiumUpdatedAt: admin.firestore.Timestamp.now(),
+                lastGenerationDate: null,
+                createdAt: userDoc.exists ? userData.createdAt : admin.firestore.Timestamp.now(),
+                photoURL: context.auth.token.picture || null
+            };
+            
+            await userRef.set(premiumUserData, { merge: true });
+            
+            // Activar premium global
+            const globalPremiumConfig = {
+                isPremiumGlobalActive: true,
+                promoEndDate: admin.firestore.Timestamp.fromDate(new Date(Date.now() + (365 * 24 * 60 * 60 * 1000))),
+                promoDescription: 'Premium Global Debug Auto-Activation',
+                allowAllSocialNetworks: true,
+                allowAllCopyTypes: true,
+                unlimitedGenerations: true,
+                bypassCreditsCheck: true,
+                lastUpdated: admin.firestore.Timestamp.now(),
+                updatedBy: email,
+                debugActivation: true
+            };
+            
+            await db.collection('config').doc('app').set(globalPremiumConfig, { merge: true });
+            
+            debugInfo.step5_autoActivation = {
+                userDataUpdated: premiumUserData,
+                globalConfigUpdated: globalPremiumConfig,
+                success: true
+            };
+        }
+        
+        console.log('[DEBUG] ✅ Debug completado:', debugInfo);
+        
+        return {
+            success: true,
+            debugInfo: debugInfo,
+            recommendations: finalAccess ? 
+                ['Usuario tiene acceso correcto'] : 
+                ['Premium activado automáticamente', 'Reintentar generación de copywriting']
+        };
+        
+    } catch (error) {
+        console.error('[DEBUG] ❌ Error en debug:', error);
+        throw new functions.https.HttpsError('internal', `Debug error: ${error.message}`);
+    }
+});

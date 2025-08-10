@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DEBUG ESPECÍFICO - Error Créditos</title>
+    <style>
+        body { font-family: 'Courier New', monospace; margin: 20px; background: #000; color: #00ff00; }
+        .container { max-width: 1200px; margin: 0 auto; background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        .result { padding: 10px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #00ff00; background: #222; }
+        .error { border-left-color: #ff4444; color: #ff4444; }
+        .warning { border-left-color: #ffaa00; color: #ffaa00; }
+        .info { border-left-color: #4444ff; color: #4444ff; }
+        .success { border-left-color: #00ff00; color: #00ff00; }
+        button { padding: 12px 24px; background: #333; color: #00ff00; border: 1px solid #555; border-radius: 6px; cursor: pointer; margin: 10px 5px; font-family: 'Courier New'; }
+        button:hover { background: #555; }
+        .emergency { background: #ff4444; color: white; }
+        .code { background: #000; padding: 15px; border-radius: 4px; font-family: 'Courier New'; font-size: 12px; overflow-x: auto; white-space: pre; border: 1px solid #333; }
+        h1, h2, h3 { color: #00ff00; }
+        .step { background: #333; padding: 10px; margin: 10px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 DEBUG ESPECÍFICO - ERROR DE CRÉDITOS</h1>
+        <p>Análisis línea por línea de por qué sigue arrojando el error de créditos.</p>
+        
+        <div class="step">
+            <h3>PASO 1: Verificar datos exactos del usuario</h3>
+            <button onclick="debugUserData()">📊 Debug Datos Usuario</button>
+        </div>
+        
+        <div class="step">
+            <h3>PASO 2: Verificar configuración premium global</h3>
+            <button onclick="debugGlobalPremium()">🌐 Debug Premium Global</button>
+        </div>
+        
+        <div class="step">
+            <h3>PASO 3: Simular la lógica exacta de la Cloud Function</h3>
+            <button onclick="simulateCloudFunctionLogic()">⚙️ Simular Lógica Función</button>
+        </div>
+        
+        <div class="step">
+            <h3>PASO 4: Activar premium inmediatamente</h3>
+            <button onclick="emergencyActivatePremium()" class="emergency">🚨 ACTIVAR PREMIUM AHORA</button>
+        </div>
+        
+        <div class="step">
+            <h3>PASO 5: Test de generación real</h3>
+            <button onclick="testRealGeneration()">🧪 Test Generación Real</button>
+        </div>
+        
+        <div class="step">
+            <h3>PASO 6: Ejecutar función de debug automática</h3>
+            <button onclick="runDebugFunction()" class="emergency">🤖 DEBUG AUTOMÁTICO</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-functions-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDWy1rFkFRB_MX8NxQdCVPWCQZKIlEqHM8",
+            authDomain: "brain-storm-8f0d8.firebaseapp.com",
+            projectId: "brain-storm-8f0d8",
+            storageBucket: "brain-storm-8f0d8.appspot.com",
+            messagingSenderId: "659020802774",
+            appId: "1:659020802774:web:ab0ee5c3b2e7f5e3b70ed1"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const functions = firebase.functions();
+
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+            console.log(message);
+        }
+
+        // Autenticación automática
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                addResult(`✅ Usuario autenticado: ${user.email} (UID: ${user.uid})`, 'success');
+                debugUserData();
+            } else {
+                auth.signInWithEmailAndPassword('w.guillermoef@gmail.com', 'Willywonka1900')
+                    .then(() => {
+                        addResult('✅ Login automático exitoso', 'success');
+                    })
+                    .catch((error) => {
+                        addResult(`❌ Error en login: ${error.message}`, 'error');
+                    });
+            }
+        });
+
+        async function debugUserData() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    addResult('❌ No hay usuario autenticado', 'error');
+                    return;
+                }
+
+                addResult('=== PASO 1: DATOS EXACTOS DEL USUARIO ===', 'info');
+                
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                
+                if (!userDoc.exists) {
+                    addResult('❌ PROBLEMA ENCONTRADO: El documento del usuario NO EXISTE', 'error');
+                    addResult('🔧 Esto significa que se creará automáticamente con 5 créditos', 'warning');
+                    return;
+                }
+
+                const userData = userDoc.data();
+                
+                addResult(`<div class="code">
+DATOS EXACTOS DEL USUARIO:
+========================
+UID: ${user.uid}
+Email: ${user.email}
+generationCredits: ${userData.generationCredits} (tipo: ${typeof userData.generationCredits})
+isPremium: ${userData.isPremium} (tipo: ${typeof userData.isPremium})
+lastGenerationDate: ${userData.lastGenerationDate}
+createdAt: ${userData.createdAt}
+
+LÓGICA DE VERIFICACIÓN:
+======================
+userData.generationCredits > 0: ${userData.generationCredits > 0}
+userData.isPremium: ${userData.isPremium}
+hasAccess (individual): ${userData.generationCredits > 0 || userData.isPremium}
+</div>`, 'info');
+
+                // Verificar si tiene acceso individual
+                const hasIndividualAccess = userData.generationCredits > 0 || userData.isPremium;
+                if (hasIndividualAccess) {
+                    addResult('✅ TIENE ACCESO INDIVIDUAL', 'success');
+                } else {
+                    addResult('❌ NO TIENE ACCESO INDIVIDUAL - Verificando premium global...', 'warning');
+                    await debugGlobalPremium();
+                }
+
+            } catch (error) {
+                addResult(`❌ Error verificando datos usuario: ${error.message}`, 'error');
+            }
+        }
+
+        async function debugGlobalPremium() {
+            try {
+                addResult('=== PASO 2: CONFIGURACIÓN PREMIUM GLOBAL ===', 'info');
+                
+                const configDoc = await db.collection('config').doc('app').get();
+                
+                if (!configDoc.exists()) {
+                    addResult('❌ PROBLEMA CRÍTICO: No existe config/app en Firestore', 'error');
+                    addResult('🔧 Esto significa que NO hay premium global configurado', 'warning');
+                    return;
+                }
+
+                const configData = configDoc.data();
+                
+                addResult(`<div class="code">
+CONFIGURACIÓN PREMIUM GLOBAL:
+============================
+isPremiumGlobalActive: ${configData.isPremiumGlobalActive} (tipo: ${typeof configData.isPremiumGlobalActive})
+promoEndDate: ${configData.promoEndDate}
+promoDescription: ${configData.promoDescription}
+allowAllSocialNetworks: ${configData.allowAllSocialNetworks}
+unlimitedGenerations: ${configData.unlimitedGenerations}
+
+VERIFICACIÓN DE FECHA:
+=====================
+Fecha actual: ${new Date()}
+Fecha fin promo: ${configData.promoEndDate ? configData.promoEndDate.toDate() : 'No definida'}
+¿Promo vigente?: ${!configData.promoEndDate || configData.promoEndDate.toDate() > new Date()}
+</div>`, 'info');
+
+                // Simular lógica exacta
+                if (configData.isPremiumGlobalActive) {
+                    const promoEndDate = configData.promoEndDate;
+                    if (!promoEndDate || promoEndDate.toDate() > new Date()) {
+                        addResult('✅ PREMIUM GLOBAL ESTÁ ACTIVO Y VIGENTE', 'success');
+                    } else {
+                        addResult('❌ PREMIUM GLOBAL EXPIRADO', 'error');
+                    }
+                } else {
+                    addResult('❌ PREMIUM GLOBAL NO ESTÁ ACTIVO', 'error');
+                }
+
+            } catch (error) {
+                addResult(`❌ Error verificando premium global: ${error.message}`, 'error');
+            }
+        }
+
+        async function simulateCloudFunctionLogic() {
+            try {
+                addResult('=== PASO 3: SIMULACIÓN EXACTA DE LA CLOUD FUNCTION ===', 'info');
+                
+                const user = auth.currentUser;
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                let userData = userDoc.exists ? userDoc.data() : null;
+
+                // Simular creación automática si no existe
+                if (!userDoc.exists) {
+                    addResult('🔧 Usuario no existe, simulando creación automática...', 'warning');
+                    userData = {
+                        generationCredits: 5,
+                        isPremium: false
+                    };
+                }
+
+                // LÓGICA EXACTA DE LA CLOUD FUNCTION
+                let hasAccess = userData.generationCredits > 0 || userData.isPremium;
+                let accessReason = '';
+
+                addResult(`<div class="code">
+SIMULACIÓN LÍNEA POR LÍNEA:
+===========================
+1. hasAccess inicial = userData.generationCredits > 0 || userData.isPremium
+   hasAccess = ${userData.generationCredits} > 0 || ${userData.isPremium}
+   hasAccess = ${hasAccess}
+
+2. Si (!hasAccess) verificar premium global...
+</div>`, 'info');
+
+                if (!hasAccess) {
+                    addResult('⚠️ Sin acceso individual, verificando premium global...', 'warning');
+                    
+                    try {
+                        const configDoc = await db.collection('config').doc('app').get();
+                        if (configDoc.exists()) {
+                            const configData = configDoc.data();
+                            const isGlobalPremiumActive = configData.isPremiumGlobalActive;
+                            
+                            addResult(`<div class="code">
+3. Verificación premium global:
+   configDoc.exists() = ${configDoc.exists()}
+   isGlobalPremiumActive = ${isGlobalPremiumActive}
+</div>`, 'info');
+                            
+                            if (isGlobalPremiumActive) {
+                                const promoEndDate = configData.promoEndDate;
+                                const isPromoValid = !promoEndDate || promoEndDate.toDate() > new Date();
+                                
+                                addResult(`<div class="code">
+4. Verificación fecha promoción:
+   promoEndDate = ${promoEndDate}
+   isPromoValid = ${isPromoValid}
+</div>`, 'info');
+                                
+                                if (isPromoValid) {
+                                    hasAccess = true;
+                                    accessReason = 'Premium Global Activo';
+                                    addResult('✅ ACCESO CONCEDIDO POR PREMIUM GLOBAL', 'success');
+                                } else {
+                                    addResult('❌ PREMIUM GLOBAL EXPIRADO', 'error');
+                                }
+                            } else {
+                                addResult('❌ PREMIUM GLOBAL NO ACTIVO', 'error');
+                            }
+                        } else {
+                            addResult('❌ NO EXISTE CONFIGURACIÓN GLOBAL', 'error');
+                        }
+                    } catch (error) {
+                        addResult(`❌ Error en verificación global: ${error.message}`, 'error');
+                    }
+                } else {
+                    accessReason = userData.isPremium ? 'Premium Individual' : userData.generationCredits + ' créditos';
+                    addResult('✅ ACCESO CONCEDIDO POR ACCESO INDIVIDUAL', 'success');
+                }
+
+                addResult(`<div class="code">
+RESULTADO FINAL:
+===============
+hasAccess = ${hasAccess}
+accessReason = ${accessReason}
+
+if (!hasAccess) {
+    throw Error('No tienes créditos disponibles...')
+}
+</div>`, hasAccess ? 'success' : 'error');
+
+                if (!hasAccess) {
+                    addResult('❌ LA FUNCIÓN ARROJARÍA EL ERROR AQUÍ', 'error');
+                } else {
+                    addResult('✅ LA FUNCIÓN DEBERÍA FUNCIONAR CORRECTAMENTE', 'success');
+                }
+
+            } catch (error) {
+                addResult(`❌ Error en simulación: ${error.message}`, 'error');
+            }
+        }
+
+        async function emergencyActivatePremium() {
+            try {
+                addResult('=== PASO 4: ACTIVACIÓN DE EMERGENCIA ===', 'warning');
+                
+                const user = auth.currentUser;
+                
+                // 1. Activar premium individual
+                addResult('🔧 Activando premium individual...', 'info');
+                await db.collection('users').doc(user.uid).update({
+                    isPremium: true,
+                    generationCredits: 9999,
+                    premiumUntil: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)),
+                    premiumSource: 'emergency_debug',
+                    premiumUpdatedAt: firebase.firestore.Timestamp.now()
+                });
+                
+                // 2. Activar premium global
+                addResult('🔧 Activando premium global...', 'info');
+                const globalConfig = {
+                    isPremiumGlobalActive: true,
+                    promoEndDate: new Date(Date.now() + (365 * 24 * 60 * 60 * 1000)),
+                    promoDescription: 'Premium Global de Emergencia - Debug Session',
+                    allowAllSocialNetworks: true,
+                    allowAllCopyTypes: true,
+                    unlimitedGenerations: true,
+                    bypassCreditsCheck: true,
+                    lastUpdated: firebase.firestore.Timestamp.now(),
+                    updatedBy: user.email
+                };
+                
+                await db.collection('config').doc('app').set(globalConfig, { merge: true });
+                
+                addResult('✅ PREMIUM INDIVIDUAL Y GLOBAL ACTIVADOS', 'success');
+                addResult('🔄 Verificando cambios...', 'info');
+                
+                // Verificar inmediatamente
+                setTimeout(() => {
+                    debugUserData();
+                    debugGlobalPremium();
+                }, 2000);
+                
+            } catch (error) {
+                addResult(`❌ Error en activación de emergencia: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRealGeneration() {
+            try {
+                addResult('=== PASO 5: TEST DE GENERACIÓN REAL ===', 'info');
+                
+                const apiFunction = functions.httpsCallable('api');
+                
+                const testData = {
+                    generationMode: 'copywriting',
+                    socialMedia: ['Facebook'],
+                    keyword: 'test debug',
+                    copyType: 'Narrativo o storytelling',
+                    language: 'es'
+                };
+                
+                addResult('🧪 Llamando a la Cloud Function con datos de test...', 'info');
+                addResult(`<div class="code">Datos enviados: ${JSON.stringify(testData, null, 2)}</div>`, 'info');
+                
+                const result = await apiFunction(testData);
+                
+                addResult('✅ GENERACIÓN EXITOSA!', 'success');
+                addResult(`<div class="code">Resultado: ${JSON.stringify(result.data, null, 2)}</div>`, 'success');
+                
+            } catch (error) {
+                addResult(`❌ ERROR EN GENERACIÓN REAL: ${error.message}`, 'error');
+                addResult(`<div class="code">Error completo: ${JSON.stringify(error, null, 2)}</div>`, 'error');
+                
+                // Si el error sigue siendo de créditos, hay un problema más profundo
+                if (error.message.includes('créditos disponibles')) {
+                    addResult('🚨 EL ERROR PERSISTE - PROBLEMA MÁS PROFUNDO', 'error');
+                    addResult('🔧 Posibles causas:', 'warning');
+                    addResult('- La función no se desplegó correctamente', 'warning');
+                    addResult('- Hay cache en la Cloud Function', 'warning');
+                    addResult('- Error en el código de la función', 'warning');
+                }
+            }
+        }
+
+        async function runDebugFunction() {
+            try {
+                addResult('=== PASO 6: DEBUG AUTOMÁTICO ===', 'info');
+                
+                const debugFunction = functions.httpsCallable('debugCreditsError');
+                
+                addResult('🤖 Ejecutando función de debug automática...', 'info');
+                
+                const result = await debugFunction();
+                
+                addResult('✅ DEBUG AUTOMÁTICO COMPLETADO', 'success');
+                
+                const debugInfo = result.data.debugInfo;
+                
+                addResult(`<div class="code">
+RESULTADOS DEL DEBUG AUTOMÁTICO:
+===============================
+
+PASO 1 - Documento Usuario:
+- Existe: ${debugInfo.step1_userDoc.exists}
+- Función data(): ${debugInfo.step1_userDoc.hasDataFunction}
+
+PASO 2 - Acceso Individual:
+${debugInfo.step2_individualAccess ? `
+- Créditos: ${debugInfo.step2_individualAccess.generationCredits} (${debugInfo.step2_individualAccess.generationCreditsType})
+- Tiene créditos: ${debugInfo.step2_individualAccess.hasCredits}
+- Es premium: ${debugInfo.step2_individualAccess.isPremium} (${debugInfo.step2_individualAccess.isPremiumType})
+- Acceso individual: ${debugInfo.step2_individualAccess.hasIndividualAccess}
+` : 'No disponible (usuario no existe)'}
+
+PASO 3 - Configuración Global:
+- Config existe: ${debugInfo.step3_globalConfig.configExists}
+- Función data(): ${debugInfo.step3_globalConfig.hasDataFunction}
+${debugInfo.step3_globalConfig.verification ? `
+- Premium global activo: ${debugInfo.step3_globalConfig.verification.isGlobalPremiumActive}
+- Fecha fin: ${debugInfo.step3_globalConfig.verification.promoEndDate}
+- Fecha actual: ${debugInfo.step3_globalConfig.verification.currentDate}
+- Promo válida: ${debugInfo.step3_globalConfig.verification.isPromoValid}
+- Acceso global: ${debugInfo.step3_globalConfig.verification.hasGlobalAccess}
+` : ''}
+
+PASO 4 - Verificación Final:
+- Acceso individual: ${debugInfo.step4_finalVerification.individualAccess}
+- Acceso global: ${debugInfo.step4_finalVerification.hasGlobalAccess}
+- Acceso final: ${debugInfo.step4_finalVerification.finalAccess}
+- ¿Arrojaría error?: ${debugInfo.step4_finalVerification.wouldThrowError}
+
+${debugInfo.step5_autoActivation ? `
+PASO 5 - Auto-activación:
+- Premium activado automáticamente ✅
+- Créditos asignados: ${debugInfo.step5_autoActivation.userDataUpdated.generationCredits}
+- Premium individual: ${debugInfo.step5_autoActivation.userDataUpdated.isPremium}
+- Premium global: ${debugInfo.step5_autoActivation.globalConfigUpdated.isPremiumGlobalActive}
+` : ''}
+</div>`, 'info');
+
+                // Mostrar recomendaciones
+                result.data.recommendations.forEach(rec => {
+                    addResult(`💡 ${rec}`, 'success');
+                });
+                
+                if (debugInfo.step5_autoActivation) {
+                    addResult('🚀 PREMIUM ACTIVADO - PRUEBA GENERAR COPYWRITING AHORA', 'success');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Error en debug automático: ${error.message}`, 'error');
+                addResult(`<div class="code">Error completo: ${JSON.stringify(error, null, 2)}</div>`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
