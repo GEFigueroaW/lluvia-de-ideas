@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔤 Prueba del Autocorrector Funcional</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px; 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            min-height: 100vh; 
+            color: white;
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background: rgba(255,255,255,0.1); 
+            padding: 30px; 
+            border-radius: 20px; 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .test-field { 
+            margin: 20px 0; 
+            padding: 20px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 15px; 
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+        .modern-input { 
+            width: 100%; 
+            padding: 15px; 
+            border: 2px solid rgba(255,255,255,0.3); 
+            border-radius: 10px; 
+            font-size: 16px; 
+            background: rgba(255,255,255,0.9); 
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        .modern-input:focus { 
+            outline: none; 
+            border-color: #00ff88; 
+            box-shadow: 0 0 0 3px rgba(0,255,136,0.2);
+        }
+        textarea.modern-input { 
+            min-height: 100px; 
+            resize: vertical; 
+        }
+        .autocorrect-indicator { 
+            color: #00ff88; 
+            font-size: 12px; 
+            margin-top: 8px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+        }
+        .test-examples { 
+            background: rgba(255,255,255,0.1); 
+            padding: 20px; 
+            border-radius: 15px; 
+            margin: 20px 0; 
+        }
+        .error-word { 
+            color: #ff6b6b; 
+            background: rgba(255,107,107,0.2); 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            margin: 2px;
+            display: inline-block;
+        }
+        .keyboard-shortcuts { 
+            background: rgba(0,0,0,0.3); 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin: 20px 0; 
+        }
+        .shortcut { 
+            background: rgba(255,255,255,0.2); 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-family: monospace; 
+            margin: 0 4px;
+        }
+        h1 { color: #fff; text-align: center; margin-bottom: 30px; }
+        h2 { color: #00ff88; margin: 20px 0 10px 0; }
+        .demo-button { 
+            background: linear-gradient(135deg, #00ff88, #00d4ff); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            margin: 5px;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+        .demo-button:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔤 Prueba del Autocorrector Funcional</h1>
+        
+        <div class="keyboard-shortcuts">
+            <h2>⌨️ Atajos de Teclado:</h2>
+            <p>• <span class="shortcut">Ctrl+Shift+L</span> - Corregir y limpiar todo el texto</p>
+            <p>• <span class="shortcut">Ctrl+Shift+C</span> - Capitalizar correctamente</p>
+            <p>• Escribe un espacio después de una palabra mal escrita para corregirla automáticamente</p>
+        </div>
+        
+        <div class="test-examples">
+            <h2>📝 Ejemplos para Probar:</h2>
+            <p>Copia y pega estos textos con errores para ver la corrección automática:</p>
+            <br>
+            <div style="font-family: monospace; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; line-height: 1.6;">
+                <span class="error-word">marketting</span> digital para <span class="error-word">facil</span> crecimiento<br>
+                <span class="error-word">copywrite</span> persuasivo para <span class="error-word">instagram</span> y <span class="error-word">facebook</span><br>
+                <span class="error-word">tambien</span> necesitamos <span class="error-word">mas</span> contenido <span class="error-word">util</span><br>
+                estrategia de <span class="error-word">redes socales</span> muy <span class="error-word">dificil</span> de implementar<br>
+                <span class="error-word">iphone</span> y <span class="error-word">android</span> para <span class="error-word">mexico</span> y <span class="error-word">peru</span>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <button class="demo-button" onclick="fillExample1()">📱 Ejemplo Marketing</button>
+                <button class="demo-button" onclick="fillExample2()">💼 Ejemplo Profesional</button>
+                <button class="demo-button" onclick="fillExample3()">🌎 Ejemplo Geografía</button>
+                <button class="demo-button" onclick="clearAll()">🗑️ Limpiar Todo</button>
+            </div>
+        </div>
+        
+        <div class="test-field">
+            <h2>🎯 Campo de Palabra Clave (Autocorrector Activado)</h2>
+            <input id="testKeyword" class="modern-input" type="text" 
+                   placeholder="Escribe palabras con errores aquí..." 
+                   spellcheck="true" autocomplete="on" autocorrect="on" 
+                   autocapitalize="words"
+                   title="Autocorrector funcional - Escribe y corrige automáticamente">
+            <div class="autocorrect-indicator">🔤 Autocorrector funcional activo - Ctrl+Shift+L para corregir todo</div>
+        </div>
+        
+        <div class="test-field">
+            <h2>📄 Área de Contexto (Autocorrector + Gramática)</h2>
+            <textarea id="testContext" class="modern-input" rows="4" 
+                      placeholder="Escribe un texto más largo con errores de ortografía y gramática..."
+                      spellcheck="true" autocomplete="on" autocorrect="on" 
+                      autocapitalize="sentences"
+                      title="Autocorrector funcional - Corrige automáticamente al escribir"></textarea>
+            <div class="autocorrect-indicator">🔤 Autocorrector + gramática - Ctrl+Shift+C para capitalizar</div>
+        </div>
+        
+        <div class="test-field">
+            <h2>🔍 Campo de Búsqueda (Autocorrector Básico)</h2>
+            <input id="testSearch" class="modern-input" type="text" 
+                   placeholder="Buscar en historial..." 
+                   spellcheck="true" autocomplete="on" autocorrect="on" 
+                   autocapitalize="words">
+            <div class="autocorrect-indicator">🔤 Autocorrector para búsquedas</div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(0,255,136,0.1); border-radius: 15px;">
+            <h2>✨ ¿Cómo Funciona?</h2>
+            <p style="line-height: 1.6;">
+                1. <strong>Corrección Automática:</strong> Al escribir un espacio después de una palabra mal escrita, se corrige automáticamente<br>
+                2. <strong>Corrección al Desenfoque:</strong> Al salir del campo, se corrigen todas las palabras restantes<br>
+                3. <strong>Atajos de Teclado:</strong> Usa Ctrl+Shift+L para forzar corrección completa<br>
+                4. <strong>Notificaciones:</strong> Recibes notificaciones visuales de las correcciones realizadas
+            </p>
+        </div>
+    </div>
+
+    <!-- Cargar el autocorrector funcional -->
+    <script src="js/autocorrector.js"></script>
+    
+    <script>
+        // Funciones para los botones de ejemplo
+        function fillExample1() {
+            document.getElementById('testKeyword').value = 'marketting digital para facil crecimiento';
+            document.getElementById('testContext').value = 'copywrite persuasivo para instagram y facebook, tambien necesitamos mas contenido util para redes socales';
+        }
+        
+        function fillExample2() {
+            document.getElementById('testKeyword').value = 'estrategia empresarial dificil';
+            document.getElementById('testContext').value = 'necesitamos una estrategia mas efectiva para nuestro negocio, es muy dificil competir en el mercado actual. tambien debemos considerar el uso de tecnologia movil';
+        }
+        
+        function fillExample3() {
+            document.getElementById('testKeyword').value = 'iphone para mexico y peru';
+            document.getElementById('testContext').value = 'lanzamiento de iphone en mexico, peru, bogota y medellin. tambien incluir android y apple en la campaña de marketting digital';
+        }
+        
+        function clearAll() {
+            document.getElementById('testKeyword').value = '';
+            document.getElementById('testContext').value = '';
+            document.getElementById('testSearch').value = '';
+        }
+        
+        // Mensaje de bienvenida
+        setTimeout(() => {
+            if (window.AutocorrectorFuncional) {
+                const notification = document.createElement('div');
+                notification.innerHTML = '🎉 ¡Autocorrector funcional cargado! Prueba escribiendo palabras con errores.';
+                notification.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #00ff88, #00d4ff);
+                    color: white;
+                    padding: 15px 20px;
+                    border-radius: 10px;
+                    font-weight: bold;
+                    z-index: 10000;
+                    box-shadow: 0 4px 15px rgba(0,255,136,0.3);
+                `;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => document.body.removeChild(notification), 300);
+                }, 4000);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
