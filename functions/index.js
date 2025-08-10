@@ -1,6 +1,6 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const { Configuration, OpenAIApi } = require('openai'); // Usaremos el cliente de OpenAI que es compatible con Deepseek
+const axios = require('axios');
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -13,13 +13,9 @@ exports.initializeAppConfig = initializeAppConfig;
 exports.getAdminStats = getAdminStats;
 exports.isUserAdmin = isUserAdmin;
 
-// Configuración del cliente Deepseek
+// Configuración de Deepseek API
 const DEEPSEEK_API_KEY = 'sk-97c8f4c543fa45acabaf02ebcac60f03';
-const deepseekConfig = new Configuration({
-    apiKey: DEEPSEEK_API_KEY,
-    basePath: "https://api.deepseek.com/v1"
-});
-const deepseekApi = new OpenAIApi(deepseekConfig);
+const DEEPSEEK_BASE_URL = 'https://api.deepseek.com/v1';
 
 // Objeto de traducciones para el prompt
 const translations = {
@@ -145,16 +141,49 @@ ${t.copyDescription}${copyTypeDesc}
 El contenido generado siempre debe estar en ${language === 'es' ? 'español' : language === 'en' ? 'inglés' : 'portugués'}.`;
 
     try {
-        const deepseekResponse = await deepseekApi.createChatCompletion({
+        console.log('Enviando prompt a Deepseek:', prompt);
+        
+        const response = await axios.post(`${DEEPSEEK_BASE_URL}/chat/completions`, {
             model: "deepseek-chat",
             messages: [
-                { role: "user", content: prompt }
+                { 
+                    role: "user", 
+                    content: prompt 
+                }
             ],
-            stream: false,
+            temperature: 0.7,
+            max_tokens: 2000,
+            stream: false
+        }, {
+            headers: {
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 30000 // 30 segundos timeout
         });
 
-        const rawText = deepseekResponse.data.choices[0].message.content;
+        console.log('Respuesta de Deepseek recibida:', response.data);
+
+        if (!response.data || !response.data.choices || !response.data.choices[0]) {
+            throw new Error('Respuesta inválida de Deepseek API');
+        }
+
+        const rawText = response.data.choices[0].message.content;
+        console.log('Texto raw de Deepseek:', rawText);
+        
         const parsedIdeas = parseDeepseekResponse(rawText);
+        console.log('Ideas parseadas:', parsedIdeas);
+
+        if (parsedIdeas.length === 0) {
+            // Si no se pudieron parsear las ideas, crear una respuesta de fallback
+            parsedIdeas.push({
+                hook: "Ideas generadas por IA",
+                postText: rawText.substring(0, 500) + (rawText.length > 500 ? '...' : ''),
+                hashtags: ['#contenido', '#redessociales', '#marketing'],
+                cta: "¡Únete a la conversación!",
+                visualFormat: "Imagen llamativa con texto superpuesto"
+            });
+        }
 
         // 5. Actualización de la base de datos
         await userRef.update({
@@ -172,15 +201,32 @@ El contenido generado siempre debe estar en ${language === 'es' ? 'español' : l
         return { success: true, ideas: parsedIdeas };
 
     } catch (error) {
-        console.error("Error calling Deepseek API:", error.response?.data || error.message);
-        throw new functions.https.HttpsError('internal', 'Error generating ideas with Deepseek.');
+        console.error("Error completo al llamar a Deepseek API:", error);
+        
+        // Log más detallado del error
+        if (error.response) {
+            console.error("Error response data:", error.response.data);
+            console.error("Error response status:", error.response.status);
+            console.error("Error response headers:", error.response.headers);
+        } else if (error.request) {
+            console.error("Error request:", error.request);
+        } else {
+            console.error("Error message:", error.message);
+        }
+        
+        throw new functions.https.HttpsError('internal', `Error generating ideas with Deepseek: ${error.message}`);
     }
 });
 
 // Función para parsear la respuesta de Deepseek
 function parseDeepseekResponse(text) {
+    console.log('Parseando respuesta de Deepseek:', text);
+    
     const ideas = [];
-    const ideaPattern = /---IDEA_(\d+)---\s*Gancho Verbal Impactante:\s*(.*?)\s*Texto del Post:\s*(.*?)\s*Hashtags:\s*(.*?)\s*Llamada a la Acción \(CTA\):\s*(.*?)\s*Formato Visual Sugerido:\s*(.*?)\s*---FIN_IDEA_\d+---/gs;
+    
+    // Patrones más flexibles para capturar las ideas
+    const ideaPattern = /---IDEA_(\d+)---\s*(?:Gancho Verbal Impactante|Hook|Gancho):\s*(.*?)\s*(?:Texto del Post|Post Text|Texto):\s*(.*?)\s*(?:Hashtags):\s*(.*?)\s*(?:Llamada a la Acción|CTA|Call to Action).*?:\s*(.*?)\s*(?:Formato Visual Sugerido|Visual Format|Visual).*?:\s*(.*?)\s*---FIN_IDEA_\d+---/gis;
+    
     const finalPhrasePattern = /---FRASE_FINAL---\s*(.*?)\s*---FIN_FRASE_FINAL---/s;
     
     let match;
@@ -188,12 +234,64 @@ function parseDeepseekResponse(text) {
         ideas.push({
             hook: match[2].trim(),
             postText: match[3].trim(),
-            hashtags: match[4].split(/\s+/).filter(Boolean),
+            hashtags: match[4].split(/\s+/).filter(tag => tag.startsWith('#') || tag.trim().length > 0),
             cta: match[5].trim(),
             visualFormat: match[6].trim()
         });
     }
 
+    // Si no se encontraron ideas con el patrón estructurado, intentar parsing alternativo
+    if (ideas.length === 0) {
+        console.log('No se encontraron ideas con patrón estructurado, intentando parsing alternativo...');
+        
+        // Dividir por líneas y buscar contenido útil
+        const lines = text.split('\n').filter(line => line.trim().length > 0);
+        let currentIdea = {};
+        let ideaCount = 0;
+        
+        for (const line of lines) {
+            const cleanLine = line.trim();
+            
+            if (cleanLine.includes('Gancho') || cleanLine.includes('Hook')) {
+                if (Object.keys(currentIdea).length > 0) {
+                    ideas.push(currentIdea);
+                    currentIdea = {};
+                }
+                currentIdea.hook = cleanLine.split(':').slice(1).join(':').trim() || cleanLine;
+            } else if (cleanLine.includes('Texto') || cleanLine.includes('Post')) {
+                currentIdea.postText = cleanLine.split(':').slice(1).join(':').trim() || cleanLine;
+            } else if (cleanLine.includes('#') && cleanLine.includes('Hashtag')) {
+                const hashtags = cleanLine.split(':').slice(1).join(':').match(/#\w+/g) || [];
+                currentIdea.hashtags = hashtags;
+            } else if (cleanLine.includes('CTA') || cleanLine.includes('Acción')) {
+                currentIdea.cta = cleanLine.split(':').slice(1).join(':').trim() || cleanLine;
+            } else if (cleanLine.includes('Visual') || cleanLine.includes('Formato')) {
+                currentIdea.visualFormat = cleanLine.split(':').slice(1).join(':').trim() || cleanLine;
+            }
+        }
+        
+        // Agregar la última idea si existe
+        if (Object.keys(currentIdea).length > 0) {
+            ideas.push(currentIdea);
+        }
+        
+        // Si aún no hay ideas, crear una idea básica con todo el texto
+        if (ideas.length === 0) {
+            const chunks = text.split('\n\n').filter(chunk => chunk.trim().length > 20);
+            
+            for (let i = 0; i < Math.min(chunks.length, 3); i++) {
+                ideas.push({
+                    hook: `Idea ${i + 1}: Ideas generadas`,
+                    postText: chunks[i].trim(),
+                    hashtags: ['#contenido', '#redessociales', '#marketing'],
+                    cta: '¡Únete a la conversación!',
+                    visualFormat: 'Imagen atractiva con texto superpuesto'
+                });
+            }
+        }
+    }
+
+    // Buscar frase final
     const finalPhraseMatch = text.match(finalPhrasePattern);
     const finalQuote = finalPhraseMatch ? finalPhraseMatch[1].trim() : "¡Sigue creando contenido increíble!";
 
@@ -201,6 +299,7 @@ function parseDeepseekResponse(text) {
         ideas[0].finalQuote = finalQuote;
     }
 
+    console.log('Ideas parseadas finales:', ideas);
     return ideas;
 }
 
