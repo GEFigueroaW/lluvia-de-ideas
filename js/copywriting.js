@@ -464,15 +464,22 @@ async function generateCopywriting(params) {
         const generateFunction = httpsCallable(functions, 'api');
         console.log('[COPYWRITING] Llamando a Cloud Function...');
         
-        const result = await generateFunction({
-            topic: prompt,
-            context: `Generar copywriting para redes sociales`,
-            userId: getCurrentUser()?.uid,
-            type: 'copywriting'
-        });
+        // Mapear los parámetros al formato que espera la Cloud Function
+        const cloudFunctionParams = {
+            generationMode: params.generationMode, // 'single' o 'multi'
+            socialMedia: params.socialNetworks.map(net => SOCIAL_NETWORKS[net].name), // Nombres de las redes
+            keyword: params.keyword,
+            copyType: COPY_TYPES[params.copyType].name, // Nombre del tipo de copy
+            language: 'es' // Español por defecto
+        };
+        
+        console.log('[COPYWRITING] Parámetros enviados a Cloud Function:', cloudFunctionParams);
+        
+        const result = await generateFunction(cloudFunctionParams);
         
         console.log('[COPYWRITING] Resultado de Cloud Function:', result);
         
+        // La Cloud Function devuelve { success: true, ideas: [...] }
         const copies = result.data.ideas;
         console.log('[COPYWRITING] Ideas generadas:', copies);
         
@@ -567,10 +574,24 @@ function displayCopywritingResults(copies, params) {
                     ${generationMode === 'single' ? `<span class="variation-badge">Variación ${index + 1}</span>` : ''}
                 </div>
                 <div class="copywriting-content">
-                    <p>${copy.description || copy}</p>
+                    <div class="copy-section">
+                        <strong>🎯 Gancho:</strong> ${copy.hook || copy.description || copy}
+                    </div>
+                    ${copy.postText ? `<div class="copy-section">
+                        <strong>📝 Texto:</strong> ${copy.postText}
+                    </div>` : ''}
+                    ${copy.hashtags && copy.hashtags.length > 0 ? `<div class="copy-section">
+                        <strong>#️⃣ Hashtags:</strong> ${copy.hashtags.join(' ')}
+                    </div>` : ''}
+                    ${copy.cta ? `<div class="copy-section">
+                        <strong>📢 CTA:</strong> ${copy.cta}
+                    </div>` : ''}
+                    ${copy.visualFormat ? `<div class="copy-section">
+                        <strong>🎨 Visual:</strong> ${copy.visualFormat}
+                    </div>` : ''}
                 </div>
                 <div class="copywriting-actions">
-                    <button class="copy-btn" onclick="copySingleCopy('${copy.description || copy}', '${network.name}')">
+                    <button class="copy-btn" onclick="copySingleCopy(${JSON.stringify(copy).replace(/"/g, '&quot;')}, '${network.name}')">
                         <i class="fas fa-copy"></i> Copiar
                     </button>
                 </div>
@@ -606,8 +627,23 @@ function displayCopywritingResults(copies, params) {
 /**
  * Copia un copy individual
  */
-function copySingleCopy(copyText, networkName) {
-    navigator.clipboard.writeText(copyText).then(() => {
+function copySingleCopy(copyObject, networkName) {
+    let copyText = '';
+    
+    if (typeof copyObject === 'string') {
+        copyText = copyObject;
+    } else {
+        // Formatear el objeto de copy
+        if (copyObject.hook) copyText += `🎯 ${copyObject.hook}\n\n`;
+        if (copyObject.postText) copyText += `📝 ${copyObject.postText}\n\n`;
+        if (copyObject.hashtags && copyObject.hashtags.length > 0) {
+            copyText += `#️⃣ ${copyObject.hashtags.join(' ')}\n\n`;
+        }
+        if (copyObject.cta) copyText += `📢 ${copyObject.cta}\n\n`;
+        if (copyObject.visualFormat) copyText += `🎨 ${copyObject.visualFormat}`;
+    }
+    
+    navigator.clipboard.writeText(copyText.trim()).then(() => {
         showNotification(`Copy de ${networkName} copiado al portapapeles`, 'success');
     }).catch(err => {
         console.error('Error al copiar:', err);
@@ -619,14 +655,23 @@ function copySingleCopy(copyText, networkName) {
  * Copia todos los copies generados
  */
 function copyAllCopywriting() {
-    const copyItems = document.querySelectorAll('.copywriting-content p');
+    const copyItems = document.querySelectorAll('.copywriting-result-item');
     if (copyItems.length === 0) return;
     
     let allCopies = '';
-    document.querySelectorAll('.copywriting-result-item').forEach((item, index) => {
+    copyItems.forEach((item, index) => {
         const networkName = item.querySelector('.social-network-badge span').textContent;
-        const copyText = item.querySelector('.copywriting-content p').textContent;
-        allCopies += `${networkName}:\n${copyText}\n\n`;
+        const copyContent = item.querySelector('.copywriting-content');
+        
+        // Extraer todo el contenido del copy
+        let copyText = `=== ${networkName} ===\n`;
+        const sections = copyContent.querySelectorAll('.copy-section');
+        sections.forEach(section => {
+            copyText += section.textContent + '\n';
+        });
+        copyText += '\n';
+        
+        allCopies += copyText;
     });
     
     navigator.clipboard.writeText(allCopies.trim()).then(() => {
