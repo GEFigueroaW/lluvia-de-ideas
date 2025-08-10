@@ -4,6 +4,12 @@
  * =========================================
  */
 
+// Importar dependencias necesarias
+import { functions } from './firebase-config.js';
+import { getCurrentUser } from './auth.js';
+import { showNotification } from './utils.js';
+import { httpsCallable } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js';
+
 // Configuración de redes sociales
 const SOCIAL_NETWORKS = {
     facebook: {
