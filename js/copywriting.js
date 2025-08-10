@@ -306,7 +306,7 @@ function toggleSocialNetwork(networkKey, element) {
         element.classList.add('selected');
         selectedSocialNetworks.add(networkKey);
     } else {
-        // Modo multi: múltiples redes sociales
+        // Modo multi: múltiples redes sociales (MÁXIMO 3 para evitar timeout)
         if (selectedSocialNetworks.has(networkKey)) {
             // Si es Facebook y es el único seleccionado, no permitir deseleccionar
             if (networkKey === 'facebook' && selectedSocialNetworks.size === 1) {
@@ -317,6 +317,12 @@ function toggleSocialNetwork(networkKey, element) {
             selectedSocialNetworks.delete(networkKey);
             element.classList.remove('selected');
         } else {
+            // LÍMITE: Máximo 3 redes sociales para evitar timeout
+            if (selectedSocialNetworks.size >= 3) {
+                showNotification('Máximo 3 redes sociales para optimizar velocidad de generación', 'warning');
+                return;
+            }
+            
             selectedSocialNetworks.add(networkKey);
             element.classList.add('selected');
         }
@@ -356,7 +362,7 @@ function updateSocialNetworkNote() {
     if (currentGenerationMode === 'single') {
         note.textContent = 'Selecciona UNA red social para generar 3 ideas diferentes';
     } else {
-        note.textContent = `${count} red${count !== 1 ? 'es' : ''} social${count !== 1 ? 'es' : ''} seleccionada${count !== 1 ? 's' : ''} - Se generará 1 idea por cada una`;
+        note.textContent = `${count}/3 red${count !== 1 ? 'es' : ''} social${count !== 1 ? 'es' : ''} seleccionada${count !== 1 ? 's' : ''} - Máximo 3 para optimizar velocidad`;
     }
 }
 
