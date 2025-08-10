@@ -18,15 +18,7 @@ import {
     validateEmail, 
     validatePassword,
     handleError,
-    toggleButton        
-        // Actualizar el estado del usuario con la respuesta
-        if (result.data.remainingUses !== undefined) {
-            updateUserStatus({
-                remainingUses: result.data.remainingUses,
-                isPremium: result.data.isPremium || false,
-                isAdmin: result.data.isAdmin || false
-            });
-        }ding,
+    toggleButton,
     debounce
 } from './utils.js';
 import { 
@@ -516,7 +508,16 @@ async function generateIdeas(topic, context) {
         showGeneratedIdeas(ideasArray);
         window.currentSession = session; // Para las funciones de UI modernas
         
-        displayIdeas(ideas, topic);
+        // Actualizar el estado del usuario con la respuesta
+        if (result.data.remainingUses !== undefined) {
+            updateUserStatus({
+                remainingUses: result.data.remainingUses,
+                isPremium: result.data.isPremium || false,
+                isAdmin: result.data.isAdmin || false
+            });
+        }
+        
+        displayIdeas(ideasArray, topic);
         
         showNotification('¡Ideas generadas exitosamente!', 'success');
         
