@@ -12,6 +12,11 @@ const CORRECCIONES = {
     'copywrite': ['copywriting'],
     'copywrting': ['copywriting'],
     'copywritng': ['copywriting'],
+    'cambaeo': ['cambaceo'],
+    'cambaceo': ['cambiazo', 'cambaceo'],
+    'cambiazo': ['cambiazo'],
+    'cambaso': ['cambiazo'],
+    'cambiaso': ['cambiazo'],
     
     // Redes sociales
     'facebook': ['Facebook'],
@@ -32,30 +37,34 @@ const CORRECCIONES = {
     'google': ['Google'],
     'microsoft': ['Microsoft'],
     'samsung': ['Samsung'],
+    'website': ['sitio web', 'página web'],
+    'email': ['correo electrónico', 'email'],
+    'online': ['en línea', 'online'],
     
     // Palabras comunes mal escritas
     'masibo': ['masivo'],
-    'masivo': ['masivo'], // por si está bien pero quieren verlo
+    'maibo': ['masivo'],
+    'maivo': ['masivo'],
+    'masivo': ['masivo'], // confirmación
     'mama': ['mamá'],
     'papa': ['papá'],
-    'maivo': ['masivo'],
-    'maibo': ['masivo'],
-    'cambaso': ['cambiazo'],
-    'cambiaso': ['cambiazo'],
-    
-    // Acentos comunes
+    'bebe': ['bebé'],
     'cafe': ['café'],
-    'menu': ['menú'],
-    'peru': ['Perú'],
-    'mexico': ['México'],
-    'bogota': ['Bogotá'],
-    'mas': ['más'],
-    'tambien': ['también'],
-    'facil': ['fácil'],
-    'dificil': ['difícil'],
-    'util': ['útil'],
+    'sofa': ['sofá'],
     
-    // Errores frecuentes
+    // Palabras con acentos
+    'medico': ['médico'],
+    'musica': ['música'],
+    'clasico': ['clásico'],
+    'basico': ['básico'],
+    'magico': ['mágico'],
+    'practico': ['práctico'],
+    'automatico': ['automático'],
+    'economico': ['económico'],
+    'academico': ['académico'],
+    'democratico': ['democrático'],
+    
+    // Errores frecuentes de escritura
     'aver': ['a ver'],
     'ay': ['hay'],
     'ahi': ['ahí'],
@@ -64,12 +73,127 @@ const CORRECCIONES = {
     'despues': ['después'],
     'si': ['sí'],
     'solo': ['sólo'],
+    'tambien': ['también'],
+    'facil': ['fácil'],
+    'dificil': ['difícil'],
+    'util': ['útil'],
+    'movil': ['móvil'],
     
-    // Palabras de prueba adicionales
-    'hola': ['hola'], // para testing
-    'mundo': ['mundo'], // para testing
-    'test': ['test'], // para testing
-    'prueba': ['prueba'] // para testing
+    // Palabras de negocios
+    'negosio': ['negocio'],
+    'negocio': ['negocio'], // confirmación
+    'empresa': ['empresa'],
+    'emprendimiento': ['emprendimiento'],
+    'cliente': ['cliente'],
+    'producto': ['producto'],
+    'servicio': ['servicio'],
+    'venta': ['venta'],
+    'ventas': ['ventas'],
+    'compra': ['compra'],
+    'compras': ['compras'],
+    
+    // Palabras de tiempo
+    'rapido': ['rápido'],
+    'lento': ['lento'],
+    'tiempo': ['tiempo'],
+    'momento': ['momento'],
+    'instante': ['instante'],
+    'segundo': ['segundo'],
+    'minuto': ['minuto'],
+    'hora': ['hora'],
+    'dia': ['día'],
+    'semana': ['semana'],
+    'mes': ['mes'],
+    'año': ['año'],
+    
+    // Adjetivos comunes
+    'bueno': ['bueno'],
+    'malo': ['malo'],
+    'grande': ['grande'],
+    'pequeño': ['pequeño'],
+    'nuevo': ['nuevo'],
+    'viejo': ['viejo'],
+    'joven': ['joven'],
+    'mayor': ['mayor'],
+    'menor': ['menor'],
+    'mejor': ['mejor'],
+    'peor': ['peor'],
+    
+    // Países y ciudades
+    'peru': ['Perú'],
+    'mexico': ['México'],
+    'argentina': ['Argentina'],
+    'colombia': ['Colombia'],
+    'chile': ['Chile'],
+    'venezuela': ['Venezuela'],
+    'ecuador': ['Ecuador'],
+    'bolivia': ['Bolivia'],
+    'paraguay': ['Paraguay'],
+    'uruguay': ['Uruguay'],
+    'bogota': ['Bogotá'],
+    'lima': ['Lima'],
+    'santiago': ['Santiago'],
+    'buenos aires': ['Buenos Aires'],
+    'caracas': ['Caracas'],
+    'quito': ['Quito'],
+    
+    // Palabras de cantidad
+    'mucho': ['mucho'],
+    'poco': ['poco'],
+    'bastante': ['bastante'],
+    'suficiente': ['suficiente'],
+    'demasiado': ['demasiado'],
+    'varios': ['varios'],
+    'algunos': ['algunos'],
+    'todos': ['todos'],
+    'nada': ['nada'],
+    'algo': ['algo'],
+    
+    // Palabras de acción
+    'hacer': ['hacer'],
+    'crear': ['crear'],
+    'construir': ['construir'],
+    'desarrollar': ['desarrollar'],
+    'implementar': ['implementar'],
+    'ejecutar': ['ejecutar'],
+    'realizar': ['realizar'],
+    'completar': ['completar'],
+    'terminar': ['terminar'],
+    'finalizar': ['finalizar'],
+    
+    // Palabras de prueba comunes
+    'hola': ['hola'],
+    'mundo': ['mundo'],
+    'test': ['test'],
+    'prueba': ['prueba'],
+    'ejemplo': ['ejemplo'],
+    'demo': ['demo'],
+    'version': ['versión'],
+    'actualizacion': ['actualización'],
+    'configuracion': ['configuración'],
+    'instalacion': ['instalación'],
+    
+    // Errores de teclado comunes
+    'q': ['que'],
+    'x': ['por'],
+    'xq': ['porque'],
+    'xk': ['porque'],
+    'tb': ['también'],
+    'tmb': ['también'],
+    'tbn': ['también'],
+    'pq': ['porque'],
+    'porq': ['porque'],
+    'dnd': ['donde'],
+    'cnd': ['cuando'],
+    'cm': ['como'],
+    'sn': ['son'],
+    'estan': ['están'],
+    'esta': ['está'],
+    'estas': ['estás'],
+    'estoy': ['estoy'],
+    'somos': ['somos'],
+    'eres': ['eres'],
+    'soy': ['soy']
 };
 
 let suggestionBox = null;
