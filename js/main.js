@@ -30,7 +30,6 @@ import {
     getCachedUserIdeas,
     searchIdeas
 } from './ideas-manager.js';
-import './copywriting.js'; // Importar módulo de copywriting
 import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js';
 
@@ -97,7 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeElements();
     initializeEventListeners();
     initAuthStateListener(handleAuthStateChange);
+    
+    // Cargar módulo de copywriting después de la inicialización
+    setTimeout(loadCopywritingModule, 1000);
 });
+
+/**
+ * Carga el módulo de copywriting de forma dinámica
+ */
+async function loadCopywritingModule() {
+    try {
+        console.log('🔄 Cargando módulo de copywriting...');
+        await import('./copywriting.js');
+        console.log('✅ Módulo de copywriting cargado exitosamente');
+    } catch (error) {
+        console.warn('⚠️ Error cargando módulo de copywriting:', error);
+        // Reintentar después de 2 segundos
+        setTimeout(loadCopywritingModule, 2000);
+    }
+}
 
 /**
  * Depura elementos del DOM para verificar que existen
