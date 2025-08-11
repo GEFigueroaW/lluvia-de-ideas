@@ -3,7 +3,246 @@
    ========================================= */
 
 /* ===========================================
+   VISTA PREVIA DE PL/* ===========================================
    VISTA PREVIA DE PLANTILLAS OPTIMIZADAS
+   =========================================== */
+
+.template-preview-section {
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.03), 
+        rgba(247, 148, 164, 0.03)
+    );
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.no-template-preview {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.templates-preview h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.templates-intro {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.network-template-info {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--border-light);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: var(--transition-smooth);
+}
+
+.network-template-info:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.template-header h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.template-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.template-structure h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.structure-section {
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-left: 3px solid var(--primary-color);
+}
+
+.section-label {
+    font-weight: 600;
+    color: var(--primary-color);
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+.section-description {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+}
+
+.section-examples {
+    font-size: 0.8rem;
+}
+
+.section-examples strong {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.example-tag {
+    background: rgba(247, 148, 164, 0.15);
+    color: var(--secondary-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    margin: 0.25rem 0.25rem 0.25rem 0;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.template-psychology {
+    background: rgba(255, 193, 7, 0.1);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-left: 3px solid #ffc107;
+}
+
+.template-psychology h5 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.template-psychology p {
+    margin-bottom: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+.template-base {
+    background: #f8f9fa;
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.base-template {
+    background: #2d3748;
+    color: #e2e8f0;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    margin: 0;
+}
+
+/* Animation para la aparición de templates */
+.network-template-info {
+    animation: templateSlideIn 0.3s ease-out;
+}
+
+@keyframes templateSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===========================================
+   ESTILOS ESPECÍFICOS PARA NUEVA ESTRUCTURA
+   =========================================== */
+
+/* Gancho Verbal Impactante */
+.gancho-section .section-content {
+    background: linear-gradient(135deg, rgba(255, 59, 48, 0.1), rgba(255, 149, 0, 0.1));
+    border-left: 4px solid #ff3b30;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #d70015;
+}
+
+/* Texto del Post */
+.texto-section .section-content {
+    background: rgba(102, 126, 234, 0.05);
+    border-left: 4px solid #667eea;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+/* CTA específico */
+.cta-section .section-content {
+    background: linear-gradient(135deg, rgba(52, 199, 89, 0.1), rgba(48, 176, 199, 0.1));
+    border-left: 4px solid #34c759;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    color: #1d8348;
+    font-size: 1.05rem;
+}
+
+/* Formato Visual Sugerido */
+.visual-section .section-content {
+    background: linear-gradient(135deg, rgba(175, 82, 222, 0.1), rgba(255, 45, 85, 0.1));
+    border-left: 4px solid #af52de;
+    padding: 1rem;
+    border-radius: var(--radius-sm);
+    font-style: italic;
+    color: #8e44ad;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+/* Hashtags mejorados */
+.hashtags-section .hashtag {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin: 0.2rem 0.3rem 0.2rem 0;
+    display: inline-block;
+    transition: transform 0.2s ease;
+}
+
+.hashtags-section .hashtag:hover {
+    transform: translateY(-2px);
+}
+
+/* ===========================================
+   COPYRWRITING RESULTS STYLES (EXISTING)
+   =========================================== */ILLAS OPTIMIZADAS
    =========================================== */
 
 .template-preview-section {
@@ -175,6 +414,25 @@
     .base-template {
         font-size: 0.75rem;
         padding: 0.75rem;
+    }
+    
+    /* Ajustes para la nueva estructura en móvil */
+    .gancho-section .section-content,
+    .texto-section .section-content,
+    .cta-section .section-content,
+    .visual-section .section-content {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .gancho-section .section-content {
+        font-size: 1rem;
+    }
+    
+    .hashtags-section .hashtag {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+        margin: 0.15rem 0.2rem;
     }
 }
 

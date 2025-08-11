@@ -556,7 +556,8 @@ const SOCIAL_NETWORK_SPECS = {
         name: 'Facebook',
         characteristics: {
             maxLength: 2000,
-            optimalLength: '50-150 palabras',
+            optimalLength: 'Máx. 150 palabras',
+            maxWords: 150,
             tone: 'emocional y conversacional',
             features: 'historias personales, comunidad, engagement emocional',
             hashtags: 'uso moderado (3-5)',
@@ -564,51 +565,59 @@ const SOCIAL_NETWORK_SPECS = {
             cta: 'preguntas directas, llamadas a la acción emocionales',
             psychologyTriggers: 'nostalgia, pertenencia grupal, validación social',
             contentDepth: 'historias que conecten emocionalmente, datos que sorprendan',
-            reflectionPrompts: 'preguntas que inviten a compartir experiencias personales'
+            reflectionPrompts: 'preguntas que inviten a compartir experiencias personales',
+            visualRequired: 'recomendado'
         },
         template: {
             structure: [
                 {
-                    section: 'hook',
-                    label: '🎯 Gancho Inicial',
-                    description: 'Pregunta provocadora, dato sorprendente o frase emocional',
-                    examples: ['¿Sabías que el 87% de las personas...?', '🔥 Lo que descubrí ayer me dejó sin palabras...', '💡 Esta simple pregunta cambió mi perspectiva...']
+                    section: 'gancho',
+                    label: '🎯 Gancho Verbal Impactante',
+                    description: 'Pregunta provocadora, dato sorprendente o frase emocional que pare el scroll',
+                    examples: ['¿Sabías que el 87% de las personas...?', '🔥 Lo que descubrí ayer cambió mi vida...', '💡 Esta simple verdad te va a impactar...']
                 },
                 {
-                    section: 'development',
-                    label: '📖 Desarrollo',
-                    description: 'Historia breve, explicación o propuesta de valor que profundice',
-                    examples: ['Hace una semana me encontré con...', 'Los estudios demuestran que...', 'Mi experiencia trabajando en... me enseñó que...']
-                },
-                {
-                    section: 'engagement',
-                    label: '✨ Conexión Emocional',
-                    description: 'Beneficio principal, insight valioso o momento de reflexión',
-                    examples: ['Esto me hizo reflexionar sobre...', 'La lección más importante fue...', 'Lo que realmente importa es...']
+                    section: 'texto_post',
+                    label: '📖 Texto del Post',
+                    description: 'Historia profunda, desarrollo emocional con la cantidad exacta de palabras necesarias para impactar',
+                    examples: ['Mi historia comenzó cuando...', 'Los expertos revelan que...', 'Después de 10 años investigando esto...']
                 },
                 {
                     section: 'cta',
-                    label: '💬 Call to Action',
-                    description: 'Pregunta que invite a comentar y compartir experiencias',
-                    examples: ['¿Tú qué opinas? 👇', '¿Has vivido algo similar?', '¿Cómo lo aplicarías en tu vida?']
+                    label: '🚀 Llamada a la Acción (CTA)',
+                    description: 'CTA específico que motive a tomar acción concreta según el tema (motivación→actuar, venta→intentar, yoga→practicar)',
+                    examples: ['¡Empieza HOY mismo!', '¿Te atreves a intentarlo?', '🧘‍♀️ Dedica 10 minutos hoy a ti mismo']
+                },
+                {
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: '3-5 hashtags estratégicos y relevantes',
+                    examples: ['#motivacion #exito #cambio', '#emprendimiento #marketing #ventas', '#yoga #bienestar #salud']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Propuesta específica para imagen/video con detalles precisos para IA (idioma español latino, texto legible, sin errores)',
+                    examples: ['Imagen: persona sonriendo en paisaje natural, texto en español latino...', 'Video: demostración de 30 segundos, subtítulos en español...']
                 }
             ],
-            baseTemplate: `🎯 [GANCHO_PROVOCADOR]
+            baseTemplate: `🎯 Gancho Verbal Impactante: [FRASE_QUE_PARE_EL_SCROLL]
 
-[HISTORIA_O_DESARROLLO_PROFUNDO]
+📖 Texto del Post: [DESARROLLO_PROFUNDO_E_IMPACTANTE]
 
-✨ [INSIGHT_VALIOSO_O_REFLEXION]
+🚀 Llamada a la Acción (CTA): [ACCION_ESPECIFICA_DEL_TEMA]
 
-💬 [PREGUNTA_REFLEXIVA] 👇
+#️⃣ Hashtags: [3-5 hashtags relevantes]
 
-#[hashtag1] #[hashtag2] #[hashtag3]`
+🎨 Formato Visual Sugerido: [PROPUESTA_DETALLADA_PARA_IA]`
         }
     },
     twitter: {
         name: 'Twitter/X',
         characteristics: {
             maxLength: 280,
-            optimalLength: '100-180 caracteres',
+            optimalLength: 'Máx. 280 caracteres (~50 palabras)',
+            maxWords: 50,
             tone: 'directo y contundente',
             features: 'brevedad, viralidad, debates, trending topics',
             hashtags: 'estratégicos (1-3)',
@@ -616,43 +625,59 @@ const SOCIAL_NETWORK_SPECS = {
             cta: 'RT, respuestas, hilos',
             psychologyTriggers: 'urgencia, FOMO, controversia constructiva',
             contentDepth: 'datos impactantes condensados, opiniones fundamentadas',
-            reflectionPrompts: 'statements que generen debate inteligente'
+            reflectionPrompts: 'statements que generen debate inteligente',
+            visualRequired: 'opcional'
         },
         template: {
             structure: [
                 {
-                    section: 'hook',
-                    label: '🚀 Hook Directo',
-                    description: 'Dato impactante, opinión clara o pregunta contundente',
-                    examples: ['🚀 Dato: El 90% de startups...', '🔥 Unpopular opinion:', '⚡ Plot twist:']
+                    section: 'gancho',
+                    label: '🚀 Gancho Verbal Impactante',
+                    description: 'Hook directo que impacte en máximo 50 palabras',
+                    examples: ['🚀 BOMBA: El 90% de emprendedores...', '⚡ REVELACIÓN que cambió todo:', '🔥 Dato que nadie te cuenta:']
                 },
                 {
-                    section: 'insight',
-                    label: '💡 Insight Clave',
-                    description: 'La esencia del mensaje, el punto más importante',
-                    examples: ['El verdadero problema es...', 'Lo que nadie te dice...', 'La diferencia real está en...']
+                    section: 'texto_post',
+                    label: '💡 Texto del Post',
+                    description: 'Mensaje conciso pero profundo con insight clave',
+                    examples: ['La diferencia entre ricos y pobres no es el dinero...', 'El secreto del éxito en 3 palabras...']
                 },
                 {
                     section: 'cta',
-                    label: '🔄 CTA Viral',
-                    description: 'Llamada a acción que fomente viralidad',
-                    examples: ['🔄 RT si estás de acuerdo', '💭 ¿Tú qué piensas?', '🧵 Abro hilo 👇']
+                    label: '🔄 Llamada a la Acción (CTA)',
+                    description: 'CTA viral que motive acción específica del tema',
+                    examples: ['💪 ¡Actúa HOY!', '🔄 RT si vas a intentarlo', '💭 ¿Te atreves?']
+                },
+                {
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: '1-3 hashtags trending y relevantes',
+                    examples: ['#motivacion #accion', '#emprendimiento #exito', '#disciplina #resultados']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Imagen simple, gráfico claro o meme ligero entendible en 2 segundos',
+                    examples: ['Gráfico simple: estadística en español latino, fondo contrastante, números grandes...', 'Imagen: quote destacado, tipografía limpia...']
                 }
             ],
-            baseTemplate: `🚀 [DATO_IMPACTANTE] 
+            baseTemplate: `🚀 Gancho Verbal Impactante: [HOOK_DIRECTO_IMPACTANTE]
 
-💡 [INSIGHT_PROFUNDO]
+💡 Texto del Post: [INSIGHT_CLAVE_CONCISO]
 
-🔄 [CTA_VIRAL]
+🔄 Llamada a la Acción (CTA): [ACCION_VIRAL_ESPECIFICA]
 
-#[hashtag] #[hashtag2]`
+#️⃣ Hashtags: [1-3 hashtags trending]
+
+🎨 Formato Visual Sugerido: [VISUAL_SIMPLE_Y_CLARO]`
         }
     },
     linkedin: {
         name: 'LinkedIn',
         characteristics: {
             maxLength: 3000,
-            optimalLength: '100-200 palabras',
+            optimalLength: 'Máx. 200 palabras',
+            maxWords: 200,
             tone: 'profesional y reflexivo',
             features: 'networking, thought leadership, casos profesionales',
             hashtags: 'profesionales (3-7)',
@@ -660,53 +685,59 @@ const SOCIAL_NETWORK_SPECS = {
             cta: 'networking, debate profesional, conexiones',
             psychologyTriggers: 'autoridad, credibilidad, crecimiento profesional',
             contentDepth: 'casos reales, lecciones profesionales, insights de industria',
-            reflectionPrompts: 'preguntas sobre aplicación práctica en el trabajo'
+            reflectionPrompts: 'preguntas sobre aplicación práctica en el trabajo',
+            visualRequired: 'opcional'
         },
         template: {
             structure: [
                 {
-                    section: 'opener',
-                    label: '📊 Apertura Profesional',
-                    description: 'Dato relevante, experiencia o insight de industria',
-                    examples: ['📊 En mis 10 años en [industria]...', '💼 Algo que aprendí dirigiendo equipos...', '🎯 Los datos del último trimestre revelan...']
+                    section: 'gancho',
+                    label: '📊 Gancho Verbal Impactante',
+                    description: 'Apertura profesional que capte atención inmediata',
+                    examples: ['📊 REVELACIÓN: En mis 10 años como CEO...', '💼 ERROR que cometen 95% de emprendedores...', '🎯 Datos que cambiarán tu perspectiva...']
                 },
                 {
-                    section: 'development',
-                    label: '🔍 Desarrollo Estructurado',
-                    description: 'Explicación detallada, contexto y análisis profundo',
-                    examples: ['El contexto es importante porque...', 'Analizando los factores clave...', 'Mi experiencia me ha enseñado que...']
-                },
-                {
-                    section: 'case',
-                    label: '📈 Ejemplo Práctico',
-                    description: 'Caso real, ejemplo concreto o aplicación práctica',
-                    examples: ['Por ejemplo, en mi último proyecto...', 'Un caso que ilustra esto perfectamente...', 'Aplicamos esta estrategia en...']
+                    section: 'texto_post',
+                    label: '🔍 Texto del Post',
+                    description: 'Desarrollo profesional estructurado con caso real y análisis profundo',
+                    examples: ['Mi experiencia dirigiendo equipos me enseñó...', 'Analicemos los factores clave...', 'Un caso que ilustra perfectamente...']
                 },
                 {
                     section: 'cta',
-                    label: '🤝 CTA de Networking',
-                    description: 'Pregunta que invite al debate profesional y conexión',
-                    examples: ['¿Cómo lo aplicas en tu industria?', '¿Qué estrategias han funcionado en tu experiencia?', '¿Estás de acuerdo con este enfoque?']
+                    label: '🤝 Llamada a la Acción (CTA)',
+                    description: 'CTA de networking que motive acción profesional específica',
+                    examples: ['🚀 ¡Implementa esta estrategia HOY!', '💪 ¿Te atreves a aplicarlo?', '🎯 ¡Empieza a diferenciarte YA!']
+                },
+                {
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: '3-7 hashtags profesionales relevantes',
+                    examples: ['#liderazgo #estrategia #resultados', '#emprendimiento #innovacion #crecimiento', '#marketing #ventas #networking']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Imagen profesional, limpia, con branding discreto',
+                    examples: ['Infografía profesional: datos en español latino, colores corporativos, tipografía sans-serif...', 'Imagen: profesional en oficina moderna, iluminación natural...']
                 }
             ],
-            baseTemplate: `📊 [APERTURA_PROFESIONAL]
+            baseTemplate: `📊 Gancho Verbal Impactante: [APERTURA_PROFESIONAL_IMPACTANTE]
 
-[DESARROLLO_Y_CONTEXTO_DETALLADO]
+🔍 Texto del Post: [DESARROLLO_CON_CASO_REAL]
 
-📈 Ejemplo: [CASO_REAL_O_APLICACION]
+🤝 Llamada a la Acción (CTA): [ACCION_PROFESIONAL_ESPECIFICA]
 
-💡 [INSIGHT_PROFESIONAL]
+#️⃣ Hashtags: [3-7 hashtags profesionales]
 
-🤝 [PREGUNTA_NETWORKING]
-
-#[hashtag_profesional] #[industria] #[skill]`
+🎨 Formato Visual Sugerido: [IMAGEN_PROFESIONAL_DETALLADA]`
         }
     },
     whatsapp: {
         name: 'WhatsApp',
         characteristics: {
             maxLength: 65536,
-            optimalLength: '1-3 líneas',
+            optimalLength: 'Máx. 40 palabras',
+            maxWords: 40,
             tone: 'directo y personal',
             features: 'inmediatez, personalización, urgencia',
             hashtags: 'no se usan',
@@ -714,39 +745,57 @@ const SOCIAL_NETWORK_SPECS = {
             cta: 'respuesta inmediata, acción específica',
             psychologyTriggers: 'urgencia, exclusividad, personalización',
             contentDepth: 'mensajes concisos pero impactantes',
-            reflectionPrompts: 'preguntas directas que requieran respuesta inmediata'
+            reflectionPrompts: 'preguntas directas que requieran respuesta inmediata',
+            visualRequired: 'opcional'
         },
         template: {
             structure: [
                 {
-                    section: 'attention',
-                    label: '🔥 Captador de Atención',
-                    description: 'Palabra o frase que genere urgencia o interés inmediato',
-                    examples: ['🔥 ¡URGENTE!', '💡 IMPORTANTE:', '🎯 Para ti específicamente:']
+                    section: 'gancho',
+                    label: '🔥 Gancho Verbal Impactante',
+                    description: 'Frase inicial que genere urgencia inmediata',
+                    examples: ['🔥 ¡URGENTE!', '💡 OPORTUNIDAD única:', '🎯 Solo para TI:']
                 },
                 {
-                    section: 'benefit',
-                    label: '⚡ Beneficio/Urgencia',
-                    description: 'El valor o la urgencia explicada brevemente',
-                    examples: ['Tienes 24h para...', 'Descubrí algo que te interesa...', 'Oportunidad única para...']
+                    section: 'texto_post',
+                    label: '⚡ Texto del Post',
+                    description: 'Beneficio o urgencia explicada brevemente pero con impacto',
+                    examples: ['Tienes 24h para aprovechar...', 'Descubrí el secreto que...', 'Esta oportunidad no se repetirá...']
                 },
                 {
                     section: 'cta',
-                    label: '📲 CTA Inmediata',
-                    description: 'Acción específica y clara para responder ahora',
-                    examples: ['Responde con SÍ si te interesa', 'Envía tu pregunta ahora', '¿Nos vemos mañana a las 3?']
+                    label: '📲 Llamada a la Acción (CTA)',
+                    description: 'Acción inmediata y específica según el tema',
+                    examples: ['💪 ¡ACTÚA AHORA!', '🚀 ¡Empieza HOY!', '📲 Responde SÍ si estás listo']
+                },
+                {
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: 'No se usan hashtags en WhatsApp',
+                    examples: ['[No aplica para WhatsApp]']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Imagen simple y clara, formato cuadrado o vertical',
+                    examples: ['Imagen cuadrada: mensaje clave en español latino, colores llamativos, texto grande y legible...', 'Captura simple: sin exceso de información...']
                 }
             ],
-            baseTemplate: `🔥 [ATENCION_URGENTE]
-⚡ [BENEFICIO_O_RAZON]
-📲 [ACCION_INMEDIATA]`
+            baseTemplate: `🔥 Gancho Verbal Impactante: [URGENCIA_INMEDIATA]
+
+⚡ Texto del Post: [BENEFICIO_IMPACTANTE]
+
+📲 Llamada a la Acción (CTA): [ACCION_INMEDIATA_ESPECIFICA]
+
+🎨 Formato Visual Sugerido: [IMAGEN_SIMPLE_Y_CLARA]`
         }
     },
     telegram: {
         name: 'Telegram',
         characteristics: {
             maxLength: 4096,
-            optimalLength: '30-60 palabras',
+            optimalLength: 'Máx. 60 palabras',
+            maxWords: 60,
             tone: 'informativo y técnico',
             features: 'canales, bots, comunidades especializadas',
             hashtags: 'uso moderado',
@@ -754,93 +803,119 @@ const SOCIAL_NETWORK_SPECS = {
             cta: 'enlaces a canales, bots interactivos',
             psychologyTriggers: 'información exclusiva, comunidad especializada',
             contentDepth: 'información valiosa y bien estructurada',
-            reflectionPrompts: 'invitaciones a profundizar en el canal'
+            reflectionPrompts: 'invitaciones a profundizar en el canal',
+            visualRequired: 'opcional'
         },
         template: {
             structure: [
                 {
-                    section: 'title',
-                    label: '📌 Titular Claro',
-                    description: 'Título que capture la esencia del mensaje',
-                    examples: ['📌 Guía Completa:', '🔧 Tutorial Rápido:', '📊 Análisis Semanal:']
+                    section: 'gancho',
+                    label: '📌 Gancho Verbal Impactante',
+                    description: 'Titular claro que capture atención inmediata',
+                    examples: ['📌 EXCLUSIVO: Estrategia secreta...', '🔧 TUTORIAL que cambiará todo:', '📊 DATOS que nadie comparte:']
                 },
                 {
-                    section: 'development',
-                    label: '💭 Desarrollo Conciso',
-                    description: 'Explicación breve pero completa del contenido',
-                    examples: ['Esta semana analizamos...', 'Los pasos son simples...', 'Los datos muestran...']
+                    section: 'texto_post',
+                    label: '💭 Texto del Post',
+                    description: 'Desarrollo conciso pero valioso con información exclusiva',
+                    examples: ['Esta técnica aumentó mis ventas 300%...', 'Los pasos que siguieron los expertos...', 'La metodología que usan los profesionales...']
                 },
                 {
                     section: 'cta',
-                    label: '👉 CTA Directo',
-                    description: 'Instrucción clara o enlace específico',
-                    examples: ['👉 Lee completo en:', '🔗 Descarga aquí:', '💬 Únete a la discusión:']
+                    label: '👉 Llamada a la Acción (CTA)',
+                    description: 'Instrucción clara para acción específica',
+                    examples: ['💪 ¡Implementa esto HOY!', '🚀 ¡Empieza a aplicarlo!', '👉 ¡Únete y transforma tu vida!']
+                },
+                {
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: '2-3 hashtags relevantes (uso moderado)',
+                    examples: ['#estrategia #resultados', '#tutorial #experto', '#exclusivo #comunidad']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Infografía compacta o captura relevante',
+                    examples: ['Infografía: pasos numerados en español latino, iconos claros, colores contrastantes...', 'Captura: herramienta o resultado, texto legible...']
                 }
             ],
-            baseTemplate: `📌 [TITULO_ATRACTIVO]
+            baseTemplate: `📌 Gancho Verbal Impactante: [TITULAR_EXCLUSIVO]
 
-[EXPLICACION_BREVE_PERO_VALIOSA]
+💭 Texto del Post: [INFORMACION_VALIOSA_CONCISA]
 
-👉 [INSTRUCCION_O_ENLACE]`
+👉 Llamada a la Acción (CTA): [INSTRUCCION_ESPECIFICA]
+
+#️⃣ Hashtags: [2-3 hashtags relevantes]
+
+🎨 Formato Visual Sugerido: [INFOGRAFIA_O_CAPTURA_DETALLADA]`
         }
     },
     instagram: {
         name: 'Instagram',
         characteristics: {
             maxLength: 2200,
-            optimalLength: '50-100 palabras',
+            optimalLength: 'Máx. 100 palabras en texto',
+            maxWords: 100,
             tone: 'visual y aspiracional',
             features: 'contenido visual, stories, reels',
-            hashtags: '5-10 hashtags relevantes',
+            hashtags: '8-15 hashtags relevantes',
             engagement: 'likes, shares, saves',
             cta: 'enlaces en bio, stories interactivas',
             psychologyTriggers: 'aspiración, inspiración, estética',
             contentDepth: 'mensajes inspiradores con contexto visual',
-            reflectionPrompts: 'invitaciones a reflexionar sobre valores y aspiraciones'
+            reflectionPrompts: 'invitaciones a reflexionar sobre valores y aspiraciones',
+            visualRequired: 'obligatorio'
         },
         template: {
             structure: [
                 {
-                    section: 'power_line',
-                    label: '💥 Primera Línea Poderosa',
-                    description: 'Frase que enganche visualmente y emocionalmente',
-                    examples: ['💥 La vida cambió cuando entendí esto...', '✨ El secreto que nadie te cuenta...', '🌟 Si pudiera regresar en el tiempo...']
+                    section: 'gancho',
+                    label: '💥 Gancho Verbal Impactante',
+                    description: 'Primera línea poderosa que enganche visualmente',
+                    examples: ['💥 Lo que cambió mi vida para siempre...', '✨ El secreto que me costó años descubrir...', '🌟 Si pudiera volver atrás...']
                 },
                 {
-                    section: 'narrative',
-                    label: '📖 Cuerpo Narrativo',
-                    description: 'Historia, contexto o mensaje inspiracional',
-                    examples: ['Durante años pensé que...', 'Mi mentora me dijo algo que...', 'Cada mañana recuerdo que...']
-                },
-                {
-                    section: 'value',
-                    label: '💎 Valor o Reflexión',
-                    description: 'El mensaje principal, la lección o insight valioso',
-                    examples: ['Lo que realmente importa es...', 'La verdadera fuerza viene de...', 'El éxito se mide por...']
+                    section: 'texto_post',
+                    label: '📖 Texto del Post',
+                    description: 'Historia inspiracional, contexto emocional con máximo 100 palabras',
+                    examples: ['Durante años busqué la felicidad en lugares equivocados...', 'Mi mentora me dijo algo que transformó mi perspectiva...', 'Cada mañana me levanto recordando que...']
                 },
                 {
                     section: 'cta',
-                    label: '❤️ CTA Emocional',
-                    description: 'Llamada a acción que conecte emocionalmente',
-                    examples: ['❤️ Guarda si esto resuena contigo', '✨ Etiqueta a quien necesita leer esto', '💫 ¿Qué te ha enseñado tu experiencia?']
+                    label: '❤️ Llamada a la Acción (CTA)',
+                    description: 'CTA emocional que motive acción específica del tema',
+                    examples: ['💪 ¡Empieza tu transformación HOY!', '🧘‍♀️ ¡Dedica 10 min a tu bienestar!', '✨ ¡Atrévete a brillar!']
+                },
+                {
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: '8-15 hashtags relevantes para viralidad',
+                    examples: ['#motivacion #transformacion #vida #exito #felicidad #crecimiento #inspiracion #cambio', '#yoga #bienestar #salud #mindfulness #paz #equilibrio #autocuidado #lifestyle']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Imagen/video obligatorio de alta calidad, formato 1:1 o 4:5',
+                    examples: ['Imagen: persona en pose inspiradora, luz natural, colores cálidos, texto motivacional en español latino legible, sin errores ortográficos...', 'Reel: transformación de 15 seg, música inspiradora, subtítulos en español latino...']
                 }
             ],
-            baseTemplate: `💥 [FRASE_PODEROSA]
+            baseTemplate: `💥 Gancho Verbal Impactante: [PRIMERA_LINEA_PODEROSA]
 
-[HISTORIA_O_CONTEXTO_INSPIRACIONAL]
+📖 Texto del Post: [HISTORIA_INSPIRACIONAL_100_PALABRAS]
 
-💎 [VALOR_O_REFLEXION_PROFUNDA]
+❤️ Llamada a la Acción (CTA): [ACCION_ESPECIFICA_MOTIVADORA]
 
-❤️ [CTA_EMOCIONAL]
+#️⃣ Hashtags: [8-15 hashtags estratégicos]
 
-#[hashtag1] #[hashtag2] #[hashtag3] #[hashtag4] #[hashtag5]`
+🎨 Formato Visual Sugerido: [VISUAL_OBLIGATORIO_DETALLADO]`
         }
     },
     tiktok: {
         name: 'TikTok',
         characteristics: {
             maxLength: 2200,
-            optimalLength: '1-2 líneas + video',
+            optimalLength: 'Máx. 2 líneas de texto',
+            maxWords: 25,
             tone: 'joven y trendy',
             features: 'videos cortos, trends, música',
             hashtags: '3-5 hashtags trending',
@@ -848,43 +923,59 @@ const SOCIAL_NETWORK_SPECS = {
             cta: 'follow, like, share',
             psychologyTriggers: 'FOMO, trending, autenticidad',
             contentDepth: 'mensajes rápidos pero impactantes',
-            reflectionPrompts: 'retos que inviten a la participación'
+            reflectionPrompts: 'retos que inviten a la participación',
+            visualRequired: 'obligatorio'
         },
         template: {
             structure: [
                 {
-                    section: 'hook',
-                    label: '🎯 Gancho Viral',
-                    description: 'Pregunta, reto o frase que enganche en los primeros segundos',
-                    examples: ['🎯 ¿Sabías que puedes...?', '😱 Esto te va a sorprender...', '🔥 El truco que nadie conoce...']
+                    section: 'gancho',
+                    label: '🎯 Gancho Verbal Impactante',
+                    description: 'Pregunta o reto viral que enganche en 3 segundos',
+                    examples: ['🎯 ¿Sabías que en 30 días puedes...?', '😱 Esto cambió mi vida y te va a impactar...', '🔥 El truco que NADIE te cuenta...']
                 },
                 {
-                    section: 'content',
-                    label: '⚡ Contenido Rápido',
-                    description: 'Información valiosa entregada de forma dinámica',
-                    examples: ['En 30 segundos te explico...', 'Los 3 pasos son...', 'La diferencia está en...']
+                    section: 'texto_post',
+                    label: '⚡ Texto del Post',
+                    description: 'Máximo 2 líneas con información valiosa y rápida',
+                    examples: ['En 30 segundos te explico el secreto...', 'Los 3 pasos que cambiaron todo...', 'La técnica que usan los expertos...']
                 },
                 {
                     section: 'cta',
-                    label: '📢 CTA Viral',
-                    description: 'Llamada a acción para engagement y viralidad',
-                    examples: ['📢 ¡Sígueme para más tips!', '🔄 Comparte si te gustó', '💬 ¿Tú qué opinas?']
+                    label: '📢 Llamada a la Acción (CTA)',
+                    description: 'CTA viral que motive acción específica inmediata',
+                    examples: ['💪 ¡Inténtalo HOY y cuéntame!', '🚀 ¡Sígueme y transforma tu vida!', '🔄 ¡Comparte si te atreves!']
+                },
+                {
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: '3-5 hashtags trending y relevantes',
+                    examples: ['#viral #motivacion #cambio', '#tutorial #tips #vida', '#transformation #mindset #success']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Video vertical 9:16 obligatorio, 7-15 seg para viralidad',
+                    examples: ['Video vertical: demostración rápida, iluminación natural, subtítulos en español latino legibles, ritmo dinámico, elemento sorpresa final...', 'Transformation video: antes/después, música trending, efectos visuales...']
                 }
             ],
-            baseTemplate: `🎯 [GANCHO_VIRAL]
+            baseTemplate: `🎯 Gancho Verbal Impactante: [PREGUNTA_O_RETO_VIRAL]
 
-⚡ [CONTENIDO_RAPIDO_VALIOSO]
+⚡ Texto del Post: [2_LINEAS_IMPACTANTES]
 
-📢 [CTA_ENGAGEMENT]
+📢 Llamada a la Acción (CTA): [ACCION_VIRAL_INMEDIATA]
 
-#[trend1] #[trend2] #[hashtag]`
+#️⃣ Hashtags: [3-5 hashtags trending]
+
+🎨 Formato Visual Sugerido: [VIDEO_VERTICAL_OBLIGATORIO_7-15_SEG]`
         }
     },
     reddit: {
         name: 'Reddit',
         characteristics: {
             maxLength: 40000,
-            optimalLength: '150-300 palabras',
+            optimalLength: 'Máx. 300 palabras',
+            maxWords: 300,
             tone: 'auténtico y comunitario',
             features: 'subreddits especializados, discusiones profundas',
             hashtags: 'no se usan',
@@ -892,54 +983,57 @@ const SOCIAL_NETWORK_SPECS = {
             cta: 'discusión, AMA, recursos útiles',
             psychologyTriggers: 'autenticidad, conocimiento profundo, comunidad',
             contentDepth: 'análisis detallados, experiencias genuinas',
-            reflectionPrompts: 'preguntas que generen discusión intelectual'
+            reflectionPrompts: 'preguntas que generen discusión intelectual',
+            visualRequired: 'opcional'
         },
         template: {
             structure: [
                 {
-                    section: 'title',
-                    label: '📰 Título Llamativo',
-                    description: 'Título que capture la atención y sea específico',
-                    examples: ['📰 [Serio] Mi experiencia con...', '🔍 Análisis profundo de...', '💡 LPT: Lo que aprendí después de...']
+                    section: 'gancho',
+                    label: '📰 Gancho Verbal Impactante',
+                    description: 'Título llamativo y específico que capture atención',
+                    examples: ['📰 [SERIO] Mi experiencia de 10 años me enseñó...', '🔍 ANÁLISIS: Por qué el 90% falla en...', '💡 LPT: Lo que aprendí perdiendo $50k...']
                 },
                 {
-                    section: 'content',
-                    label: '📝 Contenido Detallado',
-                    description: 'Historia, datos o guía con información valiosa',
-                    examples: ['Context: Trabajo en [industria] desde hace...', 'Después de investigar durante meses...', 'Mi experiencia de 5 años me ha enseñado...']
+                    section: 'texto_post',
+                    label: '📝 Texto del Post',
+                    description: 'Contenido detallado, historia genuina o guía valiosa con máximo 300 palabras',
+                    examples: ['Context: Después de trabajar 10 años en...', 'Mi experiencia perdiendo todo me enseñó...', 'Investigué durante 2 años y descubrí...']
                 },
                 {
-                    section: 'insights',
-                    label: '🧠 Insights Profundos',
-                    description: 'Análisis, conclusiones o lecciones aprendidas',
-                    examples: ['Lo que descubrí es que...', 'Los puntos clave son...', 'Mi consejo después de todo esto...']
+                    section: 'cta',
+                    label: '💭 Llamada a la Acción (CTA)',
+                    description: 'Pregunta que invite debate y acción específica',
+                    examples: ['💪 ¿Cuál ha sido tu experiencia aplicando esto?', '🚀 ¿Alguien más se atreve a intentarlo?', '💭 ¿Qué estrategias han funcionado en su caso?']
                 },
                 {
-                    section: 'discussion',
-                    label: '💭 Debate',
-                    description: 'Pregunta que invite a la discusión comunitaria',
-                    examples: ['¿Ustedes qué opinan?', '¿Alguien ha tenido experiencias similares?', '¿Estoy equivocado en algo?']
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: 'No se usan hashtags en Reddit',
+                    examples: ['[No aplica para Reddit]']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Imagen opcional relevante y explicativa, sin branding excesivo',
+                    examples: ['Gráfico explicativo: datos en español, colores neutros, tipografía clara y legible...', 'Captura de pantalla: resultados reales, información verificable...']
                 }
             ],
-            baseTemplate: `📰 [TITULO_DESCRIPTIVO_Y_ESPECIFICO]
+            baseTemplate: `📰 Gancho Verbal Impactante: [TITULO_ESPECIFICO_LLAMATIVO]
 
-[HISTORIA_DATO_O_GUIA_DETALLADA]
+📝 Texto del Post: [HISTORIA_O_GUIA_DETALLADA_300_PALABRAS]
 
-🧠 Key insights:
-- [Punto 1]
-- [Punto 2] 
-- [Punto 3]
+💭 Llamada a la Acción (CTA): [PREGUNTA_DEBATE_Y_ACCION]
 
-💭 [PREGUNTA_PARA_DEBATE]
-
-Edit: [Aclaraciones si son necesarias]`
+🎨 Formato Visual Sugerido: [IMAGEN_OPCIONAL_EXPLICATIVA]`
         }
     },
     youtube: {
         name: 'YouTube',
         characteristics: {
             maxLength: 5000,
-            optimalLength: '2-3 líneas (descripción)',
+            optimalLength: 'Descripción máx. 150 palabras',
+            maxWords: 150,
             tone: 'educativo y entretenido',
             features: 'videos largos, tutoriales, entretenimiento',
             hashtags: '3-5 hashtags en descripción',
@@ -947,48 +1041,51 @@ Edit: [Aclaraciones si son necesarias]`
             cta: 'suscribirse, campana de notificaciones',
             psychologyTriggers: 'curiosidad, valor educativo, entertainment',
             contentDepth: 'promesas de valor específicas y entrega real',
-            reflectionPrompts: 'invitaciones a continuar aprendiendo'
+            reflectionPrompts: 'invitaciones a continuar aprendiendo',
+            visualRequired: 'obligatorio'
         },
         template: {
             structure: [
                 {
-                    section: 'title',
-                    label: '🎥 Título Optimizado',
-                    description: 'Título que prometa valor específico y genere curiosidad',
-                    examples: ['🎥 Cómo [lograr resultado] en [tiempo específico]', '🔍 La verdad sobre [tema controversial]', '💡 [Número] secretos que [audiencia] necesita saber']
+                    section: 'gancho',
+                    label: '🎥 Gancho Verbal Impactante',
+                    description: 'Título optimizado que prometa valor específico',
+                    examples: ['🎥 Cómo logré [resultado específico] en [tiempo]', '🔍 La VERDAD sobre [tema] que nadie cuenta', '💡 [Número] secretos que cambiarán tu [área]']
                 },
                 {
-                    section: 'summary',
-                    label: '📄 Resumen de Valor',
-                    description: 'Qué aprenderán y por qué es importante',
-                    examples: ['En este video aprenderás...', 'Te muestro paso a paso...', 'Descubrirás los secretos de...']
-                },
-                {
-                    section: 'structure',
-                    label: '📋 Estructura del Contenido',
-                    description: 'Lista de puntos principales o timestamps',
-                    examples: ['🕐 Timestamps:', '📝 Lo que cubrimos:', '🎯 Puntos clave:']
+                    section: 'texto_post',
+                    label: '📄 Texto del Post',
+                    description: 'Descripción con valor claro y estructura del contenido (máx. 150 palabras)',
+                    examples: ['En este video te muestro paso a paso...', 'Descubrirás los secretos que usan...', 'Te enseño la metodología exacta que...']
                 },
                 {
                     section: 'cta',
-                    label: '🔔 CTA de Suscripción',
-                    description: 'Llamada a suscribirse y activar notificaciones',
-                    examples: ['🔔 Suscríbete y activa la campana', '👍 Dale like si te ayudó', '💬 Déjame tu pregunta en comentarios']
+                    label: '🔔 Llamada a la Acción (CTA)',
+                    description: 'CTA de suscripción y acción específica del tema',
+                    examples: ['💪 ¡Implementa esto HOY y cuéntame!', '🚀 ¡Suscríbete y transforma tu vida!', '🔔 ¡Activa la campana y sé el primero!']
+                },
+                {
+                    section: 'hashtags',
+                    label: '#️⃣ Hashtags',
+                    description: '3-5 hashtags relevantes en descripción',
+                    examples: ['#tutorial #motivacion #exito', '#emprendimiento #estrategia #resultados', '#lifestyle #bienestar #cambio']
+                },
+                {
+                    section: 'formato_visual',
+                    label: '🎨 Formato Visual Sugerido',
+                    description: 'Video obligatorio horizontal 16:9 o Shorts 9:16, miniatura llamativa',
+                    examples: ['Video horizontal HD: inicio impactante en 3 seg, audio claro, iluminación profesional. Miniatura: texto en español latino legible, colores contrastantes, expresión emocional...', 'YouTube Short vertical: demostración rápida, subtítulos automáticos activados...']
                 }
             ],
-            baseTemplate: `🎥 [TITULO_CON_VALOR_ESPECIFICO]
+            baseTemplate: `🎥 Gancho Verbal Impactante: [TITULO_CON_VALOR_ESPECIFICO]
 
-[RESUMEN_BREVE_DEL_VALOR]
+📄 Texto del Post: [DESCRIPCION_CON_ESTRUCTURA_150_PALABRAS]
 
-🎯 En este video:
-✅ [Punto 1]
-✅ [Punto 2] 
-✅ [Punto 3]
+🔔 Llamada a la Acción (CTA): [SUSCRIPCION_Y_ACCION_ESPECIFICA]
 
-🔔 Suscríbete y activa la campana para más contenido como este
-👉 Links útiles: [recursos]
+#️⃣ Hashtags: [3-5 hashtags relevantes]
 
-#[hashtag1] #[hashtag2] #[hashtag3]`
+🎨 Formato Visual Sugerido: [VIDEO_OBLIGATORIO_CON_MINIATURA_DETALLADA]`
         }
     }
 };
@@ -1047,42 +1144,85 @@ function processCopywritingResponse(ideas, params) {
 }
 
 /**
- * Parsea el contenido de texto de IA para extraer estructura
+ * Parsea el contenido de texto de IA para extraer la nueva estructura específica
  */
 function parseAICopyContent(content, platform) {
     const result = {
-        hook: '',
-        postText: '',
-        hashtags: [],
+        gancho: '',
+        textoPost: '',
         cta: '',
-        visualFormat: '',
+        hashtags: [],
+        formatoVisual: '',
         rawContent: content
     };
     
-    // Buscar patrones comunes en el texto
+    // Buscar patrones específicos en la nueva estructura
     const lines = content.split('\n').filter(line => line.trim());
     
     lines.forEach(line => {
         const cleanLine = line.trim();
         
-        // Detectar ganchos/hooks
-        if (cleanLine.match(/^(🎯|Gancho:|Hook:|Título:|HOOK:)/i)) {
-            result.hook = cleanLine.replace(/^(🎯|Gancho:|Hook:|Título:|HOOK:)\s*/i, '');
+        // Detectar Gancho Verbal Impactante
+        if (cleanLine.match(/^(🎯|Gancho Verbal Impactante:|Gancho:|Hook:)/i)) {
+            result.gancho = cleanLine.replace(/^(🎯|Gancho Verbal Impactante:|Gancho:|Hook:)\s*/i, '');
         }
-        // Detectar CTAs
-        else if (cleanLine.match(/^(📢|CTA:|Call to action:|Llamada a la acción:)/i)) {
-            result.cta = cleanLine.replace(/^(📢|CTA:|Call to action:|Llamada a la acción:)\s*/i, '');
+        // Detectar Texto del Post
+        else if (cleanLine.match(/^(📖|Texto del Post:|Texto:|Desarrollo:|Post:)/i)) {
+            result.textoPost = cleanLine.replace(/^(📖|Texto del Post:|Texto:|Desarrollo:|Post:)\s*/i, '');
+        }
+        // Detectar Llamada a la Acción (CTA)
+        else if (cleanLine.match(/^(🚀|Llamada a la Acción|CTA:|Call to action:|🔔|❤️|💬|📢|👉|🤝)/i)) {
+            result.cta = cleanLine.replace(/^(🚀|Llamada a la Acción \(CTA\):|Llamada a la Acción:|CTA:|Call to action:|🔔|❤️|💬|📢|👉|🤝)\s*/i, '');
         }
         // Detectar hashtags
         else if (cleanLine.match(/^(#️⃣|Hashtags:|#)/i) || cleanLine.includes('#')) {
             const hashtags = cleanLine.match(/#\w+/g) || [];
-            result.hashtags = hashtags;
+            if (hashtags.length > 0) {
+                result.hashtags = hashtags;
+            } else {
+                // Si no hay hashtags detectados pero menciona hashtags
+                result.hashtags = [cleanLine.replace(/^(#️⃣|Hashtags:)\s*/i, '')];
+            }
         }
-        // Detectar formato visual
-        else if (cleanLine.match(/^(🎨|Visual:|Imagen:|Formato visual:)/i)) {
-            result.visualFormat = cleanLine.replace(/^(🎨|Visual:|Imagen:|Formato visual:)\s*/i, '');
+        // Detectar Formato Visual Sugerido
+        else if (cleanLine.match(/^(🎨|Formato Visual Sugerido:|Visual:|Imagen:|Formato visual:)/i)) {
+            result.formatoVisual = cleanLine.replace(/^(🎨|Formato Visual Sugerido:|Visual:|Imagen:|Formato visual:)\s*/i, '');
         }
-        // El resto va al texto principal
+        // Si no coincide con ningún patrón específico, podría ser continuación del texto
+        else if (!cleanLine.match(/^(🎯|📖|🚀|#️⃣|🎨|---|VARIACIÓN|Variación)/i) && cleanLine.length > 10) {
+            // Si no tenemos texto del post aún, esto podría ser parte de él
+            if (!result.textoPost && result.gancho) {
+                result.textoPost = cleanLine;
+            }
+            // O podría ser continuación del texto existente
+            else if (result.textoPost && !result.cta) {
+                result.textoPost += ' ' + cleanLine;
+            }
+        }
+    });
+    
+    // Limpiar y validar resultados
+    result.gancho = result.gancho.replace(/^\[|\]$/g, '').trim();
+    result.textoPost = result.textoPost.replace(/^\[|\]$/g, '').trim();
+    result.cta = result.cta.replace(/^\[|\]$/g, '').trim();
+    result.formatoVisual = result.formatoVisual.replace(/^\[|\]$/g, '').trim();
+    
+    // Si no se detectó estructura específica, intentar extraer el contenido de manera más flexible
+    if (!result.gancho && !result.textoPost) {
+        const contentLines = lines.filter(line => 
+            !line.match(/^(---|VARIACIÓN|Variación|\*\*)/i) && 
+            line.length > 5
+        );
+        
+        if (contentLines.length > 0) {
+            result.gancho = contentLines[0] || '';
+            result.textoPost = contentLines.slice(1, -1).join(' ') || '';
+            result.cta = contentLines[contentLines.length - 1] || '';
+        }
+    }
+    
+    return result;
+}
         else if (!cleanLine.match(/^(Variación|===|---)/i)) {
             if (!result.postText) {
                 result.postText = cleanLine;
@@ -1158,134 +1298,171 @@ function buildCopywritingPrompt(params) {
     const copyTypeInfo = COPY_TYPES[copyType];
     
     if (generationMode === 'single') {
-        // Generar 3 variaciones profundas para una sola red social
+        // Generar 3 variaciones IMPACTANTES para una sola red social
         const networkKey = socialNetworks[0];
         const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
         
-        return `Actúa como un experto copywriter especializado en ${networkSpec.name} con conocimiento profundo en psicología del consumidor.
+        return `🎯 MISIÓN: Crear copywriting IRRESISTIBLE y PERSUASIVO para ${networkSpec.name} que PARE el scroll y genere ACCIÓN INMEDIATA.
 
 TEMA: "${keyword}"
 TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}
 ${context ? `CONTEXTO ESPECÍFICO: ${context}\n` : ''}
 
-ESPECIFICACIONES PSICOLÓGICAS PARA ${networkSpec.name.toUpperCase()}:
-• Longitud óptima: ${networkSpec.characteristics.optimalLength}
-• Tono requerido: ${networkSpec.characteristics.tone}
-• Características clave: ${networkSpec.characteristics.features}
-• Hashtags: ${networkSpec.characteristics.hashtags}
-• Engagement: ${networkSpec.characteristics.engagement}
-• CTA específico: ${networkSpec.characteristics.cta}
-• Triggers psicológicos: ${networkSpec.characteristics.psychologyTriggers}
-• Profundidad de contenido: ${networkSpec.characteristics.contentDepth}
-• Prompts de reflexión: ${networkSpec.characteristics.reflectionPrompts}
-
-ESTRUCTURA REQUERIDA PARA ${networkSpec.name}:
+📋 ESTRUCTURA OBLIGATORIA para ${networkSpec.name.toUpperCase()}:
 ${networkSpec.template.structure.map(section => 
     `${section.label}: ${section.description}\n   Ejemplos: ${section.examples.join(' | ')}`
 ).join('\n')}
 
-PLANTILLA BASE:
-${networkSpec.template.baseTemplate}
+🚨 LÍMITES ESTRICTOS:
+• Máximo ${networkSpec.characteristics.maxWords} palabras en el texto del post
+• Tono: ${networkSpec.characteristics.tone}
+• Visual: ${networkSpec.characteristics.visualRequired}
+• Triggers psicológicos: ${networkSpec.characteristics.psychologyTriggers}
 
-INSTRUCCIONES CRÍTICAS PARA GENERAR 3 VARIACIONES PROFUNDAS:
-1. VARIACIÓN 1 - ENFOQUE EMOCIONAL: Conecta profundamente con emociones, usa storytelling que haga reflexionar
-2. VARIACIÓN 2 - ENFOQUE RACIONAL: Presenta datos, estadísticas, argumentos lógicos que convenzan
-3. VARIACIÓN 3 - ENFOQUE ASPIRACIONAL: Inspira acción, muestra el futuro deseado, genera aspiración
+🎯 INSTRUCCIONES CRÍTICAS - GENERAR 3 VARIACIONES IRRESISTIBLES:
 
-CRITERIOS DE CALIDAD OBLIGATORIOS:
-✅ Cada variación debe hacer que el lector PARE y REFLEXIONE
-✅ Debe generar una respuesta emocional o intelectual inmediata
-✅ El contenido debe ser VALIOSO y MEMORABLE
-✅ Debe invitar genuinamente a la interacción y participación
-✅ Optimizado específicamente para los triggers psicológicos de ${networkSpec.name}
+VARIACIÓN 1 - ENFOQUE EMOCIONAL:
+• Gancho que genere IMPACTO emocional inmediato
+• Texto que conecte con el CORAZÓN y genere nostalgia/aspiración
+• CTA que motive ACCIÓN ESPECÍFICA del tema (si es motivación→actuar, si es venta→intentar, si es yoga→practicar)
+• Formato visual que apoye la emoción
 
-FORMATO DE RESPUESTA:
-Variación 1 - Emocional:
-[copy completo siguiendo la estructura requerida]
+VARIACIÓN 2 - ENFOQUE RACIONAL:
+• Gancho con DATOS impactantes o estadísticas sorprendentes
+• Texto con argumentos LÓGICOS y beneficios concretos
+• CTA que invite a EXPERIMENTAR o PROBAR basado en la lógica
+• Formato visual que muestre resultados/datos
 
-Variación 2 - Racional:
-[copy completo siguiendo la estructura requerida]
+VARIACIÓN 3 - ENFOQUE ASPIRACIONAL:
+• Gancho que pinte el FUTURO DESEADO o transformación
+• Texto que inspire y muestre la MEJOR VERSIÓN de sí mismos
+• CTA que invite a DAR EL PRIMER PASO hacia esa transformación
+• Formato visual que represente el estado aspiracional
 
-Variación 3 - Aspiracional:
-[copy completo siguiendo la estructura requerida]`;
+📝 FORMATO DE RESPUESTA OBLIGATORIO:
+
+**VARIACIÓN 1 - EMOCIONAL:**
+
+🎯 Gancho Verbal Impactante: [gancho emocional que pare el scroll]
+
+📖 Texto del Post: [máximo ${networkSpec.characteristics.maxWords} palabras, desarrollo emocional profundo]
+
+🚀 Llamada a la Acción (CTA): [acción específica motivadora para ${keyword}]
+
+#️⃣ Hashtags: [hashtags relevantes]
+
+🎨 Formato Visual Sugerido: [descripción detallada para IA, idioma español latino, sin errores]
+
+---
+
+**VARIACIÓN 2 - RACIONAL:**
+
+🎯 Gancho Verbal Impactante: [gancho con datos/estadísticas]
+
+📖 Texto del Post: [máximo ${networkSpec.characteristics.maxWords} palabras, argumentos lógicos]
+
+🚀 Llamada a la Acción (CTA): [acción basada en lógica para ${keyword}]
+
+#️⃣ Hashtags: [hashtags relevantes]
+
+🎨 Formato Visual Sugerido: [descripción detallada para IA, idioma español latino, sin errores]
+
+---
+
+**VARIACIÓN 3 - ASPIRACIONAL:**
+
+🎯 Gancho Verbal Impactante: [gancho aspiracional/transformación]
+
+📖 Texto del Post: [máximo ${networkSpec.characteristics.maxWords} palabras, mensaje inspirador]
+
+🚀 Llamada a la Acción (CTA): [acción hacia transformación para ${keyword}]
+
+#️⃣ Hashtags: [hashtags relevantes]
+
+🎨 Formato Visual Sugerido: [descripción detallada para IA, idioma español latino, sin errores]
+
+🔥 CRITERIOS DE EXCELENCIA OBLIGATORIOS:
+✅ DEBE generar curiosidad irresistible
+✅ DEBE incluir acción específica del tema (no solo "comenta")
+✅ DEBE respetar límite de palabras
+✅ DEBE incluir visual detallado para IA
+✅ Texto legible, sin errores ortográficos
+✅ Español latino cuando aplique`;
 
     } else {
-        // Generar 1 copy específico y profundo para cada red social
-        let prompt = `Actúa como un experto copywriter multiplatforma con conocimiento profundo en psicología del consumidor y especialización en cada red social.
+        // Generar 1 copy ESPECÍFICO y PERSUASIVO para cada red social
+        let prompt = `🎯 MISIÓN: Crear copywriting ESPECÍFICO y PERSUASIVO para cada plataforma que genere ACCIÓN INMEDIATA y RESULTADOS REALES.
 
 TEMA CENTRAL: "${keyword}"
 TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}
 ${context ? `CONTEXTO ESPECÍFICO: ${context}\n` : ''}
 
-MISIÓN: Crear copywriting que no solo venda, sino que haga PENSAR, REFLEXIONAR y genere conversaciones significativas.
+🚨 INSTRUCCIONES CRÍTICAS:
+• Cada copy DEBE ser único y específico para su plataforma
+• DEBE incluir acción específica del tema (motivación→actuar, venta→intentar, yoga→practicar)
+• DEBE respetar límites de palabras exactos
+• DEBE incluir formato visual detallado para IA
+• Texto en español latino, legible, sin errores
 
-ESPECIFICACIONES DETALLADAS POR PLATAFORMA:
+📋 ESPECIFICACIONES POR PLATAFORMA:
 
 `;
 
         socialNetworks.forEach(networkKey => {
             const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
             prompt += `
-🎯 ${networkSpec.name.toUpperCase()}:
-   • Longitud: ${networkSpec.characteristics.optimalLength}
+🎯 ${networkSpec.name.toUpperCase()} (Máx. ${networkSpec.characteristics.maxWords} palabras):
    • Tono: ${networkSpec.characteristics.tone}
-   • Enfoque: ${networkSpec.characteristics.features}
-   • Hashtags: ${networkSpec.characteristics.hashtags}
-   • CTA: ${networkSpec.characteristics.cta}
-   • Triggers psicológicos: ${networkSpec.characteristics.psychologyTriggers}
-   • Profundidad: ${networkSpec.characteristics.contentDepth}
-   • Reflexión: ${networkSpec.characteristics.reflectionPrompts}
+   • Visual: ${networkSpec.characteristics.visualRequired}
+   • Triggers: ${networkSpec.characteristics.psychologyTriggers}
+   • Engagement: ${networkSpec.characteristics.engagement}
    
-   Estructura requerida:
+   ESTRUCTURA OBLIGATORIA:
 ${networkSpec.template.structure.map(section => 
     `   ${section.label}: ${section.description}`
 ).join('\n')}
-   
-   Plantilla base:
-${networkSpec.template.baseTemplate.split('\n').map(line => `   ${line}`).join('\n')}
 `;
         });
 
         prompt += `
 
-INSTRUCCIONES CRÍTICAS PARA CADA PLATAFORMA:
+📝 FORMATO DE RESPUESTA OBLIGATORIO (para cada red seleccionada):
 
-📘 FACEBOOK: Historia personal que conecte emocionalmente, datos sorprendentes, pregunta que invite a compartir experiencias. Debe generar nostalgia o pertenencia grupal.
+**[NOMBRE DE LA RED SOCIAL]:**
 
-🔗 LINKEDIN: Caso profesional real, insight de industria, aplicación práctica. Debe establecer autoridad y generar networking genuino.
+🎯 Gancho Verbal Impactante: [gancho que pare el scroll específico para esta red]
 
-🐦 TWITTER/X: Opinión contundente con datos, declaración que genere debate inteligente. Debe ser retweeteable y memorable.
+📖 Texto del Post: [desarrollo profundo respetando límite de palabras]
 
-💬 WHATSAPP: Mensaje directo con valor inmediato, sentido de urgencia personalizada. Debe generar respuesta inmediata.
+🚀 Llamada a la Acción (CTA): [acción específica del tema "${keyword}" - NO solo comentar]
 
-📱 TELEGRAM: Información técnica valiosa, análisis profundo pero conciso. Debe aportar conocimiento específico.
+#️⃣ Hashtags: [hashtags relevantes o "No aplica" si la red no los usa]
 
-📷 INSTAGRAM: Historia inspiracional con mensaje profundo, call-to-action emocional. Debe ser guardable y compartible.
-
-🎵 TIKTOK: Hook viral con valor rápido pero impactante. Debe ser tendencia y generar participación.
-
-🔴 REDDIT: Experiencia auténtica con análisis detallado, invitación a debate comunitario. Debe ser genuino y útil.
-
-🎬 YOUTUBE: Promesa de valor específica con estructura clara. Debe generar suscripción y engagement.
-
-CRITERIOS DE EXCELENCIA OBLIGATORIOS:
-✅ Cada copy debe ser ÚNICO y ESPECÍFICO para su plataforma
-✅ Debe hacer que la audiencia PARE su scroll y PRESTE ATENCIÓN
-✅ Contenido VALIOSO que la audiencia quiera guardar/compartir
-✅ Genera REFLEXIÓN y CONVERSACIÓN genuina
-✅ Optimizado para los triggers psicológicos específicos de cada red
-✅ Invita a la ACCIÓN de manera natural y convincente
-
-FORMATO DE RESPUESTA (por cada red social seleccionada):
-[Nombre de la Red Social]:
-[copy completo siguiendo su estructura específica y plantilla base]
+🎨 Formato Visual Sugerido: [descripción DETALLADA para IA con idioma español latino especificado, sin errores ortográficos]
 
 ---
 
-[Siguiente Red Social]:
-[copy completo siguiendo su estructura específica y plantilla base]
+[SIGUIENTE RED SOCIAL...]
 
-[continuar para todas las redes seleccionadas]`;
+🔥 CRITERIOS DE EXCELENCIA PARA CADA PLATAFORMA:
+
+📘 FACEBOOK: Historia emocional + datos sorprendentes + CTA específica
+🔗 LINKEDIN: Caso profesional + insight de industria + acción de crecimiento  
+🐦 TWITTER: Opinión contundente + dato impactante + acción viral
+💬 WHATSAPP: Urgencia personal + beneficio claro + acción inmediata
+📱 TELEGRAM: Info técnica + análisis + acción de implementación
+📷 INSTAGRAM: Inspiración visual + transformación + acción motivadora
+🎵 TIKTOK: Hook viral + valor rápido + acción trendy
+🔴 REDDIT: Experiencia auténtica + análisis detallado + debate + acción
+🎬 YOUTUBE: Promesa específica + estructura clara + acción de implementación
+
+✅ CADA COPY DEBE:
+• Generar CURIOSIDAD irresistible
+• Incluir ACCIÓN específica del tema (no genérica)
+• Respetar LÍMITES de palabras exactos
+• Describir VISUAL para IA (español latino, legible)
+• Ser ÚNICO para su plataforma
+• Motivar RESULTADOS reales`;
 
         return prompt;
     }
@@ -1404,14 +1581,19 @@ function displayCopywritingResults(copies, params) {
                     ${copy.variation ? `<span class="variation-badge">Variación ${copy.variation}</span>` : ''}
                 </div>
                 <div class="copywriting-content">
-                    ${copy.hook ? `<div class="copy-section hook-section">
-                        <div class="section-label">🎯 Gancho Principal</div>
-                        <div class="section-content">${copy.hook}</div>
+                    ${copy.gancho ? `<div class="copy-section gancho-section">
+                        <div class="section-label">🎯 Gancho Verbal Impactante</div>
+                        <div class="section-content gancho-text">${copy.gancho}</div>
                     </div>` : ''}
                     
-                    ${copy.postText ? `<div class="copy-section content-section">
-                        <div class="section-label">📝 Contenido</div>
-                        <div class="section-content">${copy.postText.replace(/\n/g, '<br>')}</div>
+                    ${copy.textoPost ? `<div class="copy-section texto-section">
+                        <div class="section-label">� Texto del Post</div>
+                        <div class="section-content texto-content">${copy.textoPost.replace(/\n/g, '<br>')}</div>
+                    </div>` : ''}
+                    
+                    ${copy.cta ? `<div class="copy-section cta-section">
+                        <div class="section-label">🚀 Llamada a la Acción (CTA)</div>
+                        <div class="section-content cta-text">${copy.cta}</div>
                     </div>` : ''}
                     
                     ${copy.hashtags && copy.hashtags.length > 0 ? `<div class="copy-section hashtags-section">
@@ -1421,17 +1603,12 @@ function displayCopywritingResults(copies, params) {
                         </div>
                     </div>` : ''}
                     
-                    ${copy.cta ? `<div class="copy-section cta-section">
-                        <div class="section-label">📢 Call to Action</div>
-                        <div class="section-content cta-text">${copy.cta}</div>
+                    ${copy.formatoVisual ? `<div class="copy-section visual-section">
+                        <div class="section-label">🎨 Formato Visual Sugerido</div>
+                        <div class="section-content visual-description">${copy.formatoVisual}</div>
                     </div>` : ''}
                     
-                    ${copy.visualFormat ? `<div class="copy-section visual-section">
-                        <div class="section-label">🎨 Sugerencia Visual</div>
-                        <div class="section-content">${copy.visualFormat}</div>
-                    </div>` : ''}
-                    
-                    ${!copy.hook && !copy.postText && copy.rawContent ? `<div class="copy-section content-section">
+                    ${!copy.gancho && !copy.textoPost && copy.rawContent ? `<div class="copy-section content-section">
                         <div class="section-label">📝 Contenido Completo</div>
                         <div class="section-content">${copy.rawContent.replace(/\n/g, '<br>')}</div>
                     </div>` : ''}
