@@ -1306,11 +1306,11 @@ function buildCopywritingPrompt(params) {
 
 TEMA: "${keyword}"
 TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}
-${context ? `CONTEXTO ESPECÍFICO: ${context}\n` : ''}
+${context ? `CONTEXTO ESPECÍFICO: ${context}` : ''}
 
 📋 ESTRUCTURA OBLIGATORIA para ${networkSpec.name.toUpperCase()}:
 ${networkSpec.template.structure.map(section => 
-    `${section.label}: ${section.description}\n   Ejemplos: ${section.examples.join(' | ')}`
+    `${section.label}: ${section.description} - Ejemplos: ${section.examples.join(' | ')}`
 ).join('\n')}
 
 🚨 LÍMITES ESTRICTOS:
@@ -1395,7 +1395,7 @@ VARIACIÓN 3 - ENFOQUE ASPIRACIONAL:
 
 TEMA CENTRAL: "${keyword}"
 TIPO DE COPY: ${copyTypeInfo.name} - ${copyTypeInfo.description}
-${context ? `CONTEXTO ESPECÍFICO: ${context}\n` : ''}
+${context ? `CONTEXTO ESPECÍFICO: ${context}` : ''}
 
 🚨 INSTRUCCIONES CRÍTICAS:
 • Cada copy DEBE ser único y específico para su plataforma
