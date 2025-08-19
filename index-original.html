@@ -463,22 +463,127 @@
             }
         });
 
-        // Datos de la aplicación
-        const socialMediaOptions = ["Facebook", "LinkedIn", "X / Twitter", "WhatsApp", "Telegram", "Reddit", "Instagram", "TikTok", "YouTube"];
-        const copyTypes = [
-            { name: "De beneficio o solución", desc: "Cómo el producto mejora la vida del cliente." },
-            { name: "De novedad o lanzamiento", desc: "Anuncia algo nuevo para atraer atención inmediata." },
-            { name: "De interacción o pregunta", desc: "Diseñado para generar respuestas de la audiencia." },
-            { name: "De urgencia o escasez", desc: "Genera sensación de urgencia para actuar." },
-            { name: "Informativo o educativo", desc: "Comparte conocimiento útil." },
-            { name: "Informal", desc: "Tono casual, cercano." },
-            { name: "Llamada a la acción (CTA)", desc: "Motiva acción directa (comprar, registrarse)." },
-            { name: "Narrativo o storytelling", desc: "Cuenta una historia emocional." },
-            { name: "Posicionamiento o branding", desc: "Refuerza imagen de marca." },
-            { name: "Testimonio o prueba social", desc: "Muestra experiencias positivas de otros usuarios." },
-            { name: "Técnico o profesional", desc: "Información especializada o técnica." },
-            { name: "Venta directa o persuasivo", desc: "Convencimiento directo para cerrar ventas." }
-        ];
+        // Datos de la aplicación - Configuración de redes sociales con iconos
+        const SOCIAL_NETWORKS = {
+            facebook: {
+                name: 'Facebook',
+                icon: 'fab fa-facebook-f',
+                color: '#1877F2',
+                premium: false
+            },
+            linkedin: {
+                name: 'LinkedIn',
+                icon: 'fab fa-linkedin-in',
+                color: '#0A66C2',
+                premium: true
+            },
+            twitter: {
+                name: 'X / Twitter',
+                icon: 'fab fa-x-twitter',
+                color: '#000000',
+                premium: true
+            },
+            whatsapp: {
+                name: 'WhatsApp',
+                icon: 'fab fa-whatsapp',
+                color: '#25D366',
+                premium: true
+            },
+            telegram: {
+                name: 'Telegram',
+                icon: 'fab fa-telegram-plane',
+                color: '#0088CC',
+                premium: true
+            },
+            reddit: {
+                name: 'Reddit',
+                icon: 'fab fa-reddit-alien',
+                color: '#FF4500',
+                premium: true
+            },
+            instagram: {
+                name: 'Instagram',
+                icon: 'fab fa-instagram',
+                color: '#E4405F',
+                premium: true
+            },
+            tiktok: {
+                name: 'TikTok',
+                icon: 'fab fa-tiktok',
+                color: '#000000',
+                premium: true
+            },
+            youtube: {
+                name: 'YouTube',
+                icon: 'fab fa-youtube',
+                color: '#FF0000',
+                premium: true
+            }
+        };
+
+        // Tipos de copy con descripciones completas
+        const COPY_TYPES = {
+            'benefit': {
+                name: 'De beneficio o solución',
+                description: 'Cómo el producto mejora la vida del cliente.',
+                premium: true
+            },
+            'launch': {
+                name: 'De novedad o lanzamiento',
+                description: 'Anuncia algo nuevo para atraer atención inmediata.',
+                premium: true
+            },
+            'interaction': {
+                name: 'De interacción o pregunta',
+                description: 'Diseñado para generar respuestas de la audiencia.',
+                premium: true
+            },
+            'urgency': {
+                name: 'De urgencia o escasez',
+                description: 'Genera sensación de urgencia para actuar.',
+                premium: true
+            },
+            'educational': {
+                name: 'Informativo o educativo',
+                description: 'Comparte conocimiento útil.',
+                premium: false
+            },
+            'informal': {
+                name: 'Informal',
+                description: 'Tono casual, cercano.',
+                premium: false
+            },
+            'cta': {
+                name: 'Llamada a la acción (CTA)',
+                description: 'Motiva acción directa (comprar, registrarse).',
+                premium: true
+            },
+            'storytelling': {
+                name: 'Narrativo o storytelling',
+                description: 'Cuenta una historia emocional.',
+                premium: true
+            },
+            'branding': {
+                name: 'Posicionamiento o branding',
+                description: 'Refuerza imagen de marca.',
+                premium: true
+            },
+            'testimonial': {
+                name: 'Testimonio o prueba social',
+                description: 'Muestra experiencias positivas de otros usuarios.',
+                premium: true
+            },
+            'technical': {
+                name: 'Técnico o profesional',
+                description: 'Información especializada o técnica.',
+                premium: false
+            },
+            'sales': {
+                name: 'Venta directa o persuasivo',
+                description: 'Convencimiento directo para cerrar ventas.',
+                premium: true
+            }
+        };
 
         let currentUser = null;
         let isPremium = false;
@@ -591,51 +696,131 @@
             const generationMode = document.querySelector('input[name="generation-mode"]:checked').value;
             const isSingleMode = generationMode === 'single';
 
-            socialMediaOptions.forEach(social => {
-                const isFacebook = social === "Facebook";
-                const isAllowed = isPremium || isFacebook;
+            Object.entries(SOCIAL_NETWORKS).forEach(([key, network]) => {
+                const isFacebook = key === "facebook";
+                const isAllowed = isPremium || !network.premium;
+                
+                // Create main container for each social media item
+                const itemContainer = document.createElement('div');
+                itemContainer.className = `social-network-item ${!isAllowed ? 'disabled' : ''}`;
+                itemContainer.style.cssText = `
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 0.75rem 1rem;
+                    margin: 0.5rem;
+                    border: 2px solid ${isAllowed ? network.color : '#e0e0e0'};
+                    border-radius: 8px;
+                    background: ${isAllowed ? 'white' : '#f5f5f5'};
+                    cursor: ${isAllowed ? 'pointer' : 'not-allowed'};
+                    transition: all 0.3s ease;
+                    min-width: 140px;
+                    opacity: ${isAllowed ? '1' : '0.6'};
+                `;
+
                 const checkbox = document.createElement('input');
                 checkbox.type = isSingleMode ? 'radio' : 'checkbox';
                 checkbox.name = isSingleMode ? 'social-media-single' : 'social-media-multi';
-                checkbox.value = social;
+                checkbox.value = network.name;
                 checkbox.disabled = !isAllowed;
+                checkbox.style.marginRight = '0.5rem';
 
-                const label = document.createElement('label');
-                label.className = `checkbox-label`;
-                if (!isAllowed) {
-                    label.classList.add('has-text-grey-light');
-                }
-                label.appendChild(checkbox);
-                label.appendChild(document.createTextNode(` ${social}`));
+                // Create icon element
+                const icon = document.createElement('i');
+                icon.className = network.icon;
+                icon.style.cssText = `
+                    color: ${isAllowed ? network.color : '#999'};
+                    font-size: 1.2rem;
+                    margin-right: 0.5rem;
+                    min-width: 20px;
+                `;
 
+                // Create text label
+                const label = document.createElement('span');
+                label.textContent = network.name;
+                label.style.cssText = `
+                    font-weight: 500;
+                    color: ${isAllowed ? '#333' : '#999'};
+                    font-size: 0.9rem;
+                `;
+
+                // Add premium lock icon if needed
                 if (!isAllowed) {
-                    const lockIcon = document.createElement('span');
-                    lockIcon.className = 'icon is-small has-text-warning ml-2';
-                    lockIcon.innerHTML = '<i class="fas fa-lock"></i>';
-                    label.appendChild(lockIcon);
+                    const lockIcon = document.createElement('i');
+                    lockIcon.className = 'fas fa-lock';
+                    lockIcon.style.cssText = `
+                        color: #ffa500;
+                        font-size: 0.8rem;
+                        margin-left: 0.5rem;
+                    `;
+                    itemContainer.appendChild(lockIcon);
                 }
-                socialMediaContainer.appendChild(label);
+
+                // Assemble the item
+                itemContainer.appendChild(checkbox);
+                itemContainer.appendChild(icon);
+                itemContainer.appendChild(label);
+
+                // Add hover effects for allowed items
+                if (isAllowed) {
+                    itemContainer.addEventListener('mouseenter', () => {
+                        itemContainer.style.background = `${network.color}10`;
+                        itemContainer.style.transform = 'translateY(-2px)';
+                        itemContainer.style.boxShadow = `0 4px 12px ${network.color}30`;
+                    });
+                    
+                    itemContainer.addEventListener('mouseleave', () => {
+                        itemContainer.style.background = 'white';
+                        itemContainer.style.transform = 'translateY(0)';
+                        itemContainer.style.boxShadow = 'none';
+                    });
+
+                    // Add click handler for the entire container
+                    itemContainer.addEventListener('click', () => {
+                        if (isSingleMode) {
+                            // For radio buttons, uncheck others first
+                            document.querySelectorAll('input[name="social-media-single"]').forEach(r => r.checked = false);
+                        }
+                        checkbox.checked = !checkbox.checked;
+                    });
+                }
+
+                socialMediaContainer.appendChild(itemContainer);
             });
+
+            // Add responsive grid styling to the container
+            socialMediaContainer.style.cssText = `
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                margin-top: 1rem;
+            `;
         }
 
         function renderCopyTypes() {
-            copyTypeSelect.innerHTML = '';
-            copyTypes.forEach(copy => {
+            copyTypeSelect.innerHTML = '<option value="">Selecciona el tipo de copy...</option>';
+            
+            Object.entries(COPY_TYPES).forEach(([key, copyType]) => {
                 const option = document.createElement('option');
-                option.value = copy.name;
-                option.textContent = copy.name;
+                option.value = key;
+                option.textContent = copyType.name;
 
-                const isFreeType = ["Informativo o educativo", "Informal", "Técnico o profesional"].includes(copy.name);
-                const isAllowed = isPremium || isFreeType;
+                const isAllowed = isPremium || !copyType.premium;
 
                 if (!isAllowed) {
                     option.disabled = true;
                     option.classList.add('has-text-grey-light');
-                    option.textContent = `${copy.name} (Premium)`;
+                    option.textContent = `${copyType.name} (Premium)`;
                 }
                 copyTypeSelect.appendChild(option);
             });
-            copyDescription.textContent = copyTypes[0].desc;
+
+            // Show description for the first available option if exists
+            const firstAvailableKey = Object.keys(COPY_TYPES).find(key => 
+                isPremium || !COPY_TYPES[key].premium
+            );
+            if (firstAvailableKey && copyDescription) {
+                copyDescription.textContent = COPY_TYPES[firstAvailableKey].description;
+            }
         }
 
         // Event Listeners para la interfaz
@@ -711,8 +896,9 @@
 
         // Mostrar descripción de copy type
         copyTypeSelect.addEventListener('change', (e) => {
-            const selectedCopy = copyTypes.find(c => c.name === e.target.value);
-            copyDescription.textContent = selectedCopy ? selectedCopy.desc : '';
+            const selectedKey = e.target.value;
+            const selectedCopy = COPY_TYPES[selectedKey];
+            copyDescription.textContent = selectedCopy ? selectedCopy.description : '';
         });
 
         // Botón de nueva generación
