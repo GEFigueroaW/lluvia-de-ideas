@@ -143,22 +143,38 @@ window.setCopywritingPremiumStatus = function(premium) {
     console.log('[COPYWRITING] setCopywritingPremiumStatus llamado con:', premium);
     isUserPremium = premium;
     
-    // Si el DOM ya está listo, actualizar inmediatamente
+    // Siempre actualizar inmediatamente si el DOM está listo
     if (document.readyState === 'loading') {
         console.log('[COPYWRITING] DOM aún cargando, esperando...');
         document.addEventListener('DOMContentLoaded', () => {
             console.log('[COPYWRITING] DOM listo, actualizando redes sociales...');
-            setupSocialNetworks();
-            setupCopyTypes();
-            updatePremiumNotifications();
+            initializeCopywritingElements();
         });
     } else {
         console.log('[COPYWRITING] DOM listo, actualizando inmediatamente...');
+        initializeCopywritingElements();
+    }
+};
+
+/**
+ * Inicializa todos los elementos de copywriting
+ */
+function initializeCopywritingElements() {
+    console.log('[COPYWRITING] initializeCopywritingElements iniciado');
+    try {
+        // Verificar si ya se inicializaron los elementos básicos
+        if (window.copywritingBasicInitialized) {
+            console.log('[COPYWRITING] Elementos básicos ya inicializados, actualizando con estado premium...');
+        }
+        
         setupSocialNetworks();
         setupCopyTypes();
         updatePremiumNotifications();
+        console.log('[COPYWRITING] Elementos inicializados correctamente');
+    } catch (error) {
+        console.error('[COPYWRITING] Error inicializando elementos:', error);
     }
-};
+}
 
 /**
  * Actualiza solo las notificaciones de premium sin alterar el estado
@@ -187,16 +203,17 @@ function initializeCopywriting() {
     console.log('[COPYWRITING] Inicializando módulo de copywriting...');
     console.log('[COPYWRITING] isUserPremium inicial:', isUserPremium);
     
-    // Solo configurar elementos básicos aquí
+    // Configurar elementos básicos y event listeners
     setupEventListeners();
     
-    // Las redes sociales y tipos de copy se configurarán cuando se reciba el estado premium
-    // desde main.js a través de setCopywritingPremiumStatus()
+    // Inicializar elementos inmediatamente con estado gratuito por defecto
+    // Se actualizarán cuando se reciba el estado premium real desde main.js
+    initializeCopywritingElements();
     
     // Inicializar vista previa de plantillas
     updateTemplatePreview();
     
-    console.log('[COPYWRITING] Módulo inicializado - esperando estado premium desde main.js');
+    console.log('[COPYWRITING] Módulo inicializado completamente');
 }
 
 /**
@@ -206,10 +223,13 @@ function setupSocialNetworks() {
     console.log('[COPYWRITING] setupSocialNetworks iniciado, isUserPremium:', isUserPremium);
     const container = document.getElementById('socialNetworksContainer');
     if (!container) {
-        console.log('[COPYWRITING] ERROR: No se encontró socialNetworksContainer');
+        console.warn('[COPYWRITING] ERROR: No se encontró socialNetworksContainer - reintentando en 500ms');
+        // Reintentar después de un momento
+        setTimeout(setupSocialNetworks, 500);
         return;
     }
 
+    // Limpiar solo si hay elementos básicos para actualizar con el estado premium real
     container.innerHTML = '';
 
     Object.entries(SOCIAL_NETWORKS).forEach(([key, network]) => {
@@ -221,6 +241,7 @@ function setupSocialNetworks() {
         // Facebook siempre seleccionado por defecto
         if (key === 'facebook') {
             item.classList.add('selected');
+            selectedSocialNetworks.add('facebook'); // Asegurar que Facebook esté seleccionado
         }
 
         item.innerHTML = `
@@ -230,6 +251,9 @@ function setupSocialNetworks() {
 
         if (!network.premium || isUserPremium) {
             item.addEventListener('click', () => toggleSocialNetwork(key, item));
+        } else {
+            // Agregar mensaje para usuarios gratuitos
+            item.title = 'Disponible solo para usuarios Premium';
         }
 
         container.appendChild(item);
@@ -250,9 +274,16 @@ function setupSocialNetworks() {
  * Configura el select de tipos de copy
  */
 function setupCopyTypes() {
+    console.log('[COPYWRITING] setupCopyTypes iniciado');
     const select = document.getElementById('copyType');
-    if (!select) return;
+    if (!select) {
+        console.warn('[COPYWRITING] ERROR: No se encontró copyType select - reintentando en 500ms');
+        // Reintentar después de un momento
+        setTimeout(setupCopyTypes, 500);
+        return;
+    }
 
+    // Limpiar solo si hay elementos básicos para actualizar con el estado premium real
     select.innerHTML = '<option value="">Selecciona el tipo de copy...</option>';
 
     Object.entries(COPY_TYPES).forEach(([key, copyType]) => {
@@ -267,6 +298,8 @@ function setupCopyTypes() {
 
         select.appendChild(option);
     });
+    
+    console.log('[COPYWRITING] setupCopyTypes completado');
 }
 
 /**
@@ -1207,47 +1240,22 @@ function parseAICopyContent(content, platform) {
     result.cta = result.cta.replace(/^\[|\]$/g, '').trim();
     result.formatoVisual = result.formatoVisual.replace(/^\[|\]$/g, '').trim();
     
-    // Si no se detectó estructura específica, intentar extraer el contenido de manera más flexible
-    if (!result.gancho && !result.textoPost) {
-        const contentLines = lines.filter(line => 
-            !line.match(/^(---|VARIACIÓN|Variación|\*\*)/i) && 
-            line.length > 5
-        );
-        
-        if (contentLines.length > 0) {
-            result.gancho = contentLines[0] || '';
-            result.textoPost = contentLines.slice(1, -1).join(' ') || '';
-            result.cta = contentLines[contentLines.length - 1] || '';
-        }
-    }
-    
-    return result;
-}
-        else if (!cleanLine.match(/^(Variación|===|---)/i)) {
-            if (!result.postText) {
-                result.postText = cleanLine;
-            } else {
-                result.postText += '\n' + cleanLine;
+        // Si no se detectó estructura específica, intentar extraer el contenido de manera más flexible
+        if (!result.gancho && !result.textoPost) {
+            const contentLines = lines.filter(line => 
+                !line.match(/^(---|VARIACIÓN|Variación|\*\*)/i) && 
+                line.length > 5
+            );
+            
+            if (contentLines.length > 0) {
+                result.gancho = contentLines[0] || '';
+                result.textoPost = contentLines.slice(1, -1).join(' ') || '';
+                result.cta = contentLines[contentLines.length - 1] || '';
             }
         }
-    });
-    
-    // Si no se detectó estructura, usar todo como texto principal
-    if (!result.hook && !result.postText && !result.cta) {
-        result.postText = content.trim();
         
-        // Intentar extraer un gancho del primer párrafo
-        const firstSentence = content.split(/[.!?]/)[0];
-        if (firstSentence && firstSentence.length < 100) {
-            result.hook = firstSentence.trim();
-            result.postText = content.replace(firstSentence, '').trim();
-        }
-    }
-    
-    return result;
-}
-
-/**
+        return result;
+    }/**
  * Divide el texto en variaciones
  */
 function parseVariations(text) {
@@ -1472,58 +1480,76 @@ ${networkSpec.template.structure.map(section =>
  * Muestra información detallada de la plantilla para una red social específica
  */
 function showNetworkTemplate(networkKey) {
-    const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
-    if (!networkSpec || !networkSpec.template) return '';
+    console.log('[COPYWRITING] Mostrando template para:', networkKey);
     
-    return `
-        <div class="network-template-info">
-            <div class="template-header">
-                <h4>📋 Plantilla para ${networkSpec.name}</h4>
-                <p class="template-description">Estructura psicológicamente optimizada</p>
-            </div>
-            
-            <div class="template-structure">
-                <h5>🏗️ Estructura Requerida:</h5>
-                ${networkSpec.template.structure.map(section => `
-                    <div class="structure-section">
-                        <div class="section-label">${section.label}</div>
-                        <div class="section-description">${section.description}</div>
-                        <div class="section-examples">
-                            <strong>Ejemplos:</strong>
-                            ${section.examples.map(example => `<span class="example-tag">${example}</span>`).join('')}
+    const networkSpec = SOCIAL_NETWORK_SPECS[networkKey];
+    if (!networkSpec || !networkSpec.template) {
+        console.warn('[COPYWRITING] No se encontró spec para red:', networkKey);
+        return `<div class="network-template-error">Template no disponible para ${networkKey}</div>`;
+    }
+    
+    try {
+        return `
+            <div class="network-template-info">
+                <div class="template-header">
+                    <h4>📋 Plantilla para ${networkSpec.name}</h4>
+                    <p class="template-description">Estructura psicológicamente optimizada</p>
+                </div>
+                
+                <div class="template-structure">
+                    <h5>🏗️ Estructura Requerida:</h5>
+                    ${networkSpec.template.structure.map(section => `
+                        <div class="structure-section">
+                            <div class="section-label">${section.label}</div>
+                            <div class="section-description">${section.description}</div>
+                            <div class="section-examples">
+                                <strong>Ejemplos:</strong>
+                                ${section.examples.map(example => `<span class="example-tag">${example}</span>`).join('')}
+                            </div>
                         </div>
-                    </div>
-                `).join('')}
-            </div>
-            
-            <div class="template-psychology">
-                <h5>🧠 Triggers Psicológicos:</h5>
-                <p>${networkSpec.characteristics.psychologyTriggers}</p>
+                    `).join('')}
+                </div>
                 
-                <h5>💡 Profundidad de Contenido:</h5>
-                <p>${networkSpec.characteristics.contentDepth}</p>
+                <div class="template-psychology">
+                    <h5>🧠 Triggers Psicológicos:</h5>
+                    <p>${networkSpec.characteristics.psychologyTriggers}</p>
+                    
+                    <h5>💡 Profundidad de Contenido:</h5>
+                    <p>${networkSpec.characteristics.contentDepth}</p>
+                    
+                    <h5>🤔 Prompts de Reflexión:</h5>
+                    <p>${networkSpec.characteristics.reflectionPrompts}</p>
+                </div>
                 
-                <h5>🤔 Prompts de Reflexión:</h5>
-                <p>${networkSpec.characteristics.reflectionPrompts}</p>
+                <div class="template-base">
+                    <h5>📝 Plantilla Base:</h5>
+                    <pre class="base-template">${networkSpec.template.baseTemplate}</pre>
+                </div>
             </div>
-            
-            <div class="template-base">
-                <h5>📝 Plantilla Base:</h5>
-                <pre class="base-template">${networkSpec.template.baseTemplate}</pre>
-            </div>
-        </div>
-    `;
+        `;
+    } catch (error) {
+        console.error('[COPYWRITING] Error generando template:', error);
+        return `<div class="network-template-error">Error generando template para ${networkKey}</div>`;
+    }
 }
 
 /**
  * Actualiza la interfaz para mostrar plantillas cuando se selecciona una red social
  */
 function updateTemplatePreview() {
-    const selectedNetworks = Array.from(document.querySelectorAll('.social-network-btn.selected'))
-        .map(btn => btn.dataset.network);
+    console.log('[COPYWRITING] updateTemplatePreview iniciado');
     
     const templateContainer = document.getElementById('templatePreview');
-    if (!templateContainer) return;
+    if (!templateContainer) {
+        console.log('[COPYWRITING] templatePreview no encontrado, saltando actualización');
+        return;
+    }
+    
+    const selectedNetworks = Array.from(document.querySelectorAll('.social-network-item.selected'))
+        .map(btn => btn.dataset.network)
+        .filter(network => network); // Filtrar valores undefined
+    
+    console.log('[COPYWRITING] Redes seleccionadas para template:', selectedNetworks);
     
     if (selectedNetworks.length === 0) {
         templateContainer.innerHTML = `
@@ -1534,13 +1560,18 @@ function updateTemplatePreview() {
         return;
     }
     
-    templateContainer.innerHTML = `
-        <div class="templates-preview">
-            <h3>📋 Plantillas Optimizadas Seleccionadas</h3>
-            <p class="templates-intro">Estas son las estructuras psicológicamente optimizadas que se usarán:</p>
-            ${selectedNetworks.map(network => showNetworkTemplate(network)).join('')}
-        </div>
-    `;
+    try {
+        templateContainer.innerHTML = `
+            <div class="templates-preview">
+                <h3>📋 Plantillas Optimizadas Seleccionadas</h3>
+                <p class="templates-intro">Estas son las estructuras psicológicamente optimizadas que se usarán:</p>
+                ${selectedNetworks.map(network => showNetworkTemplate(network)).join('')}
+            </div>
+        `;
+        console.log('[COPYWRITING] Template preview actualizado correctamente');
+    } catch (error) {
+        console.error('[COPYWRITING] Error actualizando template preview:', error);
+    }
 }
 
 /**
