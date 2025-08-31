@@ -1534,10 +1534,44 @@ function showNetworkTemplate(networkKey) {
 }
 
 /**
+ * Maneja el toggle de mostrar/ocultar detalles técnicos de las plantillas
+ */
+function toggleTemplateDetails() {
+    const detailsContainer = document.getElementById('templateDetails');
+    const toggleIcon = document.getElementById('toggleIcon');
+    const toggleText = document.getElementById('toggleText');
+    
+    if (!detailsContainer || !toggleIcon || !toggleText) {
+        console.warn('[COPYWRITING] Elementos del toggle no encontrados');
+        return;
+    }
+    
+    const isHidden = detailsContainer.style.display === 'none';
+    
+    if (isHidden) {
+        // Mostrar detalles
+        detailsContainer.style.display = 'block';
+        toggleIcon.className = 'fas fa-chevron-up';
+        toggleText.textContent = 'Ocultar detalles';
+        console.log('[COPYWRITING] Detalles técnicos mostrados');
+    } else {
+        // Ocultar detalles
+        detailsContainer.style.display = 'none';
+        toggleIcon.className = 'fas fa-chevron-down';
+        toggleText.textContent = 'Ver detalles técnicos';
+        console.log('[COPYWRITING] Detalles técnicos ocultados');
+    }
+}
+
+// Exponer la función globalmente para el onclick
+window.toggleTemplateDetails = toggleTemplateDetails;
+
+/**
  * Actualiza la interfaz para mostrar plantillas cuando se selecciona una red social
+ * CON OPCIÓN COLAPSABLE - Botón para mostrar/ocultar detalles técnicos
  */
 function updateTemplatePreview() {
-    console.log('[COPYWRITING] updateTemplatePreview iniciado');
+    console.log('[COPYWRITING] updateTemplatePreview iniciado con opción colapsable');
     
     const templateContainer = document.getElementById('templatePreview');
     if (!templateContainer) {
@@ -1554,23 +1588,54 @@ function updateTemplatePreview() {
     if (selectedNetworks.length === 0) {
         templateContainer.innerHTML = `
             <div class="no-template-preview">
-                <p>📋 Selecciona una red social para ver su plantilla optimizada</p>
+                <p>📋 Selecciona una red social para ver información sobre la optimización</p>
             </div>
         `;
         return;
     }
     
     try {
+        const networkNames = selectedNetworks.map(network => {
+            const networkSpec = SOCIAL_NETWORK_SPECS[network];
+            return networkSpec ? networkSpec.name : network;
+        }).join(', ');
+        
         templateContainer.innerHTML = `
             <div class="templates-preview">
-                <h3>📋 Plantillas Optimizadas Seleccionadas</h3>
-                <p class="templates-intro">Estas son las estructuras psicológicamente optimizadas que se usarán:</p>
-                ${selectedNetworks.map(network => showNetworkTemplate(network)).join('')}
+                <div class="template-summary">
+                    <h4 style="font-size: 1rem; color: var(--text-primary); margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        ✨ Optimización Activa para: <strong>${networkNames}</strong>
+                    </h4>
+                    <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                        El contenido se generará usando estrategias psicológicamente optimizadas para cada plataforma.
+                    </p>
+                    
+                    <button id="toggleTemplateDetails" class="template-toggle-btn" onclick="toggleTemplateDetails()">
+                        <i class="fas fa-chevron-down" id="toggleIcon"></i>
+                        <span id="toggleText">Ver detalles técnicos</span>
+                    </button>
+                </div>
+                
+                <div id="templateDetails" class="template-details" style="display: none;">
+                    <div class="template-details-content">
+                        <h5 style="color: var(--text-primary); margin: 1rem 0 0.5rem 0; font-size: 0.875rem;">
+                            🔬 Estructuras Psicológicas Aplicadas:
+                        </h5>
+                        ${selectedNetworks.map(network => showNetworkTemplate(network)).join('')}
+                    </div>
+                </div>
             </div>
         `;
-        console.log('[COPYWRITING] Template preview actualizado correctamente');
+        
+        console.log('[COPYWRITING] Template preview con opción colapsable actualizado correctamente');
     } catch (error) {
         console.error('[COPYWRITING] Error actualizando template preview:', error);
+        // Fallback simple en caso de error
+        templateContainer.innerHTML = `
+            <div class="no-template-preview">
+                <p>📋 Contenido optimizado para: ${networkNames}</p>
+            </div>
+        `;
     }
 }
 

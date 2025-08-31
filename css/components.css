@@ -242,7 +242,6 @@
 
 /* ===========================================
    COPYRWRITING RESULTS STYLES (EXISTING)
-   =========================================== */ILLAS OPTIMIZADAS
    =========================================== */
 
 .template-preview-section {
@@ -1109,4 +1108,60 @@
 
 .idea-actions .dropdown {
     display: inline-block;
+}
+
+/* =========================================
+   TEMPLATE TOGGLE FUNCTIONALITY
+   ========================================= */
+
+/* Estilos para el botón de toggle de detalles técnicos */
+.template-toggle-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition-smooth);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    margin: 0.5rem 0;
+}
+
+.template-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.template-toggle-btn:active {
+    transform: translateY(0);
+}
+
+.template-details {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.template-details-content {
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    border: 1px solid var(--border-light);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
