@@ -115,40 +115,29 @@ function buildPromptForPlatform(platform, keyword, userContext) {
     
     const spec = platformSpecs[platform] || platformSpecs['Facebook'];
     
-    return `Actúa como un experto copywriter especializado en ${platform}.
+    return `Actúa como un copywriter experto en ${platform}.
 
-TEMA: "${keyword}"
+KEYWORD: "${keyword}"
 ESTRATEGIA: ${copyStrategy}
-PLATAFORMA: ${platform}
 
-ESPECIFICACIONES TÉCNICAS:
-- Tono: ${spec.tone}
-- Longitud: ${spec.length}
-- Estilo: ${spec.style}
-- Call-to-Action: ${spec.cta}
-
-FORMATO ESPECÍFICO REQUERIDO PARA ${platform}:
+FORMATO ${platform}:
 ${getFormatSpecsForPlatform(platform)}
 
-INSTRUCCIONES CRÍTICAS:
-1. Crea contenido ÚNICO y ORIGINAL sobre "${keyword}" (NO uses frases genéricas como "6 meses después" o "500+ casos")
-2. Aplica la estrategia de ${copyStrategy.split(' - ')[0]} de manera auténtica
-3. Sigue EXACTAMENTE el formato específico de ${platform}
-4. Incluye emojis relevantes pero no excesivos
-5. Genera un gancho impactante en las primeras palabras
-6. INCLUYE hashtags relevantes para ${platform}
-7. Asegúrate que sea copy-paste ready para publicar
-8. VARÍA los números, timeframes y ejemplos - sé creativo y específico
+INSTRUCCIONES:
+1. Contenido único sobre "${keyword}"
+2. Tono: ${spec.tone}
+3. Longitud: ${spec.length}
+4. Incluye hashtags relevantes
+5. CTA específico para ${platform}
 
-RESPUESTA EN FORMATO JSON:
+RESPUESTA JSON:
 {
-  "contenido": "El copy principal optimizado para ${platform}",
+  "contenido": "Copy optimizado para ${platform}",
   "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"],
-  "cta": "Call to action específico",
-  "formato": "${platform}"
+  "cta": "Call to action específico"
 }
 
-El contenido debe ser completamente original y seguir el formato característico de ${platform}.`;
+Responde SOLO el JSON, sin explicaciones.`;
 }
 
 // FUNCIÓN PARA OBTENER ESPECIFICACIONES DE FORMATO POR PLATAFORMA
@@ -526,14 +515,14 @@ function getExamplesForNetwork(networkName, keyword, userContext) {
     }
 }
 
-// FUNCIÓN PARA LLAMAR A DEEPSEEK API CON TIMEOUT Y RETRY
+// FUNCIÓN PARA LLAMAR A DEEPSEEK API CON TIMEOUT Y RETRY OPTIMIZADO
 async function callDeepseekAPI(prompt) {
-    console.log(`[DEEPSEEK] 🚀 Iniciando llamada...`);
+    console.log(`[DEEPSEEK] 🚀 Iniciando llamada optimizada...`);
     
     const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-            reject(new Error('TIMEOUT: Deepseek API tardó más de 25 segundos'));
-        }, 25000);
+            reject(new Error('TIMEOUT: Deepseek API tardó más de 12 segundos'));
+        }, 12000); // Reducido a 12 segundos
     });
     
     const apiCall = async () => {
@@ -546,13 +535,13 @@ async function callDeepseekAPI(prompt) {
                         content: prompt
                     }
                 ],
-                max_tokens: 3000,
+                max_tokens: 1500, // Reducido para respuestas más rápidas
                 temperature: 0.7,
                 top_p: 0.9,
                 stream: false
             };
             
-            console.log(`[DEEPSEEK] 📡 Enviando request...`);
+            console.log(`[DEEPSEEK] 📡 Enviando request optimizado...`);
             
             const response = await axios.post(`${DEEPSEEK_ENDPOINTS[0]}/chat/completions`, requestData, {
                 headers: {
@@ -560,8 +549,8 @@ async function callDeepseekAPI(prompt) {
                     'Content-Type': 'application/json',
                     'User-Agent': 'Firebase-Functions/1.0'
                 },
-                timeout: 20000,
-                validateStatus: (status) => status < 500 // Acepta 4xx pero rechaza 5xx
+                timeout: 10000, // Reducido a 10 segundos
+                validateStatus: (status) => status < 500
             });
             
             console.log(`[DEEPSEEK] ✅ Respuesta recibida:`, response.status);
@@ -571,15 +560,15 @@ async function callDeepseekAPI(prompt) {
             }
             
             if (response.status >= 400) {
-                throw new Error(`API_ERROR: Status ${response.status} - ${JSON.stringify(response.data)}`);
+                throw new Error(`API_ERROR: Status ${response.status}`);
             }
             
             if (response.data && response.data.choices && response.data.choices[0]) {
                 const content = response.data.choices[0].message.content.trim();
-                console.log(`[DEEPSEEK] ✅ Contenido generado: ${content.substring(0, 100)}...`);
+                console.log(`[DEEPSEEK] ✅ Contenido generado: ${content.substring(0, 50)}...`);
                 
-                if (content.length < 30) {
-                    throw new Error('CONTENT_TOO_SHORT: Respuesta de Deepseek muy corta');
+                if (content.length < 20) {
+                    throw new Error('CONTENT_TOO_SHORT: Respuesta muy corta');
                 }
                 
                 // Intentar parsear como JSON, si falla devolver como texto plano
@@ -592,17 +581,10 @@ async function callDeepseekAPI(prompt) {
                     return { contenido: content, hashtags: [], cta: '', formato: 'text' };
                 }
             } else {
-                throw new Error('EMPTY_RESPONSE: Respuesta de Deepseek vacía o malformada');
+                throw new Error('EMPTY_RESPONSE: Respuesta vacía');
             }
         } catch (axiosError) {
             console.error(`[DEEPSEEK] ❌ Error en API:`, axiosError.message);
-            if (axiosError.response) {
-                console.error(`[DEEPSEEK] ❌ Status:`, axiosError.response.status);
-                console.error(`[DEEPSEEK] ❌ Headers:`, axiosError.response.headers);
-                if (axiosError.response.data) {
-                    console.error(`[DEEPSEEK] ❌ Data:`, JSON.stringify(axiosError.response.data).substring(0, 200));
-                }
-            }
             throw axiosError;
         }
     };
@@ -670,56 +652,40 @@ exports.generateIdeas = functions
                 console.log(`[API-${requestId}] Generando contenido para ${platform} con tipo: ${userContext}`);
                 
                 if (useDeepseek) {
-                    let attempt = 0;
-                    let deepseekSuccess = false;
-                    
-                    while (attempt < 2 && !deepseekSuccess) {
-                        attempt++;
-                        try {
-                            // Construir prompt específico para Deepseek
-                            const prompt = buildPromptForPlatform(platform, keyword, userContext);
-                            console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform} (intento ${attempt}/2)...`);
-                            
-                            // Llamar a Deepseek API con delay entre llamadas
-                            if (attempt > 1) {
-                                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 segundo de delay
-                            }
-                            
-                            const deepseekResponse = await callDeepseekAPI(prompt);
-                            
-                            if (deepseekResponse && (deepseekResponse.contenido || deepseekResponse.length > 50)) {
-                                // Manejar respuesta estructurada de Deepseek
-                                if (deepseekResponse.contenido) {
-                                    // Respuesta JSON estructurada
-                                    ideas[platform] = {
-                                        rawContent: deepseekResponse.contenido,
-                                        hashtags: deepseekResponse.hashtags || [],
-                                        cta: deepseekResponse.cta || '',
-                                        formato: platform
-                                    };
-                                    console.log(`[API-${requestId}] ✅ Deepseek JSON exitoso para ${platform} con ${deepseekResponse.hashtags?.length || 0} hashtags`);
-                                } else {
-                                    // Respuesta de texto plano (fallback)
-                                    ideas[platform] = {
-                                        rawContent: deepseekResponse.trim(),
-                                        hashtags: [],
-                                        cta: '',
-                                        formato: platform
-                                    };
-                                    console.log(`[API-${requestId}] ✅ Deepseek texto exitoso para ${platform}`);
-                                }
-                                deepseekSuccess = true;
+                    try {
+                        // Una sola llamada optimizada por plataforma
+                        const prompt = buildPromptForPlatform(platform, keyword, userContext);
+                        console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform}...`);
+                        
+                        const deepseekResponse = await callDeepseekAPI(prompt);
+                        
+                        if (deepseekResponse && (deepseekResponse.contenido || deepseekResponse.length > 30)) {
+                            // Manejar respuesta estructurada de Deepseek
+                            if (deepseekResponse.contenido) {
+                                // Respuesta JSON estructurada
+                                ideas[platform] = {
+                                    rawContent: deepseekResponse.contenido,
+                                    hashtags: deepseekResponse.hashtags || [],
+                                    cta: deepseekResponse.cta || '',
+                                    formato: platform
+                                };
+                                console.log(`[API-${requestId}] ✅ Deepseek JSON exitoso para ${platform} con ${deepseekResponse.hashtags?.length || 0} hashtags`);
                             } else {
-                                console.log(`[API-${requestId}] ⚠️ Respuesta de Deepseek insuficiente para ${platform} (intento ${attempt})`);
+                                // Respuesta de texto plano (fallback)
+                                ideas[platform] = {
+                                    rawContent: deepseekResponse.trim(),
+                                    hashtags: generateHashtagsForPlatform(platform, keyword),
+                                    cta: '',
+                                    formato: platform
+                                };
+                                console.log(`[API-${requestId}] ✅ Deepseek texto exitoso para ${platform}`);
                             }
-                        } catch (deepseekError) {
-                            console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform} (intento ${attempt}): ${deepseekError.message}`);
+                        } else {
+                            throw new Error('RESPUESTA_INSUFICIENTE');
                         }
-                    }
-                    
-                    // Si Deepseek falló después de 2 intentos, usar fallback
-                    if (!deepseekSuccess) {
-                        console.log(`[API-${requestId}] 🔄 Usando fallback mejorado para ${platform} después de fallos en Deepseek`);
+                    } catch (deepseekError) {
+                        console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform}: ${deepseekError.message}`);
+                        console.log(`[API-${requestId}] 🔄 Usando fallback mejorado para ${platform}`);
                         const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
                         const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
                         ideas[platform] = { 
@@ -741,9 +707,9 @@ exports.generateIdeas = functions
                     };
                 }
                 
-                // Pequeño delay entre plataformas para evitar rate limiting
+                // Delay más pequeño entre plataformas
                 if (platforms.indexOf(platform) < platforms.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    await new Promise(resolve => setTimeout(resolve, 200)); // Reducido a 200ms
                 }
             }
 
