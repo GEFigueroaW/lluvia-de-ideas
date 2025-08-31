@@ -1677,9 +1677,10 @@ function displayCopywritingResults(copies, params) {
                     ${copy.variation ? `<span class="variation-badge">Variación ${copy.variation}</span>` : ''}
                 </div>
                 <div class="copywriting-content">
-                    ${copy.gancho ? `<div class="copy-section gancho-section">
-                        <div class="section-label">🎯 Gancho Verbal Impactante</div>
-                        <div class="section-content gancho-text">${copy.gancho}</div>
+                    ${copy.rawContent ? `<div class="copy-section content-section">
+                        <div class="section-content unified-content">${copy.rawContent.replace(/\n/g, '<br>')}</div>
+                    </div>` : copy.gancho ? `<div class="copy-section gancho-section">
+                        <div class="section-content unified-content">${copy.gancho}</div>
                     </div>` : ''}
                     
                     ${copy.textoPost ? `<div class="copy-section texto-section">
@@ -1702,11 +1703,8 @@ function displayCopywritingResults(copies, params) {
                     ${copy.formatoVisual ? `<div class="copy-section visual-section">
                         <div class="section-label">🎨 Formato Visual Sugerido</div>
                         <div class="section-content visual-description">${copy.formatoVisual}</div>
-                    </div>` : ''}
-                    
-                    ${!copy.gancho && !copy.textoPost && copy.rawContent ? `<div class="copy-section content-section">
-                        <div class="section-label">📝 Contenido Completo</div>
-                        <div class="section-content">${copy.rawContent.replace(/\n/g, '<br>')}</div>
+                    </div>` : copy.gancho ? `<div class="copy-section content-section">
+                        <div class="section-content">Sin contenido generado</div>
                     </div>` : ''}
                 </div>
                 <div class="copywriting-actions">
