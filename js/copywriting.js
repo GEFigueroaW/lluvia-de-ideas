@@ -129,11 +129,6 @@ const COPY_TYPES = {
         name: 'Venta directa o persuasivo',
         description: 'Convencimiento directo para cerrar ventas.',
         premium: true
-    },
-    'thread': {
-        name: '🧵 Thread/Hilo de X (Twitter)',
-        description: 'Secuencia de tweets conectados que desarrollan un tema completo.',
-        premium: true
     }
 };
 
@@ -519,8 +514,7 @@ async function generateCopywriting(params) {
         const cloudFunctionParams = {
             keyword: params.keyword.trim(),
             platforms: params.socialNetworks.map(net => SOCIAL_NETWORKS[net] ? SOCIAL_NETWORKS[net].name : net), // Nombres de las redes
-            userContext: `Tipo de copy: ${COPY_TYPES[params.copyType] ? COPY_TYPES[params.copyType].name : params.copyType}. ${params.context || ''}`.trim(),
-            copyType: params.copyType // Agregar copyType como parámetro separado
+            userContext: `Tipo de copy: ${COPY_TYPES[params.copyType] ? COPY_TYPES[params.copyType].name : params.copyType}. ${params.context || ''}`.trim()
         };
         
         // Validar parámetros antes de enviar

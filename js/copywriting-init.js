@@ -32,8 +32,7 @@ const BASIC_COPY_TYPES = {
     'storytelling': { name: 'Narrativo o storytelling', premium: true },
     'branding': { name: 'Posicionamiento o branding', premium: true },
     'testimonial': { name: 'Testimonio o prueba social', premium: true },
-    'sales': { name: 'Venta directa o persuasivo', premium: true },
-    'thread': { name: '🧵 Thread/Hilo de X (Twitter)', premium: true }
+    'sales': { name: 'Venta directa o persuasivo', premium: true }
 };
 
 /**
