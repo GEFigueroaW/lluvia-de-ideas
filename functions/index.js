@@ -127,19 +127,270 @@ ESPECIFICACIONES TÉCNICAS:
 - Estilo: ${spec.style}
 - Call-to-Action: ${spec.cta}
 
+FORMATO ESPECÍFICO REQUERIDO PARA ${platform}:
+${getFormatSpecsForPlatform(platform)}
+
 INSTRUCCIONES CRÍTICAS:
 1. Crea contenido ÚNICO y ORIGINAL sobre "${keyword}" (NO uses frases genéricas como "6 meses después" o "500+ casos")
 2. Aplica la estrategia de ${copyStrategy.split(' - ')[0]} de manera auténtica
-3. Adapta completamente al estilo de ${platform}
+3. Sigue EXACTAMENTE el formato específico de ${platform}
 4. Incluye emojis relevantes pero no excesivos
 5. Genera un gancho impactante en las primeras palabras
-6. Asegúrate que sea copy-paste ready para publicar
-7. VARÍA los números, timeframes y ejemplos - sé creativo y específico
+6. INCLUYE hashtags relevantes para ${platform}
+7. Asegúrate que sea copy-paste ready para publicar
+8. VARÍA los números, timeframes y ejemplos - sé creativo y específico
 
-FORMATO DE RESPUESTA:
-Devuelve ÚNICAMENTE el copy final listo para publicar, sin explicaciones adicionales, sin comillas, sin "Aquí tienes" o introducciones.
+RESPUESTA EN FORMATO JSON:
+{
+  "contenido": "El copy principal optimizado para ${platform}",
+  "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"],
+  "cta": "Call to action específico",
+  "formato": "${platform}"
+}
 
-El contenido debe ser completamente original y evitar cualquier patrón repetitivo.`;
+El contenido debe ser completamente original y seguir el formato característico de ${platform}.`;
+}
+
+// FUNCIÓN PARA OBTENER ESPECIFICACIONES DE FORMATO POR PLATAFORMA
+function getFormatSpecsForPlatform(platform) {
+    const formatSpecs = {
+        'Facebook': `
+- ESTRUCTURA: Gancho (1-2 líneas) + Historia personal + Valor/Aprendizaje + Pregunta de engagement
+- PÁRRAFOS: Máximo 3-4 líneas por párrafo para facilitar lectura
+- EMOJIS: 1-2 por párrafo, estratégicamente ubicados
+- HASHTAGS: 3-5 hashtags relevantes al final
+- CTA: Pregunta directa que invite a comentar
+EJEMPLO ESTRUCTURA:
+"[Gancho impactante] 🎯
+
+[Historia o contexto personal]
+[Párrafo con valor/insight]
+
+[Pregunta de engagement] ⬇️
+#hashtag1 #hashtag2 #hashtag3"`,
+
+        'LinkedIn': `
+- ESTRUCTURA: Hook profesional + Contexto + Insights + Llamada a acción profesional
+- PÁRRAFOS: Párrafos cortos con bullets o números cuando sea relevante
+- EMOJIS: Moderados, principalmente iconos profesionales
+- HASHTAGS: 5-8 hashtags profesionales específicos del sector
+- CTA: Invitación a networking, comentarios profesionales o conexión
+EJEMPLO ESTRUCTURA:
+"🎯 [Insight profesional]
+
+✅ Punto clave 1
+✅ Punto clave 2  
+✅ Punto clave 3
+
+[Reflexión profesional]
+
+¿Qué opinan ustedes? 👇
+
+#hashtag1 #hashtag2 #hashtag3 #hashtag4"`,
+
+        'X / Twitter': `
+- ESTRUCTURA: Thread format (si es necesario) o tweet único impactante
+- LÍMITE: 280 caracteres máximo
+- EMOJIS: 2-3 máximo, muy específicos
+- HASHTAGS: 2-3 hashtags trending o específicos
+- CTA: Retweet, reply o engagement directo
+EJEMPLO ESTRUCTURA:
+"🔥 [Statement impactante]
+
+[Explicación breve]
+
+[CTA directa] 👇
+
+#hashtag1 #hashtag2"`,
+
+        'Instagram': `
+- ESTRUCTURA: Gancho visual + Historia aspiracional + Transformación + CTA para stories
+- PÁRRAFOS: Líneas cortas, muy visual, espaciado amplio
+- EMOJIS: Abundantes pero estéticos, alineados con el mood
+- HASHTAGS: 10-15 hashtags específicos del nicho
+- CTA: Guiar a stories, DM o guardar post
+EJEMPLO ESTRUCTURA:
+"✨ [Gancho aspiracional]
+
+💫 [Historia de transformación]
+
+🌟 [Momento de revelación]
+
+💕 [CTA emocional]
+
+#hashtag1 #hashtag2 #hashtag3 ... (hasta 15)"`,
+
+        'WhatsApp': `
+- ESTRUCTURA: Mensaje personal directo + Urgencia + CTA inmediata
+- FORMATO: Sin párrafos largos, como mensaje de texto real
+- EMOJIS: Casual, como conversación real
+- HASHTAGS: NO usar hashtags (no es apropiado para WhatsApp)
+- CTA: Respuesta inmediata, acción directa
+EJEMPLO ESTRUCTURA:
+"🚨 [Mensaje urgente personalizado]
+
+[Contexto breve]
+
+[Beneficio directo]
+
+¿Estás interesad@? 
+Responde YA 👆"`,
+
+        'TikTok': `
+- ESTRUCTURA: Hook viral + Storyline rápida + Revelation + CTA trend
+- FORMATO: Texto para caption, no para audio
+- EMOJIS: Trending, generacionales
+- HASHTAGS: 3-5 hashtags trending + específicos
+- CTA: Duetos, comentarios, shares
+EJEMPLO ESTRUCTURA:
+"POV: [Situación relatable] 👀
+
+✨ [Plot twist o revelación]
+
+Tell me you relate 💅
+
+#hashtag1 #trending #relatable"`,
+
+        'Telegram': `
+- ESTRUCTURA: Análisis profesional + Data + Insights + CTA exclusivo
+- FORMATO: Texto denso, informativo, premium content
+- EMOJIS: Íconos informativos y técnicos
+- HASHTAGS: 2-3 hashtags técnicos o de nicho
+- CTA: Forwarding, discusión analítica
+EJEMPLO ESTRUCTURA:
+"📊 [Análisis técnico]
+
+📈 Data points importantes:
+• Punto 1
+• Punto 2
+
+💡 [Insight clave]
+
+#hashtag1 #hashtag2"`,
+
+        'Reddit': `
+- ESTRUCTURA: Título honesto + Contexto detallado + Story + Lessons learned
+- FORMATO: Como post genuino de Reddit, auténtico
+- EMOJIS: Mínimos, solo cuando es natural
+- HASHTAGS: NO usar hashtags (no es estilo Reddit)
+- CTA: Upvotes, comentarios, compartir experiencias
+EJEMPLO ESTRUCTURA:
+"[Honest title] - My experience with [tema]
+
+Context: [Background story]
+
+What happened: [Detailed experience]
+
+What I learned: [Key insights]
+
+Has anyone else experienced this?"`,
+
+        'YouTube': `
+- ESTRUCTURA: Hook para thumbnail + Promesa de valor + Preview + CTA suscripción
+- FORMATO: Descripción de video optimizada para algoritmo
+- EMOJIS: Para separar secciones y llamar atención
+- HASHTAGS: 3-5 hashtags de YouTube específicos
+- CTA: Suscribirse, activar notificaciones, comentar
+EJEMPLO ESTRUCTURA:
+"🎯 [Hook que coincida con thumbnail]
+
+En este video aprenderás:
+✅ Punto 1
+✅ Punto 2
+✅ Punto 3
+
+[Preview del contenido más valioso]
+
+👇 SUSCRÍBETE y activa las notificaciones
+
+#hashtag1 #hashtag2 #hashtag3"`
+    };
+
+    return formatSpecs[platform] || formatSpecs['Facebook'];
+}
+
+// FUNCIÓN PARA GENERAR HASHTAGS ESPECÍFICOS POR PLATAFORMA
+function generateHashtagsForPlatform(platform, keyword) {
+    const baseKeyword = keyword.toLowerCase().replace(/\s+/g, '').substring(0, 12);
+    
+    const hashtagsByPlatform = {
+        'Facebook': [
+            `#${baseKeyword}`,
+            `#${baseKeyword}tips`,
+            `#crecimientopersonal`,
+            `#motivacion`,
+            `#exito`
+        ],
+        'LinkedIn': [
+            `#${baseKeyword}`,
+            `#liderazgo`,
+            `#desarrolloprofesional`,
+            `#networking`,
+            `#crecimientoempresarial`,
+            `#productividad`,
+            `#estrategia`,
+            `#innovacion`
+        ],
+        'X / Twitter': [
+            `#${baseKeyword}`,
+            `#tips`,
+            `#Thread`
+        ],
+        'Instagram': [
+            `#${baseKeyword}`,
+            `#${baseKeyword}tips`,
+            `#motivation`,
+            `#lifestyle`,
+            `#selfcare`,
+            `#mindset`,
+            `#inspiration`,
+            `#wellness`,
+            `#growth`,
+            `#transformation`,
+            `#positivevibes`,
+            `#selfimprovement`,
+            `#success`,
+            `#entrepreneur`,
+            `#personaldevelopment`
+        ],
+        'WhatsApp': [], // WhatsApp no usa hashtags
+        'TikTok': [
+            `#${baseKeyword}`,
+            `#fyp`,
+            `#viral`,
+            `#trending`,
+            `#tips`
+        ],
+        'Telegram': [
+            `#${baseKeyword}`,
+            `#analisis`,
+            `#data`
+        ],
+        'Reddit': [], // Reddit no usa hashtags tradicionales
+        'YouTube': [
+            `#${baseKeyword}`,
+            `#tutorial`,
+            `#howto`
+        ]
+    };
+
+    const platformHashtags = hashtagsByPlatform[platform] || hashtagsByPlatform['Facebook'];
+    
+    // Para Instagram, devolver más hashtags
+    if (platform === 'Instagram') {
+        return platformHashtags.slice(0, 15);
+    }
+    
+    // Para otras plataformas, limitar según sus características
+    if (platform === 'LinkedIn') {
+        return platformHashtags.slice(0, 8);
+    }
+    
+    if (platform === 'X / Twitter') {
+        return platformHashtags.slice(0, 3);
+    }
+    
+    return platformHashtags.slice(0, 5);
 }
 
 // FUNCIÓN PARA GENERAR EJEMPLOS ESPECÍFICOS POR RED SOCIAL Y TIPO DE COPY (FALLBACK MEJORADO)
@@ -331,7 +582,15 @@ async function callDeepseekAPI(prompt) {
                     throw new Error('CONTENT_TOO_SHORT: Respuesta de Deepseek muy corta');
                 }
                 
-                return content;
+                // Intentar parsear como JSON, si falla devolver como texto plano
+                try {
+                    const jsonContent = JSON.parse(content);
+                    console.log(`[DEEPSEEK] ✅ JSON válido detectado`);
+                    return jsonContent;
+                } catch (jsonError) {
+                    console.log(`[DEEPSEEK] ⚠️ No es JSON válido, devolviendo como texto plano`);
+                    return { contenido: content, hashtags: [], cta: '', formato: 'text' };
+                }
             } else {
                 throw new Error('EMPTY_RESPONSE: Respuesta de Deepseek vacía o malformada');
             }
@@ -428,9 +687,27 @@ exports.generateIdeas = functions
                             
                             const deepseekResponse = await callDeepseekAPI(prompt);
                             
-                            if (deepseekResponse && deepseekResponse.trim().length > 50) {
-                                ideas[platform] = { rawContent: deepseekResponse.trim() };
-                                console.log(`[API-${requestId}] ✅ Deepseek exitoso para ${platform}: ${deepseekResponse.substring(0, 100)}...`);
+                            if (deepseekResponse && (deepseekResponse.contenido || deepseekResponse.length > 50)) {
+                                // Manejar respuesta estructurada de Deepseek
+                                if (deepseekResponse.contenido) {
+                                    // Respuesta JSON estructurada
+                                    ideas[platform] = {
+                                        rawContent: deepseekResponse.contenido,
+                                        hashtags: deepseekResponse.hashtags || [],
+                                        cta: deepseekResponse.cta || '',
+                                        formato: platform
+                                    };
+                                    console.log(`[API-${requestId}] ✅ Deepseek JSON exitoso para ${platform} con ${deepseekResponse.hashtags?.length || 0} hashtags`);
+                                } else {
+                                    // Respuesta de texto plano (fallback)
+                                    ideas[platform] = {
+                                        rawContent: deepseekResponse.trim(),
+                                        hashtags: [],
+                                        cta: '',
+                                        formato: platform
+                                    };
+                                    console.log(`[API-${requestId}] ✅ Deepseek texto exitoso para ${platform}`);
+                                }
                                 deepseekSuccess = true;
                             } else {
                                 console.log(`[API-${requestId}] ⚠️ Respuesta de Deepseek insuficiente para ${platform} (intento ${attempt})`);
@@ -443,11 +720,25 @@ exports.generateIdeas = functions
                     // Si Deepseek falló después de 2 intentos, usar fallback
                     if (!deepseekSuccess) {
                         console.log(`[API-${requestId}] 🔄 Usando fallback mejorado para ${platform} después de fallos en Deepseek`);
-                        ideas[platform] = { rawContent: getExamplesForNetwork(platform, keyword, userContext) };
+                        const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
+                        const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
+                        ideas[platform] = { 
+                            rawContent: fallbackContent,
+                            hashtags: fallbackHashtags,
+                            cta: '',
+                            formato: platform
+                        };
                     }
                 } else {
                     console.log(`[API-${requestId}] 🔄 Usando templates mejorados para ${platform} (Deepseek no disponible)`);
-                    ideas[platform] = { rawContent: getExamplesForNetwork(platform, keyword, userContext) };
+                    const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
+                    const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
+                    ideas[platform] = { 
+                        rawContent: fallbackContent,
+                        hashtags: fallbackHashtags,
+                        cta: '',
+                        formato: platform
+                    };
                 }
                 
                 // Pequeño delay entre plataformas para evitar rate limiting

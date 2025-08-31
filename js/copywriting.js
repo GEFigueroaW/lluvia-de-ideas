@@ -1668,22 +1668,38 @@ function displayCopywritingResults(copies, params) {
         const networkKey = generationMode === 'single' ? socialNetworks[0] : socialNetworks[index % socialNetworks.length];
         const network = SOCIAL_NETWORKS[networkKey];
         
-        // Determinar qué contenido mostrar - PRIORIZAR CONTENIDO UNIFICADO
-        let unifiedContent = '';
+        // Determinar qué contenido mostrar - MANEJO MEJORADO CON HASHTAGS
+        let contenidoPrincipal = '';
+        let hashtags = [];
+        let callToAction = '';
+        
         if (copy.rawContent) {
-            unifiedContent = copy.rawContent;
+            contenidoPrincipal = copy.rawContent;
+            hashtags = copy.hashtags || [];
+            callToAction = copy.cta || '';
         } else if (copy.gancho && copy.textoPost && copy.cta) {
-            // Combinar las partes en un solo texto fluido
-            unifiedContent = `${copy.gancho} ${copy.textoPost} ${copy.cta}`;
-            if (copy.hashtags && copy.hashtags.length > 0) {
-                unifiedContent += ` ${copy.hashtags.join(' ')}`;
-            }
+            // Combinar las partes en un solo texto fluido (formato legacy)
+            contenidoPrincipal = `${copy.gancho} ${copy.textoPost}`;
+            callToAction = copy.cta;
+            hashtags = copy.hashtags || [];
         } else if (copy.gancho) {
-            unifiedContent = copy.gancho;
+            contenidoPrincipal = copy.gancho;
         } else if (copy.textoPost) {
-            unifiedContent = copy.textoPost;
+            contenidoPrincipal = copy.textoPost;
         } else {
-            unifiedContent = 'Sin contenido generado';
+            contenidoPrincipal = 'Sin contenido generado';
+        }
+        
+        // Formatear hashtags para display
+        const hashtagsDisplay = hashtags.length > 0 ? hashtags.join(' ') : '';
+        
+        // Construir contenido completo para mostrar
+        let contenidoCompleto = contenidoPrincipal;
+        if (callToAction && callToAction.trim()) {
+            contenidoCompleto += `\n\n${callToAction}`;
+        }
+        if (hashtagsDisplay) {
+            contenidoCompleto += `\n\n${hashtagsDisplay}`;
         }
         
         html += `
@@ -1697,11 +1713,13 @@ function displayCopywritingResults(copies, params) {
                 </div>
                 <div class="copywriting-content">
                     <div class="copy-section content-section">
-                        <div class="section-content unified-content">${unifiedContent.replace(/\n/g, '<br>')}</div>
+                        <div class="section-content main-content">${contenidoPrincipal.replace(/\n/g, '<br>')}</div>
+                        ${callToAction ? `<div class="section-content cta-content"><strong>Call to Action:</strong><br>${callToAction}</div>` : ''}
+                        ${hashtagsDisplay ? `<div class="section-content hashtags-content"><strong>Hashtags:</strong><br><span class="hashtags">${hashtagsDisplay}</span></div>` : ''}
                     </div>
                 </div>
                 <div class="copywriting-actions">
-                    <button class="copy-btn primary" onclick="copySingleCopy(${JSON.stringify(copy).replace(/"/g, '&quot;')}, '${network.name}')">
+                    <button class="copy-btn primary" onclick="copySingleCopy(${JSON.stringify({...copy, contenidoCompleto: contenidoCompleto}).replace(/"/g, '&quot;')}, '${network.name}')">>
                         <i class="fas fa-copy"></i> Copiar
                     </button>
                     <button class="copy-btn secondary" onclick="editCopy(${index})">

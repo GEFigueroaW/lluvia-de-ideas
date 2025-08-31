@@ -1165,3 +1165,65 @@
         transform: translateY(0);
     }
 }
+
+/* ===========================================
+   ESTILOS PARA COPYWRITING MEJORADO
+   =========================================== */
+
+.copywriting-content .main-content {
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: var(--radius-md);
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--primary-color);
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.copywriting-content .cta-content {
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #10b981;
+    font-size: 0.95rem;
+}
+
+.copywriting-content .cta-content strong {
+    color: #059669;
+    font-weight: 600;
+}
+
+.copywriting-content .hashtags-content {
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    border-left: 4px solid #8b5cf6;
+    font-size: 0.9rem;
+}
+
+.copywriting-content .hashtags-content strong {
+    color: #7c3aed;
+    font-weight: 600;
+}
+
+.hashtags {
+    color: #6366f1;
+    font-weight: 500;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.hashtags::before {
+    content: "🏷️ ";
+    margin-right: 0.25rem;
+}
+
+/* Responsive para móvil */
+@media (max-width: 768px) {
+    .copywriting-content .main-content,
+    .copywriting-content .cta-content,
+    .copywriting-content .hashtags-content {
+        padding: 0.8rem;
+        font-size: 0.9rem;
+    }
+}
