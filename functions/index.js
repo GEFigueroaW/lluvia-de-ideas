@@ -2,16 +2,25 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const axios = require('axios');
 
+// Cargar variables de entorno de forma segura
+require('dotenv').config();
+
 admin.initializeApp();
 const db = admin.firestore();
 
-// Configuración de Deepseek API
-const DEEPSEEK_API_KEY = 'sk-97c8f4c543fa45acabaf02ebcac60f03';
+// Configuración de Deepseek API - Obtenida de Firebase Config y variables de entorno
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || functions.config().deepseek?.key;
 const DEEPSEEK_ENDPOINTS = [
     'https://api.deepseek.com/v1'
 ];
 
-console.log('[INIT] Deepseek API configurado');
+// Validar que tenemos la API key
+if (!DEEPSEEK_API_KEY || !DEEPSEEK_API_KEY.startsWith('sk-')) {
+    console.warn('⚠️ DEEPSEEK_API_KEY no configurada correctamente. Usando solo templates fallback.');
+    console.warn('📝 Para usar Deepseek: configura con firebase functions:config:set deepseek.key=TU_API_KEY');
+} else {
+    console.log('[INIT] ✅ Deepseek API key configurada correctamente:', DEEPSEEK_API_KEY.substring(0, 8) + '...');
+}
 
 // FUNCIÓN PARA CONSTRUIR PROMPTS DINÁMICOS PARA DEEPSEEK
 function buildPromptForPlatform(platform, keyword, userContext) {
@@ -358,13 +367,14 @@ exports.generateIdeas = functions
             for (const platform of platforms) {
                 console.log(`[API-${requestId}] Generando contenido para ${platform} con tipo: ${userContext}`);
                 
-                let useDeepseek = false; // Deshabilitar Deepseek temporalmente hasta validar API key
+                // Activar Deepseek si tenemos API key válida
+                const useDeepseek = DEEPSEEK_API_KEY && DEEPSEEK_API_KEY.startsWith('sk-');
                 
                 if (useDeepseek) {
                     try {
                         // Construir prompt específico para Deepseek
                         const prompt = buildPromptForPlatform(platform, keyword, userContext);
-                        console.log(`[API-${requestId}] Llamando a Deepseek API para ${platform}...`);
+                        console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform}...`);
                         
                         // Llamar a Deepseek API
                         const deepseekResponse = await callDeepseekAPI(prompt);
@@ -382,7 +392,7 @@ exports.generateIdeas = functions
                         ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
                     }
                 } else {
-                    console.log(`[API-${requestId}] 🔄 Usando templates mejorados para ${platform} (Deepseek deshabilitado)`);
+                    console.log(`[API-${requestId}] 🔄 Usando templates mejorados para ${platform} (Deepseek no disponible)`);
                     ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
                 }
             }
