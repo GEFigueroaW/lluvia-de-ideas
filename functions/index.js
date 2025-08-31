@@ -14,7 +14,7 @@ const DEEPSEEK_ENDPOINTS = [
 console.log('[INIT] Deepseek API configurado');
 
 // FUNCIÓN PARA GENERAR EJEMPLOS ESPECÍFICOS POR RED SOCIAL
-function getExamplesForNetwork(networkName, keyword, userContext) {
+function getExamplesForNetwork(networkName, keyword, userContext, copyType) {
     const contextText = userContext ? ` (contexto: ${userContext})` : '';
     
     switch(networkName) {
@@ -23,7 +23,11 @@ function getExamplesForNetwork(networkName, keyword, userContext) {
         case 'LinkedIn':
             return `Análisis profesional: Tras implementar ${keyword} en 200+ proyectos${contextText}, confirmé ROI del 340%. Como estratega senior, estos son los KPIs críticos...`;
         case 'X / Twitter':
-            return `🧵 THREAD: El secreto de ${keyword}${contextText} que cambió mi vida. Día 1: Escéptico, Día 30: Resultados, Día 90: Transformación ⬇️`;
+            if (copyType === 'thread' || copyType === '🧵 Thread/Hilo de X (Twitter)') {
+                return `🧵 THREAD: El secreto de ${keyword}${contextText} que cambió mi vida. Día 1: Escéptico, Día 30: Resultados, Día 90: Transformación ⬇️`;
+            } else {
+                return `🔥 BOMBA: ${keyword}${contextText} que cambió mi perspectiva completamente. La diferencia en 30 días fue brutal. El secreto está en... 🧵⬇️`;
+            }
         case 'WhatsApp':
             return `🚨 URGENTE sobre ${keyword}${contextText}. Últimos 3 cupos con 50% descuento. Solo hasta medianoche. ¿Te apuntas? Responde YA`;
         case 'Instagram':
@@ -201,7 +205,7 @@ exports.generateIdeas = functions
         console.log(`[API-${requestId}] ⏰ Start time: ${new Date().toISOString()}`);
 
         try {
-            const { keyword, platforms, userContext } = data;
+            const { keyword, platforms, userContext, copyType } = data;
             const uid = context.auth?.uid;
 
             if (!uid) {
@@ -319,14 +323,14 @@ exports.generateIdeas = functions
                     } else {
                         // Fallback específico por red si no se puede parsear
                         console.log(`[API-${requestId}] 🔄 Fallback para ${platform} - no se pudo parsear`);
-                        ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                        ideas[platform] = getExamplesForNetwork(platform, keyword, userContext, copyType);
                     }
                 });
             } else {
                 // Si no hay contenido de API, usar fallback para todas las plataformas
                 console.log(`[API-${requestId}] 🔄 Usando fallback completo para todas las plataformas`);
                 platforms.forEach(platform => {
-                    ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                    ideas[platform] = getExamplesForNetwork(platform, keyword, userContext, copyType);
                 });
             }
 
