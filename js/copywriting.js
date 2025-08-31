@@ -1642,6 +1642,7 @@ function updateTemplatePreview() {
 /**
  * Muestra los resultados del copywriting generado
  */
+// FUNCIÓN SIMPLIFICADA PARA MOSTRAR SOLO CONTENIDO UNIFICADO
 function displayCopywritingResults(copies, params) {
     const container = document.getElementById('ideasContainer');
     if (!container) return;
@@ -1667,6 +1668,24 @@ function displayCopywritingResults(copies, params) {
         const networkKey = generationMode === 'single' ? socialNetworks[0] : socialNetworks[index % socialNetworks.length];
         const network = SOCIAL_NETWORKS[networkKey];
         
+        // Determinar qué contenido mostrar - PRIORIZAR CONTENIDO UNIFICADO
+        let unifiedContent = '';
+        if (copy.rawContent) {
+            unifiedContent = copy.rawContent;
+        } else if (copy.gancho && copy.textoPost && copy.cta) {
+            // Combinar las partes en un solo texto fluido
+            unifiedContent = `${copy.gancho} ${copy.textoPost} ${copy.cta}`;
+            if (copy.hashtags && copy.hashtags.length > 0) {
+                unifiedContent += ` ${copy.hashtags.join(' ')}`;
+            }
+        } else if (copy.gancho) {
+            unifiedContent = copy.gancho;
+        } else if (copy.textoPost) {
+            unifiedContent = copy.textoPost;
+        } else {
+            unifiedContent = 'Sin contenido generado';
+        }
+        
         html += `
             <div class="copywriting-result-item animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
                 <div class="copywriting-header">
@@ -1677,35 +1696,9 @@ function displayCopywritingResults(copies, params) {
                     ${copy.variation ? `<span class="variation-badge">Variación ${copy.variation}</span>` : ''}
                 </div>
                 <div class="copywriting-content">
-                    ${copy.rawContent ? `<div class="copy-section content-section">
-                        <div class="section-content unified-content">${copy.rawContent.replace(/\n/g, '<br>')}</div>
-                    </div>` : copy.gancho ? `<div class="copy-section gancho-section">
-                        <div class="section-content unified-content">${copy.gancho}</div>
-                    </div>` : ''}
-                    
-                    ${copy.textoPost ? `<div class="copy-section texto-section">
-                        <div class="section-label">� Texto del Post</div>
-                        <div class="section-content texto-content">${copy.textoPost.replace(/\n/g, '<br>')}</div>
-                    </div>` : ''}
-                    
-                    ${copy.cta ? `<div class="copy-section cta-section">
-                        <div class="section-label">🚀 Llamada a la Acción (CTA)</div>
-                        <div class="section-content cta-text">${copy.cta}</div>
-                    </div>` : ''}
-                    
-                    ${copy.hashtags && copy.hashtags.length > 0 ? `<div class="copy-section hashtags-section">
-                        <div class="section-label">#️⃣ Hashtags</div>
-                        <div class="section-content hashtags-list">
-                            ${copy.hashtags.map(tag => `<span class="hashtag">${tag}</span>`).join('')}
-                        </div>
-                    </div>` : ''}
-                    
-                    ${copy.formatoVisual ? `<div class="copy-section visual-section">
-                        <div class="section-label">🎨 Formato Visual Sugerido</div>
-                        <div class="section-content visual-description">${copy.formatoVisual}</div>
-                    </div>` : copy.gancho ? `<div class="copy-section content-section">
-                        <div class="section-content">Sin contenido generado</div>
-                    </div>` : ''}
+                    <div class="copy-section content-section">
+                        <div class="section-content unified-content">${unifiedContent.replace(/\n/g, '<br>')}</div>
+                    </div>
                 </div>
                 <div class="copywriting-actions">
                     <button class="copy-btn primary" onclick="copySingleCopy(${JSON.stringify(copy).replace(/"/g, '&quot;')}, '${network.name}')">
