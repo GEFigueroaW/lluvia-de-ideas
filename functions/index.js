@@ -9,10 +9,25 @@ admin.initializeApp();
 const db = admin.firestore();
 
 // Configuración de Deepseek API - Obtenida de Firebase Config y variables de entorno
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || functions.config().deepseek?.key;
+console.log('[DEBUG] process.env.DEEPSEEK_API_KEY:', process.env.DEEPSEEK_API_KEY ? 'SET' : 'NOT_SET');
+
+let configValue;
+try {
+    configValue = functions.config().deepseek?.key;
+    console.log('[DEBUG] functions.config().deepseek?.key:', configValue ? configValue.substring(0, 8) + '...' : 'NOT_SET');
+} catch (error) {
+    console.log('[DEBUG] Error accessing functions.config():', error.message);
+    configValue = null;
+}
+
+// Solo usar env variable si es una API key real (no el placeholder)
+const envKey = process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_API_KEY.startsWith('sk-') ? process.env.DEEPSEEK_API_KEY : null;
+const DEEPSEEK_API_KEY = envKey || configValue;
 const DEEPSEEK_ENDPOINTS = [
     'https://api.deepseek.com/v1'
 ];
+
+console.log('[DEBUG] Final DEEPSEEK_API_KEY:', DEEPSEEK_API_KEY ? DEEPSEEK_API_KEY.substring(0, 8) + '...' : 'NOT_SET');
 
 // Validar que tenemos la API key
 if (!DEEPSEEK_API_KEY || !DEEPSEEK_API_KEY.startsWith('sk-')) {
