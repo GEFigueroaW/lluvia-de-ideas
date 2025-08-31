@@ -13,7 +13,112 @@ const DEEPSEEK_ENDPOINTS = [
 
 console.log('[INIT] Deepseek API configurado');
 
-// FUNCIÓN PARA GENERAR EJEMPLOS ESPECÍFICOS POR RED SOCIAL Y TIPO DE COPY
+// FUNCIÓN PARA CONSTRUIR PROMPTS DINÁMICOS PARA DEEPSEEK
+function buildPromptForPlatform(platform, keyword, userContext) {
+    // Extraer el tipo de copy del userContext
+    const copyType = userContext ? userContext.toLowerCase() : '';
+    const isPositioning = copyType.includes('posicionamiento') || copyType.includes('branding');
+    const isUrgency = copyType.includes('urgencia') || copyType.includes('escasez');
+    const isDirectSale = copyType.includes('venta directa') || copyType.includes('persuasivo');
+    
+    let copyStrategy = '';
+    if (isPositioning) {
+        copyStrategy = 'POSICIONAMIENTO Y BRANDING - Enfócate en identidad, autenticidad, mindset, filosofía personal, transformación de identidad, construcción de marca personal';
+    } else if (isUrgency) {
+        copyStrategy = 'URGENCIA Y ESCASEZ - Enfócate en límites de tiempo, ofertas limitadas, oportunidades que expiran, FOMO, exclusividad, últimas oportunidades';
+    } else if (isDirectSale) {
+        copyStrategy = 'VENTA DIRECTA Y PERSUASIÓN - Enfócate en ROI, números específicos, resultados medibles, ofertas directas, precios, testimonios, garantías';
+    } else {
+        copyStrategy = 'GENERAL - Contenido engaging y persuasivo';
+    }
+    
+    const platformSpecs = {
+        'Facebook': {
+            tone: 'conversacional y emocional',
+            length: '150-200 palabras',
+            style: 'storytelling personal, preguntas para engagement, emojis moderados',
+            cta: 'comentarios y reacciones'
+        },
+        'LinkedIn': {
+            tone: 'profesional pero humano',
+            length: '200-300 palabras',
+            style: 'insights profesionales, datos, experiencia laboral, hashtags relevantes',
+            cta: 'networking y discusión profesional'
+        },
+        'X / Twitter': {
+            tone: 'directo y impactante',
+            length: '200-280 caracteres',
+            style: 'statements contundentes, controversial, viral, threads cortos',
+            cta: 'retweets y replies'
+        },
+        'Instagram': {
+            tone: 'visual y aspiracional',
+            length: '120-150 palabras',
+            style: 'lifestyle, transformación visual, hashtags trending, muy emocional',
+            cta: 'likes y shares en stories'
+        },
+        'WhatsApp': {
+            tone: 'personal e íntimo',
+            length: '80-120 palabras',
+            style: 'mensaje directo, urgente, como de amigo cercano',
+            cta: 'respuesta inmediata'
+        },
+        'TikTok': {
+            tone: 'trendy y generacional',
+            length: '80-100 palabras',
+            style: 'viral, POV, trends actuales, muy casual',
+            cta: 'duetos y comentarios'
+        },
+        'Telegram': {
+            tone: 'analítico y exclusivo',
+            length: '200-250 palabras',
+            style: 'data-driven, análisis profundo, contenido premium',
+            cta: 'forwarding y discusión'
+        },
+        'Reddit': {
+            tone: 'auténtico y detallado',
+            length: '300-400 palabras',
+            style: 'experiencia real, storytime, muy genuino, sin marketing',
+            cta: 'upvotes y comentarios'
+        },
+        'YouTube': {
+            tone: 'educativo y entretenido',
+            length: '200-300 palabras',
+            style: 'descripción de video, promesa de valor, storytelling',
+            cta: 'suscripciones y comentarios'
+        }
+    };
+    
+    const spec = platformSpecs[platform] || platformSpecs['Facebook'];
+    
+    return `Actúa como un experto copywriter especializado en ${platform}.
+
+TEMA: "${keyword}"
+ESTRATEGIA: ${copyStrategy}
+PLATAFORMA: ${platform}
+
+ESPECIFICACIONES TÉCNICAS:
+- Tono: ${spec.tone}
+- Longitud: ${spec.length}
+- Estilo: ${spec.style}
+- Call-to-Action: ${spec.cta}
+
+INSTRUCCIONES CRÍTICAS:
+1. Crea contenido ÚNICO y ORIGINAL sobre "${keyword}" (NO uses frases genéricas como "6 meses después" o "500+ casos")
+2. Aplica la estrategia de ${copyStrategy.split(' - ')[0]} de manera auténtica
+3. Adapta completamente al estilo de ${platform}
+4. Incluye emojis relevantes pero no excesivos
+5. Genera un gancho impactante en las primeras palabras
+6. Asegúrate que sea copy-paste ready para publicar
+7. VARÍA los números, timeframes y ejemplos - sé creativo y específico
+
+FORMATO DE RESPUESTA:
+Devuelve ÚNICAMENTE el copy final listo para publicar, sin explicaciones adicionales, sin comillas, sin "Aquí tienes" o introducciones.
+
+El contenido debe ser completamente original y evitar cualquier patrón repetitivo.`;
+}
+
+// FUNCIÓN PARA GENERAR EJEMPLOS ESPECÍFICOS POR RED SOCIAL Y TIPO DE COPY (FALLBACK MEJORADO)
 function getExamplesForNetwork(networkName, keyword, userContext) {
     // Extraer el tipo de copy del userContext
     const copyType = userContext ? userContext.toLowerCase() : '';
@@ -21,117 +126,128 @@ function getExamplesForNetwork(networkName, keyword, userContext) {
     const isUrgency = copyType.includes('urgencia') || copyType.includes('escasez');
     const isDirectSale = copyType.includes('venta directa') || copyType.includes('persuasivo');
     
+    // Generar números y timeframes aleatorios para evitar repetición
+    const timeframes = ['3 semanas', '45 días', '2 meses', '90 días', '4 meses', 'medio año', '8 meses', '1 año'];
+    const numbers = ['127', '234', '89', '156', '67', '198', '341', '78', '245', '112'];
+    const percentages = ['180%', '240%', '320%', '150%', '275%', '190%', '380%', '210%'];
+    const cases = ['300+', '750+', '420+', '680+', '950+', '1200+', '380+', '560+'];
+    
+    const randomTime = timeframes[Math.floor(Math.random() * timeframes.length)];
+    const randomNumber = numbers[Math.floor(Math.random() * numbers.length)];
+    const randomPercent = percentages[Math.floor(Math.random() * percentages.length)];
+    const randomCases = cases[Math.floor(Math.random() * cases.length)];
+    
     switch(networkName) {
         case 'Facebook':
             if (isPositioning) {
-                return `💭 La primera vez que descubrí ${keyword}, no sabía que se convertiría en mi filosofía de vida. 🌟 No se trata solo de una técnica o método... es una nueva forma de ver las posibilidades. 💫 Durante años creí que había límites en lo que podía lograr, hasta que ${keyword} me mostró que esos límites estaban solo en mi mente. 🔮 Ahora entiendo que no se trata de ser perfecto, sino de ser auténtico con quien realmente soy. ✨ Mi marca personal se ha transformado porque finalmente encontré mi verdadera voz. 👇 ¿Quién más ha sentido esa conexión profunda con algo que cambió su perspectiva? 💕`;
+                return `💭 ${keyword} no cambió solo mis resultados... transformó completamente mi identidad. 🌟 Antes era alguien que "intentaba" cosas. Ahora soy alguien que las vive desde el alma. 💫 La diferencia no está en las técnicas, sino en quién me permito ser cuando las aplico. 🔮 Mi familia nota algo diferente en mí, pero no pueden poner en palabras qué es. ✨ Es esa confianza silenciosa que viene de estar alineado con tu verdadero propósito. 👇 ¿Alguna vez han sentido esa transformación de identidad tan profunda que hasta cambió su energía? 💕`;
             }
             if (isUrgency) {
-                return `🚨 ATENCIÓN: Solo hasta mañana puedes acceder a lo que cambió mi vida con ${keyword}. ⏰ Han pasado 6 meses desde que cerré esta oportunidad y las 47 personas que lo tomaron siguen agradeciéndomelo. 💥 No volveré a abrir esto hasta 2026 porque requiere mi atención personal completa. 🔥 Si has estado esperando la señal perfecta... ESTA ES. ⚡ Mañana a medianoche se cierra para siempre. 👆 Solo comenta "YA" si estás listo para el cambio más importante de tu vida. ⏳`;
+                return `🚨 BREAKING: ${keyword} se retira del mercado en ${randomTime} ⏰ El creador anunció que cierra para siempre después de recibir ${randomCases} historias de transformación. 💥 "Ya cumplí mi propósito", dijo en su último video. 🔒 Después del deadline NO habrá excepciones, extensiones ni súplicas que funcionen. ⚡ Si lo has estado posponiendo, este es literalmente tu último chance. 👆 Comenta "ÚLTIMO" si necesitas el acceso antes de que desaparezca para siempre. ⏳`;
             }
             if (isDirectSale) {
-                return `💰 RESULTADOS REALES: ${keyword} me generó $12,847 en 45 días. 📊 No es casualidad, es método. Tampoco es suerte, es estrategia probada. 🎯 Mientras otros pierden tiempo con teorías, yo aplico lo que FUNCIONA. 💎 3 pilares que cambiarán tu cuenta bancaria: ✅ Sistema probado paso a paso ✅ Sin inversión inicial requerida ✅ Resultados visibles en 2 semanas 🔥 ¿Prefieres seguir soñando o empezar a ganar? 💸 Responde "QUIERO" y te muestro exactamente cómo. 🚀`;
+                return `💰 NÚMEROS REALES: ${keyword} me generó $${randomNumber}K en ${randomTime} 📊 No es postureo, son screenshots verificables de mi cuenta bancaria. 🎯 La estrategia exacta que uso: ✅ ${randomTime} de implementación ✅ Cero inversión inicial ✅ Escalable a cualquier nivel 🔥 ¿Quieres el sistema paso a paso? 💸 Solo 50 personas este mes. Responde "${randomNumber}" si estás ready para cambiar tu situación financiera. 🚀`;
             }
-            return `💭 La primera vez que probé ${keyword}, pensé que era una pérdida de tiempo. Hoy, 6 meses después, no reconozco a la persona que era antes. 🌟 Mi familia me pregunta qué cambió en mí... La respuesta los sorprendería. 💫`;
+            return `💭 Cuando probé ${keyword} por primera vez, honestly pensé que era otro trend pasajero. ${randomTime} después... mi vida es irreconocible. 🌟 No solo cambió mis resultados, cambió mi forma de pensar sobre las posibilidades.`;
             
         case 'LinkedIn':
             if (isPositioning) {
-                return `🎯 REFLEXIÓN PROFESIONAL: ${keyword} redefinió mi liderazgo empresarial. 📈 En 15 años de carrera corporativa, nunca había visto una metodología que transforme tanto la cultura organizacional como el mindset individual. 💡 Lo que comenzó como una estrategia de optimización se convirtió en la base de nuestra propuesta de valor. 🏆 Nuestro equipo pasó de ejecutar tareas a liderar innovación. La diferencia: dejamos de enfocarnos en procesos y nos centramos en propósito. ⚡ El ROI más importante no está en las métricas, sino en la motivación intrínseca de cada colaborador. 💼 ¿Cómo están redefiniendo ustedes el liderazgo en sus organizaciones? #Liderazgo #TransformacionEmpresarial #CulturaOrganizacional`;
+                return `🎯 LIDERAZGO TRANSFORMACIONAL: ${keyword} redefinió mi filosofía empresarial en ${randomTime}. 📈 No se trata de optimizar procesos... se trata de reimaginar qué significa liderar con propósito auténtico. 💡 Mi equipo pasó de ejecutar tareas a co-crear visiones. La transformación fue profunda: cambiamos de una mentalidad de "cumplir objetivos" a "impactar vidas". ⚡ El ROI más valioso no se mide en métricas, se siente en la energía del equipo cuando llegan cada lunes. 💼 ¿Cómo están redefiniendo ustedes el liderazgo desde la autenticidad? #LiderazgoAutentico #TransformacionOrganizacional #PropositoEmpresarial`;
             }
             if (isUrgency) {
-                return `⚠️ ALERTA PROFESIONAL: La ventana para dominar ${keyword} se cierra en Q1 2025. 📊 Datos de McKinsey confirman: empresas que lo adopten ahora tendrán 340% más ventaja competitiva. ⏰ Solo 90 días para posicionarse antes de que se sature el mercado. 🎯 Los early adopters ya están capturando el 80% de las oportunidades emergentes. 💼 Como consultor estratégico, veo la misma historia repetirse: quienes actúan rápido dominan, quienes dudan se quedan atrás. 🚀 ¿Su empresa está preparada para liderar o seguir? #EstrategiaEmpresarial #Innovacion #VentajaCompetitiva #Liderazgo`;
+                return `⚠️ ALERTA ESTRATÉGICA: La oportunidad de dominar ${keyword} se cierra Q1 2025. 📊 McKinsey confirma: solo las primeras ${randomCases} empresas que lo adopten mantendrán ventaja competitiva. ⏰ Timeline crítico: ${randomTime} para posicionarse antes de saturación total del mercado. 🎯 Early adopters ya capturan ${randomPercent} de las oportunidades emergentes. 💼 En mis 15 años como estratega, veo el mismo patrón: quienes actúan rápido dominan sectores completos. 🚀 ¿Su organización está preparada para liderar o seguir? #EstrategiaEmpresarial #VentajaCompetitiva #Innovacion`;
             }
             if (isDirectSale) {
-                return `💎 ROI COMPROBADO: ${keyword} incrementó nuestros ingresos 280% en 8 meses. 📈 No es teoría, son números auditados. No es suerte, es metodología sistemática aplicada. 🎯 Resultados específicos que conseguimos: ✅ +$2.4M en nuevos contratos ✅ 89% retención de clientes ✅ 340% mejora en conversiones 💼 Si buscan crecimiento real y medible, necesitamos conversar. 🤝 Comparto la estrategia exacta con 5 empresas serias este mes. ¿Su organización califica? Escriban "ESTRATEGIA" en comentarios. 🚀 #Resultados #ROI #CrecimientoEmpresarial #EstrategiaComercial`;
+                return `💎 ROI AUDITADO: ${keyword} incrementó nuestros ingresos ${randomPercent} en ${randomTime}. 📈 No son proyecciones, son resultados certificados por PwC. 🎯 Impacto específico documentado: ✅ +$${randomNumber}K en nuevos contratos ✅ ${randomPercent} mejora en retención de clientes ✅ ${randomCases} leads calificados adicionales 💼 Comparto la metodología exacta con 15 empresas serious este trimestre. 🤝 Investment: $4,997 (valor documentado: $47K). ¿Su organización califica? Reply "ROI" para detalles. 🚀 #ResultadosReales #CrecimientoEmpresarial #EstrategiaComercial`;
             }
-            return `📊 REVELACIÓN: Después de analizar 500+ casos de implementación de ${keyword}, descubrí un patrón que contradice todo lo que creíamos sobre productividad profesional. 💡 Las empresas que lo aplicaron vieron 280% más retención de talento.`;
+            return `📊 INSIGHT PROFESIONAL: Después de analizar ${randomCases} implementaciones de ${keyword}, encontré un patrón que contradice las mejores prácticas tradicionales. 💡 Las organizaciones exitosas aumentaron productividad ${randomPercent} en ${randomTime}.`;
             
         case 'X / Twitter':
             if (isPositioning) {
-                return `🧠 MINDSET SHIFT: ${keyword} no es una habilidad, es una identidad. 💭 Dejé de preguntar "¿Cómo hago esto?" y empecé a preguntar "¿Quién necesito ser?" 🔥 El cambio fue instantáneo. La transformación, permanente. ⚡ Tu marca personal = Tu forma de pensar. 🎯 Cambia uno, cambias todo.`;
+                return `🧠 IDENTITY SHIFT: ${keyword} isn't something you DO, it's someone you BECOME. 💭 Stopped asking "How?" Started asking "Who?" 🔥 Everything changed in ${randomTime}. ⚡ Your results = Your identity. Change the identity, change everything. 🎯`;
             }
             if (isUrgency) {
-                return `🚨 BREAKING: ${keyword} se agota en 48h. 💥 Solo 12 spots disponibles. ⏰ Precio normal: $497. Precio ahora: $97. 🔥 Última vez que ofrezco esto a este precio. ⚡ Se cierra automáticamente cuando llegue a 0. 👆 Reply "GO" si lo quieres YA.`;
+                return `🚨 ${keyword} ENDS ${randomTime} 💥 Only ${randomNumber} spots left ⏰ Price jumps ${randomPercent} after deadline 🔥 Last time offering this 👆 Reply "${randomNumber}" if you want it`;
             }
             if (isDirectSale) {
-                return `💰 ${keyword} = $47K en 60 días. 📊 Prueba: screenshot en mi bio. 🎯 Sistema exacto que uso: ✅ 20 min/día ✅ $0 inversión inicial ✅ Escalable infinitamente 🔥 ¿Quieres el blueprint? 💸 RT + reply "BLUEPRINT" 🚀`;
+                return `💰 ${keyword} = $${randomNumber}K in ${randomTime} 📊 Proof: pinned tweet 🎯 Exact system: ✅ ${randomTime} implementation ✅ $0 startup cost ✅ Infinitely scalable 🔥 Blueprint available 💸 RT + "${randomNumber}" for access`;
             }
-            return `🔥 VERDAD INCÓMODA: ${keyword} no es lo que te vendieron. Es 10 veces más poderoso y 100 veces más simple. 💥 El 95% lo hace mal por esto...`;
+            return `🔥 TRUTH: ${keyword} isn't what they told you. It's ${randomPercent} more powerful and 10x simpler. 💥 ${randomPercent} of people get this wrong...`;
             
         case 'WhatsApp':
             if (isPositioning) {
-                return `🌟 Mi transformación con ${keyword} va más allá de resultados... cambió mi identidad. 💎 No se trata de técnicas, sino de convertirte en la versión más auténtica de ti mismo. ✨ Cuando alineas quién eres con lo que haces, la magia sucede naturalmente. 🔮 Tu presencia se vuelve magnética sin esfuerzo. 💫 ¿Estás listo para descubrir tu verdadero potencial? 🚀`;
+                return `🌟 ${keyword} transformó mi esencia en ${randomTime} 💎 No se trata de técnicas... se trata de convertirte en la versión más auténtica de ti mismo. ✨ Cuando alineas quién eres con lo que haces, la magia sucede sin esfuerzo. 🔮 Tu presencia se vuelve magnética naturalmente. 💫 ¿Ready para descubrir tu verdadero potencial? 🚀`;
             }
             if (isUrgency) {
-                return `🚨 ÚLTIMO AVISO: Lo que descubrí sobre ${keyword} cambió mi vida en 21 días. 💥 Solo 3 personas más pueden acceder antes de que retire esta información permanentemente. 🔒 No exagero: va contra todo lo establecido. ⚡ ¿Eres una de esas 3 personas? 👆 Responde YA 🏃‍♀️`;
+                return `🚨 ÚLTIMO MOMENTO: Lo que descubrí sobre ${keyword} cambió mi vida en ${randomTime} 💥 Solo ${randomNumber} personas más pueden acceder antes de que retire esta información permanentemente. 🔒 Va contra todo lo establecido. ⚡ ¿Eres una de esas ${randomNumber}? 👆 Responde YA 🏃‍♀️`;
             }
             if (isDirectSale) {
-                return `💰 OFERTA DIRECTA: ${keyword} me está generando $8K/mes. 📊 Te enseño el sistema exacto por $297 (valor real $1,997). 🎯 Incluye: ✅ Estrategia paso a paso ✅ Templates que uso ✅ Soporte directo conmigo 🔥 Solo para 10 personas serias. ✅ Responde "QUIERO" si estás dentro 💸`;
+                return `💰 PROPUESTA DIRECTA: ${keyword} me genera $${randomNumber}K/mes 📊 Te enseño el sistema por $297 (valor real $${randomNumber}97). 🎯 Incluye: ✅ Estrategia paso a paso ✅ Templates que uso ✅ Support 1:1 por ${randomTime} 🔥 Solo ${randomNumber} personas serias. ✅ "${randomNumber}" si estás dentro 💸`;
             }
-            return `🚨 ÚLTIMO AVISO: Lo que descubrí sobre ${keyword} cambió mi vida en 21 días. 💥 Solo 3 personas más pueden acceder a esta información antes de que la retire permanentemente.`;
+            return `🚨 REVELACIÓN: ${keyword} cambió mi vida en ${randomTime}. 💥 Solo ${randomNumber} personas más pueden acceder antes de que retire esta información para siempre.`;
             
         case 'Instagram':
             if (isPositioning) {
-                return `✨ GLOW UP MINDSET: ${keyword} no cambió solo mi apariencia... transformó mi energía completa. 💫 Antes: Insegura, buscando validación externa 🌟 Ahora: Confident, irradiando autenticidad 💎 La diferencia no está en lo que hago, sino en quién me permito ser. 🔥 When you align with your true self, everything shifts ✋ 💕 Tu vibe atrae tu tribe, baby 👑 #SelfLove #Authenticity #GlowUp #Mindset #SelfGrowth #Confidence #Energy #Transformation`;
+                return `✨ AUTHENTIC GLOW UP: ${keyword} didn't just change my results... it transformed my entire energy 💫 Before: Seeking validation externally 🌟 Now: Radiating confidence from within 💎 The shift isn't in what I do, but in who I allow myself to be 🔥 When you align with your true essence, everything flows ✋ 💕 #AuthenticSelf #SelfLove #GlowUp #InnerWork #Confidence #SelfGrowth #Mindset #Transformation`;
             }
             if (isUrgency) {
-                return `🚨 GIRLS! Solo 24h para que cierren ${keyword} para siempre 😭 💔 NO puedo creer que lo vayan a quitar de la app... ⏰ Literalmente changed my life y ahora solo quedan horas 💥 Si lo has estado considerando, THIS IS IT sis 🔥 After tomorrow = gone forever 😩 ✨ Swipe para ver my transformation 👆 Stories para el link directo ⚡ #LastChance #TransformationTuesday #DontMissOut #LinkInBio`;
+                return `🚨 GIRLS! ${keyword} disappears in ${randomTime} 😭 💔 They're literally removing it from existence... ⏰ This changed my ENTIRE life y'all 💥 After ${randomTime} = gone FOREVER � If you've been thinking about it, THIS IS THE SIGN sis 🔥 ✨ Swipe to see my transformation 👆 Link in bio before it's too late ⚡ #LastChance #TransformationTuesday #LinkInBio #DontMissOut`;
             }
             if (isDirectSale) {
-                return `💰 REAL TALK: ${keyword} me está dando $15K/month 📊 Not flexing, just facts babe 💯 Si estás ready para tu financial glow up: ✅ Sistema que uso (super simple) ✅ Templates exactos ✅ Support grupo exclusivo 🔥 Solo para 20 boss babes serias 💎 Investment: $497 (payment plan available) 💕 DM "READY" si you're serious about leveling up 👑 #BossBabe #FinancialFreedom #MoneyMindset #WealthBuilding #Success`;
+                return `💰 REAL NUMBERS: ${keyword} brought me $${randomNumber}K in ${randomTime} 📊 Not flexing, just transparency babe 💯 Ready for your financial glow up? ✅ Sistema que uso daily ✅ Templates exactos ✅ Exclusive support group 🔥 Solo ${randomNumber} boss babes ✨ Investment: $497 � DM "${randomNumber}" if you're serious about leveling up 👑 #MoneyMindset #FinancialFreedom #BossBabe #WealthBuilding`;
             }
-            return `✨ ANTES: Escéptica total sobre ${keyword} 😒 DESPUÉS: Completamente transformada 💫 Lo que NO esperaba: Que cambiaría mi relación con todo lo demás. 🌟`;
+            return `✨ PLOT TWIST: Probé ${keyword} expecting basic results... 😒 But this happened instead 💫 ${randomTime} later and I'm a completely different person 🌟 The glow up is REAL bestie`;
             
         case 'TikTok':
             if (isPositioning) {
-                return `POV: Descubres que ${keyword} no es un hack... es tu nueva identidad 💫 *aesthetic transformation* When you stop trying to be someone else and embrace who you actually are 🔥 The confidence hits different ✨ #MainCharacterEnergy #SelfGrowth #AuthenticSelf #IdentityShift #PersonalBrand #Confidence #SelfLove`;
+                return `POV: You discover ${keyword} isn't a strategy... it's your new identity 💫 *aesthetic transformation music* When you stop trying to be someone else and embrace who you actually are 🔥 The confidence hits different ✨ #MainCharacterEnergy #AuthenticSelf #SelfGrowth #IdentityShift #Confidence #SelfLove`;
             }
             if (isUrgency) {
-                return `GUYS THIS IS NOT A DRILL ‼️ ${keyword} disappears in 2 days 😭 I'm literally shaking... this changed my ENTIRE life 💔 If you've been waiting for a sign THIS IS IT ⚡ After Wednesday = gone forever 🚨 Link in bio RUN don't walk 🏃‍♀️ #Emergency #LastChance #LifeChanging #RunDontWalk #LinkInBio`;
+                return `THIS IS NOT A DRILL ‼️ ${keyword} vanishes in ${randomTime} 😭 I'm literally shaking... this saved my life 💔 If you've been waiting for a sign THIS IS IT ⚡ After ${randomTime} = gone forever 🚨 Link in bio RUN 🏃‍♀️ #Emergency #LastChance #LifeChanging #LinkInBio`;
             }
             if (isDirectSale) {
-                return `I made $23K in 30 days with ${keyword} 💰 Proof in my bio ✨ Here's exactly what I did: ✅ This one strategy ✅ Zero followers needed ✅ Works from your phone 🔥 Teaching 50 people max 💯 $297 gets you everything ⚡ Comment "BAG" if you're ready to secure yours 💸 #MoneyTok #SideHustle #OnlineIncome #FinancialFreedom`;
+                return `Made $${randomNumber}K in ${randomTime} with ${keyword} 💰 Proof in my bio bestie ✨ Exactly what I did: ✅ This one strategy ✅ Zero followers needed ✅ Works from your phone 🔥 Teaching ${randomNumber} people max 💯 $297 gets you everything ⚡ Comment "${randomNumber}" if you're ready to secure the bag 💸 #MoneyTok #SideHustle #OnlineIncome`;
             }
-            return `POV: Intentas ${keyword} por primera vez esperando resultados "normales"... 👀 Pero esto pasó 🤯 *mind blown* Me quedé así toda la semana 😱`;
+            return `POV: You try ${keyword} expecting normal results... 👀 But THIS happened instead 🤯 *mind blown sound* Been shook for ${randomTime} 😱`;
             
         case 'Telegram':
             if (isPositioning) {
-                return `🎯 ANÁLISIS ESTRATÉGICO: ${keyword} como ventaja competitiva sostenible 📊 Implementación exitosa requiere: • Mindset de innovador temprano • Visión a largo plazo (24-36 meses) • Tolerancia a la experimentación 💡 No es una táctica, es una filosofía operacional que redefine la propuesta de valor. 🏆 Organizaciones que lo han adoptado reportan: • Mayor coherencia en decision-making • Cultura de innovación más robusta • Posicionamiento de liderazgo en su sector 📈 ¿Tu organización está lista para liderar la siguiente ola de innovación?`;
+                return `🎯 FILOSOFÍA ESTRATÉGICA: ${keyword} como redefinición de ventaja competitiva sostenible 📊 Implementación requiere: • Mindset de early adopter • Visión estratégica (${randomTime}) • Tolerancia a experimentación controlada 💡 No es táctica, es filosofía operacional que redefine creación de valor. 🏆 Organizaciones que lo adoptaron reportan: • ${randomPercent} mejora en decision-making • Cultura de innovación más robusta • Posicionamiento de thought leadership sectorial 📈 ¿Su organización está preparada para liderar la próxima evolución?`;
             }
             if (isUrgency) {
-                return `⚠️ ALERTA CRÍTICA: ${keyword} se descontinúa en 72 horas 📉 Supply chain disruption global afecta disponibilidad hasta 2026 ⏰ Únicamente 127 unidades restantes en inventario mundial 🚨 Empresas Fortune 500 ya compraron stock para 3 años 💼 Precio aumenta 340% después del deadline 📊 Ventana de oportunidad se cierra: Jueves 23:59 GMT ⚡ Decisión estratégica requerida NOW`;
+                return `⚠️ ALERTA CRÍTICA: ${keyword} discontinuado en ${randomTime} 📉 Global supply chain disruption afecta disponibilidad hasta 2026 ⏰ Solo ${randomNumber} unidades en inventario mundial 🚨 Fortune 500 ya compraron stock para 3 años 💼 Precio aumenta ${randomPercent} post-deadline 📊 Ventana estratégica: ${randomTime} restantes ⚡ Decisión requerida NOW`;
             }
             if (isDirectSale) {
-                return `💎 PROPUESTA DIRECTA: ${keyword} generó $847K en revenue adicional ⚡ ROI documentado: 423% en 180 días 📊 Sistema replicable que incluye: • Metodología completa paso a paso • Software propietario (licencia perpetua) • Consultoría estratégica 1:1 por 90 días 🎯 Inversión: $4,997 (valor real $24,997) 🤝 Solo para 15 organizaciones serias este trimestre 📈 Payment plan available. Reply "PROPOSAL" para detalles completos`;
+                return `💎 PROPUESTA EJECUTIVA: ${keyword} generó $${randomNumber}K revenue adicional ⚡ ROI documentado: ${randomPercent} en ${randomTime} 📊 Sistema replicable incluye: • Metodología step-by-step • Software propietario (licencia perpetua) • Consultoría estratégica 1:1 x ${randomTime} 🎯 Inversión: $4,997 (valor real $${randomNumber},997) 🤝 Solo ${randomNumber} organizaciones Q1 2025 📈 Payment plans available. Reply "EXECUTIVE" para detalles`;
             }
-            return `📈 ANÁLISIS EXCLUSIVO: ${keyword} en 2024 🔹 Adopción: +340% en últimos 6 meses 📊 ROI promedio: 2.8x en 30-60 días ⚡ Tasa de éxito: 89% con implementación correcta`;
+            return `📈 DATA EXCLUSIVO: ${keyword} adoption rate: +${randomPercent} en últimos ${randomTime} 📊 ROI promedio: ${randomPercent} en ${randomTime} ⚡ Success rate: ${randomPercent} con implementación correcta`;
             
         case 'Reddit':
             if (isPositioning) {
-                return `The Philosophy Behind ${keyword} - Why It's More Than Just a Tool [Discussion] 🧠 After 2 years of deep implementation, I realized this isn't about optimization - it's about identity reconstruction. 💭 Traditional approaches treat it like a skill to acquire. Reality: it's a worldview to embody. 📚 The real transformation happens when you stop asking "How do I do this?" and start asking "Who do I need to become?" 🔄 Changed my entire relationship with success, failure, and progress. Would love to hear your philosophical takes on this. What's your experience with identity-level changes? 🤔`;
+                return `The Philosophy Behind ${keyword} - More Than Optimization [${randomTime} Update] 🧠 After ${randomTime} of implementation, realized this isn't about skill acquisition - it's identity reconstruction. 💭 Traditional approaches treat it like a tool. Reality: it's a worldview shift. 📚 Real transformation: stop asking "How do I do this?" Start asking "Who do I become?" 🔄 Changed my relationship with success, failure, and progress fundamentally. What's your experience with identity-level transformations? Deep philosophical takes welcome 🤔`;
             }
             if (isUrgency) {
-                return `PSA: ${keyword} program shutting down permanently in 48 hours ⚠️ Not clickbait - confirmed by multiple sources in r/entrepreneur and r/digitalnomad 📰 Creator announced retirement due to personal reasons 😢 All materials, community access, and future updates gone forever after deadline ⏰ Current members trying to archive everything but legal restrictions apply 📋 If you've been on the fence, this is literally the last chance ever 🚨 No refunds, no extensions, no exceptions 💔 Link still works but payment processor cuts off Thursday midnight EST ⚡`;
+                return `PSA: ${keyword} program CONFIRMED shutting down ${randomTime} ⚠️ Not clickbait - verified by ${randomNumber} sources across multiple subreddits 📰 Creator retiring due to personal circumstances 😢 All materials, community access, future updates = gone after deadline ⏰ Current members scrambling to archive but legal restrictions apply 📋 Been on the fence? This is literally last chance ever 🚨 No extensions, no exceptions 💔 Payment processor cuts off ${randomTime} ⚡`;
             }
             if (isDirectSale) {
-                return `${keyword} Income Report - $127K in 8 months [Data Inside] 💰 Full transparency: Started with $500, reinvested everything, scaled systematically 📊 Proof, expenses, taxes, everything documented in spreadsheet (link in comments) 🔍 What I'm selling: The exact playbook I used. Not a course, not coaching - just the step-by-step system 📋 $497 one-time payment. No upsells, no recurring anything. You get the files and you're done ✅ Only doing this for 50 people max because I want to maintain quality control 🎯 Questions welcome but please read the FAQ comment first 👇`;
+                return `${keyword} Income Report - $${randomNumber}K in ${randomTime} [Full Transparency] 💰 Started with $500, reinvested systematically, scaled methodically 📊 Proof, expenses, taxes documented in spreadsheet (comments) 🔍 What I'm offering: exact playbook I used. Not course, not coaching - just the system 📋 $497 one-time. No upsells, no recurring fees. Files + you're done ✅ Max ${randomNumber} people for quality control 🎯 FAQ in comments first please 👇`;
             }
-            return `Mi experiencia BRUTAL con ${keyword} - 18 meses después [LONG] 📝 TL;DR: Cambió mi vida, pero NO como esperaba. Backstory: Era escéptico total, lo intenté para probar que era BS... 💀`;
+            return `My ${keyword} Journey - ${randomTime} Later [Honest Review] 📝 TL;DR: Life-changing but NOT how expected. Started skeptical, tried it to prove it was BS... 💀 Plot twist: worked, but discovered something nobody mentions in success posts.`;
             
         case 'YouTube':
             if (isPositioning) {
-                return `🎥 The REAL Story Behind ${keyword} - Building Your Personal Brand (Not Clickbait) 🎯 ✅ Why most people get this completely wrong ✅ The identity shift that changes everything ✅ How to build authentic influence (not fake guru stuff) ✅ My 3-year journey from unknown to thought leader ⚡ This isn't about tactics - it's about becoming the person who naturally attracts opportunities 🌟 Free resources and frameworks in description 📋 No course sales, no affiliate links - just pure value 💎`;
+                return `🎥 The TRUTH About ${keyword} - Building Authentic Influence (${randomTime} Journey) 🎯 ✅ Why ${randomPercent} get this completely wrong ✅ The identity shift that changes everything ✅ Building real influence vs fake guru tactics ✅ My ${randomTime} journey: unknown to thought leader ⚡ This isn't about tactics - it's becoming someone who naturally attracts opportunities 🌟 All resources free in description 📋 Zero sales, zero affiliates - pure value 💎`;
             }
             if (isUrgency) {
-                return `🚨 BREAKING: ${keyword} Platform Shutting Down This Week! 😱 ⚠️ Official announcement dropped 2 hours ago ⚠️ ⏰ All accounts deactivated Friday at midnight PST 📱 Millions of users scrambling to backup their data 💾 Legal battle brewing but damage already done 📰 ✅ How to save your progress before it's too late ✅ Alternative platforms that might work ✅ What this means for the industry 🔥 URGENT: Watch before Friday or lose everything! ⚡ Emergency backup tutorial in pinned comment 👇`;
+                return `🚨 BREAKING: ${keyword} Platform OFFICIALLY Shutting Down ${randomTime}! 😱 ⚠️ Announcement dropped ${randomTime} ago ⚠️ ⏰ ${randomNumber} million accounts deactivated ${randomTime} 📱 Users panicking to backup data 💾 Legal battles brewing but damage done 📰 ✅ Save your progress before too late ✅ Alternative platforms analysis ✅ Industry impact breakdown 🔥 WATCH before ${randomTime} or lose everything! ⚡ Emergency tutorial pinned 👇`;
             }
             if (isDirectSale) {
-                return `💰 How I Made $89K With ${keyword} (Showing Real Numbers) 🎯 📊 Full income breakdown + expenses (nothing hidden) 💻 Exact tools, software, and systems I use ⚡ Why 90% of people fail (and how to be in the 10%) 📋 Complete step-by-step blueprint in description 🔥 $297 for everything - no upsells, no BS, just results 💎 100+ success stories from students (testimonials in comments) ✅ 30-day money-back guarantee if you follow the system 🚀 Link below but only taking 100 students this month 👇`;
+                return `💰 How I Made $${randomNumber}K With ${keyword} (${randomTime} Breakdown) 🎯 📊 Complete income + expenses (nothing hidden) 💻 Exact tools, software, systems I use daily ⚡ Why ${randomPercent} fail (how to be in top ${randomPercent}) 📋 Complete blueprint in description 🔥 $297 everything - no upsells, no BS 💎 ${randomNumber}+ student success stories (comments) ✅ 30-day guarantee if you follow system 🚀 Limited to ${randomNumber} students this month 👇`;
             }
-            return `📺 ${keyword.toUpperCase()} desde CERO - Lo que NADIE te cuenta 🎯 ✅ Guía completa: 0 a experto en 30 días ⚠️ Errores que me costaron 6 meses (para que tú no los cometas)`;
+            return `📺 ${keyword.toUpperCase()} From ZERO - What They DON'T Tell You (${randomTime} Guide) 🎯 ✅ Complete roadmap: beginner to expert ⚠️ Mistakes that cost me ${randomTime} (avoid these)`;
             
         default:
-            return `💡 ${keyword} cambió mi perspectiva sobre todo. 🤔 Lo que descubrí desafía lo que todos "sabemos" sobre este tema. 🔥`;
+            return `💡 ${keyword} shifted my entire perspective in ${randomTime}. 🤔 What I discovered challenges everything we "know" about this topic. 🔥`;
     }
 }
 
@@ -145,25 +261,46 @@ async function callDeepseekAPI(prompt) {
         }, 20000);
     });
     
-    const apiCall = axios.post(`${DEEPSEEK_ENDPOINTS[0]}/chat/completions`, {
-        model: 'deepseek-chat',
-        messages: [
-            {
-                role: 'user',
-                content: prompt
+    const apiCall = async () => {
+        try {
+            const response = await axios.post(`${DEEPSEEK_ENDPOINTS[0]}/chat/completions`, {
+                model: 'deepseek-chat',
+                messages: [
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: 3000,
+                temperature: 0.7
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                timeout: 15000
+            });
+            
+            console.log(`[DEEPSEEK] ✅ Respuesta recibida:`, response.status);
+            
+            if (response.data && response.data.choices && response.data.choices[0]) {
+                const content = response.data.choices[0].message.content.trim();
+                console.log(`[DEEPSEEK] ✅ Contenido generado: ${content.substring(0, 100)}...`);
+                return content;
+            } else {
+                throw new Error('Respuesta de Deepseek vacía o malformada');
             }
-        ],
-        max_tokens: 3000,
-        temperature: 0.7
-    }, {
-        headers: {
-            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-            'Content-Type': 'application/json'
-        },
-        timeout: 15000
-    });
+        } catch (axiosError) {
+            console.error(`[DEEPSEEK] ❌ Error en API:`, axiosError.message);
+            if (axiosError.response) {
+                console.error(`[DEEPSEEK] ❌ Status:`, axiosError.response.status);
+                console.error(`[DEEPSEEK] ❌ Data:`, axiosError.response.data);
+            }
+            throw axiosError;
+        }
+    };
     
-    return Promise.race([apiCall, timeoutPromise]);
+    return Promise.race([apiCall(), timeoutPromise]);
 }
 
 // FUNCIÓN PRINCIPAL PARA GENERAR IDEAS
@@ -215,11 +352,40 @@ exports.generateIdeas = functions
                 throw new functions.https.HttpsError('permission-denied', 'Límite alcanzado. Upgrade a Premium.');
             }
 
-            // Generar ideas usando fallback por ahora (para garantizar funcionamiento)
+            // Generar ideas usando Deepseek API (con fallback mejorado)
             const ideas = {};
-            platforms.forEach(platform => {
-                ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
-            });
+            
+            for (const platform of platforms) {
+                console.log(`[API-${requestId}] Generando contenido para ${platform} con tipo: ${userContext}`);
+                
+                let useDeepseek = false; // Deshabilitar Deepseek temporalmente hasta validar API key
+                
+                if (useDeepseek) {
+                    try {
+                        // Construir prompt específico para Deepseek
+                        const prompt = buildPromptForPlatform(platform, keyword, userContext);
+                        console.log(`[API-${requestId}] Llamando a Deepseek API para ${platform}...`);
+                        
+                        // Llamar a Deepseek API
+                        const deepseekResponse = await callDeepseekAPI(prompt);
+                        
+                        if (deepseekResponse && deepseekResponse.trim().length > 50) {
+                            ideas[platform] = deepseekResponse.trim();
+                            console.log(`[API-${requestId}] ✅ Deepseek exitoso para ${platform}: ${deepseekResponse.substring(0, 100)}...`);
+                        } else {
+                            console.log(`[API-${requestId}] ⚠️ Respuesta de Deepseek insuficiente para ${platform}, usando fallback`);
+                            ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                        }
+                    } catch (deepseekError) {
+                        console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform}: ${deepseekError.message}`);
+                        console.log(`[API-${requestId}] 🔄 Usando fallback para ${platform}`);
+                        ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                    }
+                } else {
+                    console.log(`[API-${requestId}] 🔄 Usando templates mejorados para ${platform} (Deepseek deshabilitado)`);
+                    ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                }
+            }
 
             // Actualizar contador
             if (!isAdmin) {
