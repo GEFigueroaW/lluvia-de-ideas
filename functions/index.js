@@ -19,25 +19,51 @@ function getExamplesForNetwork(networkName, keyword, userContext) {
     
     switch(networkName) {
         case 'Facebook':
-            return `Historia personal: Ayer probé ${keyword}${contextText} y cambió todo. Mi familia está impresionada. ¿Alguien más lo ha intentado? Comenten 👇`;
+            return `💭 La primera vez que probé ${keyword}${contextText}, pensé que era una pérdida de tiempo. Hoy, 6 meses después, no reconozco a la persona que era antes. Mi familia me pregunta qué cambió... La respuesta los sorprendería. ¿Alguien más ha vivido una transformación así? Cuéntenme en comentarios 👇`;
+        
         case 'LinkedIn':
-            return `Análisis profesional: Tras implementar ${keyword} en 200+ proyectos${contextText}, confirmé ROI del 340%. Como estratega senior, estos son los KPIs críticos...`;
+            return `📊 REVELACIÓN: Después de analizar 500+ casos de implementación de ${keyword}${contextText}, descubrí un patrón que contradice todo lo que creíamos sobre productividad profesional. Las empresas que lo aplicaron vieron 280% más retención de talento. La razón te sorprenderá... ¿Están listos para repensar sus estrategias? 💡`;
+        
         case 'X / Twitter':
-            return `🔥 BOMBA: ${keyword}${contextText} que cambió mi perspectiva completamente. La diferencia en 30 días fue brutal. El secreto está en... 💥`;
+            return `🔥 VERDAD INCÓMODA: ${keyword}${contextText} no es lo que te vendieron. Es 10 veces más poderoso y 100 veces más simple. El 95% lo hace mal por esto... ¿Te atreves a intentar el enfoque real? 💥`;
+        
         case 'WhatsApp':
-            return `🚨 URGENTE sobre ${keyword}${contextText}. Últimos 3 cupos con 50% descuento. Solo hasta medianoche. ¿Te apuntas? Responde YA`;
+            return `🚨 ÚLTIMO AVISO: Lo que descubrí sobre ${keyword}${contextText} cambió mi vida en 21 días. Solo 3 personas más pueden acceder a esta información antes de que la retire. ¿Eres una de ellas? Responde YA si quieres saber qué es 👆`;
+        
         case 'Instagram':
-            return `✨ La transformación con ${keyword}${contextText} que cambió todo 💫 Antes vs Después: Mindset limitado → Mentalidad ganadora ¿Ready? 💅`;
+            return `✨ ANTES: Escéptica sobre ${keyword}${contextText} 
+DESPUÉS: Completamente transformada 💫
+Lo que NO esperaba: Que cambiaría mi relación con todo lo demás. La diferencia en mis fotos habla por sí sola... ¿Ready para tu glow up? 💅 #transformacion #mindset`;
+        
         case 'TikTok':
-            return `POV: Intentas ${keyword}${contextText} por primera vez y... 🤯 VIDA = CAMBIADA ✨ No esperaba ESTO 👀`;
+            return `POV: Intentas ${keyword}${contextText} por primera vez esperando resultados "normales"... Pero esto pasó 👀 *mind blown* ¿Alguien más experimentó ESTO? Dueto contándome tu experiencia 🤯 #${keyword.replace(/\s+/g, '')} #transformation`;
+        
         case 'Telegram':
-            return `📊 ANÁLISIS: ${keyword} en 2024${contextText}. Tendencias: +340% adopción, ROI 2.8x, implementación 15-30 días. Recomendación: implementar antes Q1 2025`;
+            return `� ANÁLISIS EXCLUSIVO: ${keyword} en 2024${contextText}
+🔹 Adopción: +340% en últimos 6 meses
+🔹 ROI promedio: 2.8x en 30-60 días
+🔹 Tasa de éxito: 89% con implementación correcta
+📊 Datos de 15 estudios independientes
+💡 Predicción: Quienes no lo adopten en Q1 2025 quedarán 3 años atrás
+📌 ¿Implementas ahora o esperas a que sea "mainstream"?`;
+        
         case 'Reddit':
-            return `Mi experiencia REAL con ${keyword}${contextText} después de 18 meses. TL;DR: Cambió mi vida, pero no como esperaba. Story completo en comentarios...`;
+            return `Mi experiencia BRUTAL con ${keyword}${contextText} - 18 meses después [LONG]
+TL;DR: Cambió mi vida, pero NO como esperaba.
+Backstory: Era escéptico total, lo intenté para probar que era BS...
+Plot twist: Funcionó, pero descubrí algo que nadie menciona...
+[Story completo en comentarios - AMA]`;
+        
         case 'YouTube':
-            return `📺 TUTORIAL: ${keyword} desde CERO${contextText}. En este video: fundamentos, implementación paso a paso, errores comunes, plan 90 días. Links en descripción ⬇️`;
+            return `📺 ${keyword.toUpperCase()} desde CERO - Lo que NADIE te cuenta${contextText}
+✅ Guía completa: 0 a experto en 30 días
+✅ Errores que me costaron 6 meses (para que tú no los cometas)
+✅ Resultados REALES documentados día a día
+✅ Plan exacto que seguí paso a paso
+⬇️ Links y recursos en descripción ⬇️`;
+        
         default:
-            return `Contenido específico para ${networkName} sobre ${keyword}${contextText}`;
+            return `💡 ${keyword}${contextText} cambió mi perspectiva sobre todo. Lo que descubrí desafía lo que todos "sabemos" sobre este tema. ¿Listos para cuestionar sus creencias? 🤔`;
     }
 }
 
@@ -170,18 +196,121 @@ async function callDeepseekAPI(prompt) {
     }
 }
 
-// FUNCIÓN PARA GENERAR PROMPTS ULTRA-OPTIMIZADOS (MÁXIMA VELOCIDAD)
+// FUNCIÓN PARA GENERAR PROMPTS PSICOLÓGICAMENTE OPTIMIZADOS
 function generateUltraSpecificPrompt(keyword, platforms, userContext) {
-    console.log(`[PROMPT] 🎯 Generando prompt ultra-optimizado para: ${platforms.join(', ')}`);
+    console.log(`[PROMPT] 🧠 Generando prompt psicológicamente optimizado para: ${platforms.join(', ')}`);
     
-    // Prompt ultra-compacto para máxima velocidad
-    const contextSection = userContext ? `Contexto: ${userContext.substring(0, 50)}\n` : '';
+    const contextSection = userContext ? `${userContext}\n` : '';
     
-    return `${contextSection}Tema: ${keyword}
+    return `🎯 MISIÓN: Crear copywriting PSICOLÓGICAMENTE IRRESISTIBLE que genere REFLEXIÓN PROFUNDA, EMOCIÓN AUTÉNTICA y ACCIÓN INMEDIATA.
 
-${platforms.map(platform => `${platform}: contenido único`).join('\n')}
+${contextSection}
+TEMA CENTRAL: "${keyword}"
 
-Formato: [Red]: [texto específico]`;
+🧠 PRINCIPIOS PSICOLÓGICOS OBLIGATORIOS:
+• Generar CURIOSIDAD irresistible que pare el scroll
+• Provocar REFLEXIÓN personal profunda 
+• Conectar con EMOCIONES reales (aspiración, nostalgia, urgencia, transformación)
+• Incluir INSIGHTS que cambien perspectivas
+• Despertar DESEO de actuar o experimentar
+• Usar STORYTELLING que genere identificación emocional
+
+📋 ESPECIFICACIONES POR PLATAFORMA:
+
+${platforms.map(platform => {
+    switch(platform) {
+        case 'Facebook':
+            return `🔵 FACEBOOK - Historia Personal Profunda:
+• GANCHO emocional que genere identificación inmediata
+• DESARROLLO con experiencia personal auténtica que inspire
+• PREGUNTA reflexiva que invite al diálogo profundo
+• Tono: íntimo, vulnerable, inspirador
+• Objetivo: Generar comentarios reflexivos y shares emocionales`;
+
+        case 'LinkedIn':
+            return `💼 LINKEDIN - Insight Profesional Transformador:
+• REVELACIÓN contraintuitiva sobre ${keyword} en el ámbito profesional
+• CASO REAL con métricas específicas y lecciones aprendidas
+• REFLEXIÓN sobre aplicación práctica en crecimiento profesional
+• Tono: autoridad, credibilidad, pensamiento estratégico
+• Objetivo: Generar debate intelectual y conexiones de valor`;
+
+        case 'X / Twitter':
+            return `🐦 X/TWITTER - Bomba de Reflexión:
+• STATEMENT contundente que desafíe creencias comunes
+• INSIGHT condensado pero profundo sobre ${keyword}
+• PREGUNTA o reflexión que genere debate inteligente
+• Tono: directo, provocativo, memorable
+• Objetivo: Retweets masivos y respuestas reflexivas`;
+
+        case 'Instagram':
+            return `📸 INSTAGRAM - Transformación Visual:
+• ANTES/DESPUÉS emocional relacionado con ${keyword}
+• MENSAJE aspiracional que inspire cambio personal
+• LLAMADA a documentar su propia transformación
+• Tono: aspiracional, auténtico, motivador
+• Objetivo: Saves masivos y shares en stories`;
+
+        case 'WhatsApp':
+            return `💬 WHATSAPP - Urgencia Personal:
+• REVELACIÓN íntima sobre ${keyword} que genere FOMO
+• BENEFICIO específico con timeframe limitado
+• ACCIÓN inmediata clara y específica
+• Tono: personal, urgente, exclusivo
+• Objetivo: Reenvíos inmediatos y acción directa`;
+
+        case 'TikTok':
+            return `🎵 TIKTOK - Hook Viral:
+• MOMENTO "mind-blown" relacionado con ${keyword}
+• TRANSFORMACIÓN rápida y visual
+• TREND que invite a crear contenido similar
+• Tono: sorprendente, entretenido, relatable
+• Objetivo: Duetos, respuestas y viralización`;
+
+        case 'Telegram':
+            return `📡 TELEGRAM - Análisis Profundo:
+• DATOS sorprendentes sobre ${keyword} con fuentes
+• ANÁLISIS detallado con predicciones específicas
+• RECOMENDACIONES accionables basadas en investigación
+• Tono: analítico, informado, estratégico
+• Objetivo: Forwards a grupos relevantes y discusión`;
+
+        case 'Reddit':
+            return `🤓 REDDIT - Experiencia Auténtica:
+• STORY real, detallada y honesta sobre ${keyword}
+• LECCIONES específicas aprendidas a través de errores
+• INVITACIÓN a compartir experiencias similares
+• Tono: honesto, humilde, detallado
+• Objetivo: Upvotes y comentarios con experiencias propias`;
+
+        case 'YouTube':
+            return `📺 YOUTUBE - Valor Educativo Profundo:
+• TUTORIAL paso a paso con ${keyword} y resultados reales
+• TRANSFORMACIÓN documentada con antes/después
+• CALL-TO-ACTION específica para aplicar el conocimiento
+• Tono: educativo, práctico, inspirador
+• Objetivo: Suscripciones y implementación real`;
+
+        default:
+            return `📱 ${platform.toUpperCase()} - Contenido Reflexivo:
+• INSIGHT profundo sobre ${keyword} específico para esta plataforma
+• REFLEXIÓN que genere pensamiento crítico
+• ACCIÓN específica que invite al engagement auténtico`;
+    }
+}).join('\n\n')}
+
+🔥 FORMATO DE RESPUESTA OBLIGATORIO:
+
+${platforms.map(platform => `**${platform.toUpperCase()}:**
+[Contenido psicológicamente optimizado que cumpla TODOS los criterios arriba especificados]`).join('\n\n')}
+
+⚡ CRITERIOS DE EXCELENCIA CRÍTICOS:
+✅ DEBE generar emoción auténtica (no superficial)
+✅ DEBE incluir elemento de reflexión o insight
+✅ DEBE provocar DESEO de actuar/experimentar/cambiar
+✅ DEBE ser memorable y quoteable
+✅ DEBE conectar con aspiraciones o miedos reales
+✅ Español latino natural, sin errores ortográficos`;
 }
 
 // FUNCIÓN PRINCIPAL PARA GENERAR IDEAS CON TIMEOUT ULTRA-AGRESIVO
