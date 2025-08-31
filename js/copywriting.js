@@ -1668,10 +1668,21 @@ function displayCopywritingResults(copies, params) {
         const networkKey = generationMode === 'single' ? socialNetworks[0] : socialNetworks[index % socialNetworks.length];
         const network = SOCIAL_NETWORKS[networkKey];
         
-        // Determinar qué contenido mostrar - MANEJO MEJORADO CON HASHTAGS
+        // Determinar qué contenido mostrar - MANEJO MEJORADO CON HASHTAGS Y ERRORES
         let contenidoPrincipal = '';
         let hashtags = [];
         let callToAction = '';
+        let isTemplateUsed = false;
+        let errorInfo = null;
+        
+        // Verificar si se usó fallback
+        if (copy.isFallback) {
+            isTemplateUsed = true;
+            errorInfo = {
+                type: copy.errorType || 'UNKNOWN',
+                message: copy.errorMessage || 'Error desconocido'
+            };
+        }
         
         if (copy.rawContent) {
             contenidoPrincipal = copy.rawContent;
@@ -1710,7 +1721,17 @@ function displayCopywritingResults(copies, params) {
                         <span>${network.name}</span>
                     </div>
                     ${copy.variation ? `<span class="variation-badge">Variación ${copy.variation}</span>` : ''}
+                    ${isTemplateUsed ? `<span class="template-warning-badge" title="Se usaron plantillas por: ${errorInfo.message}">⚠️ Template</span>` : ''}
                 </div>
+                ${isTemplateUsed ? `
+                <div class="error-warning-banner">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="error-details">
+                        <strong>Generado con plantillas:</strong> ${errorInfo.message}
+                        <br><small>Para contenido personalizado por IA, verifica la configuración o conexión.</small>
+                    </div>
+                </div>
+                ` : ''}
                 <div class="copywriting-content">
                     <div class="copy-section content-section">
                         <div class="section-content main-content">${contenidoCompleto.replace(/\n/g, '<br>')}</div>
@@ -1805,6 +1826,172 @@ function copySingleCopy(copyObject, networkName) {
         showNotification('❌ Error al copiar el copy', 'error');
     });
 }
+
+/**
+ * Ejecuta un diagnóstico manual de la conexión DeepSeek
+ */
+async function runDeepSeekDiagnostic() {
+    const diagnosticBtn = document.getElementById('diagnosticBtn');
+    const diagnosticResults = document.getElementById('diagnosticResults');
+    
+    if (!diagnosticBtn || !diagnosticResults) {
+        showNotification('Elementos de diagnóstico no encontrados', 'error');
+        return;
+    }
+    
+    try {
+        // Cambiar estado del botón
+        const originalText = diagnosticBtn.innerHTML;
+        diagnosticBtn.disabled = true;
+        diagnosticBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Diagnosticando...';
+        
+        // Mostrar área de resultados
+        diagnosticResults.style.display = 'block';
+        diagnosticResults.innerHTML = `
+            <div class="diagnostic-loading">
+                <i class="fas fa-cog fa-spin"></i>
+                <p>Ejecutando diagnóstico de IA...</p>
+            </div>
+        `;
+        
+        // Llamar a la función de diagnóstico
+        const testFunction = httpsCallable(functions, 'testDeepseekConnection');
+        const result = await testFunction();
+        
+        console.log('[DIAGNOSTIC] Resultado del diagnóstico:', result);
+        
+        if (result.data.success) {
+            displayDiagnosticResults(result.data.diagnostics, result.data.summary);
+        } else {
+            diagnosticResults.innerHTML = `
+                <div class="diagnostic-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>Error en el diagnóstico</h4>
+                    <p>${result.data.error}</p>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('[DIAGNOSTIC] Error ejecutando diagnóstico:', error);
+        
+        let errorMessage = 'Error al ejecutar el diagnóstico';
+        if (error.code === 'unauthenticated') {
+            errorMessage = 'Debes iniciar sesión para ejecutar el diagnóstico';
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+        
+        diagnosticResults.innerHTML = `
+            <div class="diagnostic-error">
+                <i class="fas fa-times-circle"></i>
+                <h4>Error</h4>
+                <p>${errorMessage}</p>
+            </div>
+        `;
+        
+    } finally {
+        // Restaurar botón
+        diagnosticBtn.disabled = false;
+        diagnosticBtn.innerHTML = originalText;
+    }
+}
+
+/**
+ * Muestra los resultados del diagnóstico
+ */
+function displayDiagnosticResults(diagnostics, summary) {
+    const diagnosticResults = document.getElementById('diagnosticResults');
+    
+    const overallStatus = diagnostics.overall;
+    const statusColors = {
+        'healthy': '#10b981',
+        'degraded': '#f59e0b', 
+        'unhealthy': '#ef4444',
+        'unknown': '#6b7280'
+    };
+    
+    const statusIcons = {
+        'healthy': 'fas fa-check-circle',
+        'degraded': 'fas fa-exclamation-triangle',
+        'unhealthy': 'fas fa-times-circle',
+        'unknown': 'fas fa-question-circle'
+    };
+    
+    let resultsHtml = `
+        <div class="diagnostic-results">
+            <div class="diagnostic-header">
+                <i class="${statusIcons[overallStatus]}" style="color: ${statusColors[overallStatus]}"></i>
+                <h4>Diagnóstico de IA</h4>
+                <span class="overall-status" style="color: ${statusColors[overallStatus]}">${overallStatus.toUpperCase()}</span>
+            </div>
+            
+            <div class="diagnostic-summary">
+                <p>${summary}</p>
+                <small>Ejecutado: ${new Date(diagnostics.timestamp).toLocaleString()}</small>
+            </div>
+            
+            <div class="diagnostic-tests">
+    `;
+    
+    Object.entries(diagnostics.tests).forEach(([testName, testResult]) => {
+        const testStatusColor = {
+            'pass': '#10b981',
+            'fail': '#ef4444',
+            'partial': '#f59e0b',
+            'skip': '#6b7280'
+        }[testResult.status];
+        
+        const testStatusIcon = {
+            'pass': 'fas fa-check',
+            'fail': 'fas fa-times',
+            'partial': 'fas fa-exclamation',
+            'skip': 'fas fa-minus'
+        }[testResult.status];
+        
+        resultsHtml += `
+            <div class="diagnostic-test">
+                <div class="test-header">
+                    <i class="${testStatusIcon}" style="color: ${testStatusColor}"></i>
+                    <strong>${testName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}</strong>
+                    <span class="test-status" style="color: ${testStatusColor}">${testResult.status.toUpperCase()}</span>
+                </div>
+                <div class="test-message">${testResult.message}</div>
+                <div class="test-details">${testResult.details}</div>
+            </div>
+        `;
+    });
+    
+    resultsHtml += `
+            </div>
+            
+            <div class="diagnostic-actions">
+                <button class="diagnostic-btn" onclick="runDeepSeekDiagnostic()">
+                    <i class="fas fa-redo"></i> Ejecutar de nuevo
+                </button>
+                <button class="diagnostic-btn secondary" onclick="closeDiagnostic()">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+            </div>
+        </div>
+    `;
+    
+    diagnosticResults.innerHTML = resultsHtml;
+}
+
+/**
+ * Cierra el panel de diagnóstico
+ */
+function closeDiagnostic() {
+    const diagnosticResults = document.getElementById('diagnosticResults');
+    if (diagnosticResults) {
+        diagnosticResults.style.display = 'none';
+    }
+}
+
+// Exportar funciones para uso global
+window.runDeepSeekDiagnostic = runDeepSeekDiagnostic;
+window.closeDiagnostic = closeDiagnostic;
 
 /**
  * Permite editar un copy específico

@@ -1227,3 +1227,244 @@
         font-size: 0.9rem;
     }
 }
+
+/* ===========================================
+   AVISOS DE ERROR Y TEMPLATES
+   =========================================== */
+
+.template-warning-badge {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: help;
+}
+
+.error-warning-banner {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    border: 1px solid #f59e0b;
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: #92400e;
+}
+
+.error-warning-banner i {
+    color: #f59e0b;
+    margin-top: 0.125rem;
+    flex-shrink: 0;
+}
+
+.error-details {
+    flex: 1;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.error-details strong {
+    color: #78350f;
+    font-weight: 600;
+}
+
+.error-details small {
+    color: #a16207;
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* ===========================================
+   DIAGNÓSTICO DE DEEPSEEK
+   =========================================== */
+
+.diagnostic-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    margin: 0.25rem;
+}
+
+.diagnostic-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.diagnostic-btn.secondary {
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+.diagnostic-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#diagnosticResults {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: var(--card-bg-color);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: none;
+}
+
+.diagnostic-loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+}
+
+.diagnostic-loading i {
+    font-size: 2rem;
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.diagnostic-results {
+    animation: slideInUp 0.3s ease-out;
+}
+
+.diagnostic-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.diagnostic-header i {
+    font-size: 1.5rem;
+}
+
+.diagnostic-header h4 {
+    flex: 1;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.overall-status {
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+}
+
+.diagnostic-summary {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.diagnostic-summary p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.diagnostic-summary small {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.diagnostic-tests {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.diagnostic-test {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    border-left: 4px solid var(--accent-color);
+}
+
+.test-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.test-header i {
+    width: 16px;
+    text-align: center;
+}
+
+.test-header strong {
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.test-status {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.125rem 0.5rem;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.test-message {
+    color: var(--text-primary);
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.test-details {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.diagnostic-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.diagnostic-error {
+    text-align: center;
+    padding: 2rem;
+    color: #ef4444;
+}
+
+.diagnostic-error i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.diagnostic-error h4 {
+    color: #ef4444;
+    margin-bottom: 0.5rem;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

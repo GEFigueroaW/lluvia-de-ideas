@@ -330,11 +330,18 @@
                                 ACCESOS RÁPIDOS
                             </h4>
                             <div class="buttons are-small">
+                                <button id="diagnosticBtn" class="diagnostic-btn" onclick="runDeepSeekDiagnostic()">
+                                    <i class="fas fa-stethoscope"></i>
+                                    Diagnóstico IA
+                                </button>
                                 <a href="admin.html" class="modern-btn-small" id="adminBtn" style="background: var(--accent-gradient); color: white; text-decoration: none; display: none; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500; transition: var(--transition-smooth);">
                                     <i class="fas fa-cog"></i>
                                     Panel Admin
                                 </a>
                             </div>
+                            
+                            <!-- Resultados del diagnóstico -->
+                            <div id="diagnosticResults"></div>
                         </div>
                     </div>
 

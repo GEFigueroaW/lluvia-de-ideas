@@ -31,7 +31,7 @@ console.log('[DEBUG] Final DEEPSEEK_API_KEY:', DEEPSEEK_API_KEY ? DEEPSEEK_API_K
 
 // Validar que tenemos la API key
 if (!DEEPSEEK_API_KEY || !DEEPSEEK_API_KEY.startsWith('sk-')) {
-    console.warn('⚠️ DEEPSEEK_API_KEY no configurada correctamente. Usando solo templates fallback.');
+    console.warn('⚠️ DEEPSEEK_API_KEY no configurada correctamente.');
     console.warn('📝 Para usar Deepseek: configura con firebase functions:config:set deepseek.key=TU_API_KEY');
 } else {
     console.log('[INIT] ✅ Deepseek API key configurada correctamente:', DEEPSEEK_API_KEY.substring(0, 8) + '...');
@@ -516,6 +516,99 @@ function getExamplesForNetwork(networkName, keyword, userContext) {
     }
 }
 
+/**
+ * Diagnostica y clasifica errores de DeepSeek para reportar al usuario
+ */
+function diagnoseDeepseekError(error, apiKey) {
+    console.log('[ERROR_DIAGNOSIS] Analizando error de DeepSeek:', error.message);
+    
+    // Verificar API Key
+    if (!apiKey || !apiKey.startsWith('sk-')) {
+        return {
+            type: 'API_KEY_MISSING',
+            userMessage: 'Configuración de IA incompleta',
+            technicalMessage: 'API Key de DeepSeek no configurada correctamente',
+            canUseTemplates: false,
+            severity: 'high'
+        };
+    }
+    
+    // Verificar errores de conexión
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED' || error.message.includes('network')) {
+        return {
+            type: 'NETWORK_ERROR',
+            userMessage: 'Sin conexión a internet',
+            technicalMessage: 'No se pudo conectar con el servidor de IA. Verifica tu conexión a internet.',
+            canUseTemplates: true,
+            severity: 'medium'
+        };
+    }
+    
+    // Verificar timeout
+    if (error.code === 'ECONNABORTED' || error.message.includes('TIMEOUT') || error.message.includes('timeout')) {
+        return {
+            type: 'TIMEOUT_ERROR',
+            userMessage: 'Tiempo de espera agotado',
+            technicalMessage: 'La IA tardó demasiado en responder (más de 12 segundos). Intenta de nuevo.',
+            canUseTemplates: true,
+            severity: 'medium'
+        };
+    }
+    
+    // Verificar límites de API
+    if (error.message.includes('RATE_LIMIT') || error.message.includes('429') || error.message.includes('Too many requests')) {
+        return {
+            type: 'RATE_LIMIT_ERROR',
+            userMessage: 'Límite de solicitudes excedido',
+            technicalMessage: 'Se han realizado demasiadas solicitudes a la IA. Espera unos minutos antes de intentar de nuevo.',
+            canUseTemplates: true,
+            severity: 'medium'
+        };
+    }
+    
+    // Verificar errores de autenticación
+    if (error.message.includes('401') || error.message.includes('Unauthorized') || error.message.includes('API_ERROR: Status 401')) {
+        return {
+            type: 'AUTH_ERROR',
+            userMessage: 'Credenciales de IA inválidas',
+            technicalMessage: 'La API Key de DeepSeek es inválida o ha expirado.',
+            canUseTemplates: false,
+            severity: 'high'
+        };
+    }
+    
+    // Verificar errores del servidor de IA
+    if (error.message.includes('API_ERROR') || error.message.includes('500') || error.message.includes('502') || error.message.includes('503')) {
+        return {
+            type: 'SERVER_ERROR',
+            userMessage: 'Servidor de IA temporalmente no disponible',
+            technicalMessage: 'El servidor de DeepSeek está experimentando problemas. Intenta de nuevo en unos minutos.',
+            canUseTemplates: true,
+            severity: 'medium'
+        };
+    }
+    
+    // Verificar respuesta vacía o inválida
+    if (error.message.includes('EMPTY_RESPONSE') || error.message.includes('CONTENT_TOO_SHORT') || error.message.includes('RESPUESTA_INSUFICIENTE')) {
+        return {
+            type: 'INVALID_RESPONSE',
+            userMessage: 'Respuesta de IA inválida',
+            technicalMessage: 'La IA devolvió una respuesta vacía o muy corta. Intenta con una descripción más específica.',
+            canUseTemplates: true,
+            severity: 'low'
+        };
+    }
+    
+    // Error genérico
+    return {
+        type: 'UNKNOWN_ERROR',
+        userMessage: 'Error inesperado con la IA',
+        technicalMessage: `Error no clasificado: ${error.message}`,
+        canUseTemplates: true,
+        severity: 'medium'
+    };
+}
+
 // FUNCIÓN PARA LLAMAR A DEEPSEEK API CON TIMEOUT Y RETRY OPTIMIZADO
 async function callDeepseekAPI(prompt) {
     console.log(`[DEEPSEEK] 🚀 Iniciando llamada optimizada...`);
@@ -686,29 +779,62 @@ exports.generateIdeas = functions
                         }
                     } catch (deepseekError) {
                         console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform}: ${deepseekError.message}`);
-                        console.log(`[API-${requestId}] 🔄 Usando fallback mejorado para ${platform}`);
+                        
+                        // Diagnosticar el error específico
+                        const errorDiagnosis = diagnoseDeepseekError(deepseekError, DEEPSEEK_API_KEY);
+                        console.log(`[API-${requestId}] � Diagnóstico: ${errorDiagnosis.type} - ${errorDiagnosis.technicalMessage}`);
+                        
+                        // Si es un error crítico que no permite usar templates, lanzar error
+                        if (!errorDiagnosis.canUseTemplates) {
+                            throw new functions.https.HttpsError('failed-precondition', 
+                                `❌ ${errorDiagnosis.userMessage}: ${errorDiagnosis.technicalMessage}`);
+                        }
+                        
+                        // Solo usar fallback para errores que lo permiten, pero informar al usuario
+                        console.log(`[API-${requestId}] ⚠️ Usando contenido de respaldo por: ${errorDiagnosis.userMessage}`);
+                        
                         const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
                         const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
                         const fallbackVisual = generateVisualFormatForPlatform(platform, keyword);
+                        
+                        // Marcar que se usó fallback e incluir el motivo
                         ideas[platform] = { 
-                            rawContent: fallbackContent,
+                            rawContent: `⚠️ GENERADO CON TEMPLATES (${errorDiagnosis.userMessage})\n\n${fallbackContent}`,
                             hashtags: fallbackHashtags,
                             cta: '',
                             formatoVisual: fallbackVisual,
-                            formato: platform
+                            formato: platform,
+                            isFallback: true,
+                            errorType: errorDiagnosis.type,
+                            errorMessage: errorDiagnosis.userMessage
                         };
                     }
                 } else {
-                    console.log(`[API-${requestId}] 🔄 Usando templates mejorados para ${platform} (Deepseek no disponible)`);
+                    // DeepSeek no está disponible - verificar por qué
+                    const errorDiagnosis = diagnoseDeepseekError(new Error('API Key no configurada'), DEEPSEEK_API_KEY);
+                    console.log(`[API-${requestId}] ⚠️ DeepSeek no disponible: ${errorDiagnosis.technicalMessage}`);
+                    
+                    // Si es un error crítico, informar al usuario
+                    if (!errorDiagnosis.canUseTemplates) {
+                        throw new functions.https.HttpsError('failed-precondition', 
+                            `❌ ${errorDiagnosis.userMessage}: ${errorDiagnosis.technicalMessage}`);
+                    }
+                    
+                    // Usar templates pero informar claramente por qué
+                    console.log(`[API-${requestId}] 🔄 Usando contenido de respaldo para ${platform}`);
                     const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
                     const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
                     const fallbackVisual = generateVisualFormatForPlatform(platform, keyword);
+                    
                     ideas[platform] = { 
-                        rawContent: fallbackContent,
+                        rawContent: `⚠️ GENERADO CON TEMPLATES (${errorDiagnosis.userMessage})\n\n${fallbackContent}`,
                         hashtags: fallbackHashtags,
                         cta: '',
                         formatoVisual: fallbackVisual,
-                        formato: platform
+                        formato: platform,
+                        isFallback: true,
+                        errorType: errorDiagnosis.type,
+                        errorMessage: errorDiagnosis.userMessage
                     };
                 }
                 
@@ -783,3 +909,163 @@ function generateVisualFormatForPlatform(platform, keyword) {
     
     return visualSpecs[platform] || visualSpecs['Facebook'];
 }
+
+// FUNCIÓN DE DIAGNÓSTICO MANUAL DE DEEPSEEK
+exports.testDeepseekConnection = functions.https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', 'Authentication required');
+    }
+
+    const requestId = Date.now().toString().slice(-6);
+    console.log(`[TEST-${requestId}] Iniciando diagnóstico de DeepSeek...`);
+
+    const diagnostics = {
+        timestamp: new Date().toISOString(),
+        tests: {},
+        overall: 'unknown'
+    };
+
+    try {
+        // Test 1: API Key Configuration
+        console.log(`[TEST-${requestId}] 1. Verificando configuración de API Key...`);
+        if (!DEEPSEEK_API_KEY) {
+            diagnostics.tests.apiKey = {
+                status: 'fail',
+                message: 'API Key no configurada',
+                details: 'La variable de entorno DEEPSEEK_API_KEY no está configurada'
+            };
+        } else if (!DEEPSEEK_API_KEY.startsWith('sk-')) {
+            diagnostics.tests.apiKey = {
+                status: 'fail',
+                message: 'API Key inválida',
+                details: 'La API Key no tiene el formato correcto (debe empezar con "sk-")'
+            };
+        } else {
+            diagnostics.tests.apiKey = {
+                status: 'pass',
+                message: 'API Key configurada correctamente',
+                details: `Key presente: ${DEEPSEEK_API_KEY.substring(0, 8)}...`
+            };
+        }
+
+        // Test 2: Network Connectivity
+        console.log(`[TEST-${requestId}] 2. Verificando conectividad de red...`);
+        try {
+            const axios = require('axios');
+            const testResponse = await axios.get('https://api.deepseek.com/v1/models', {
+                headers: {
+                    'Authorization': `Bearer ${DEEPSEEK_API_KEY || 'test-key'}`,
+                    'Content-Type': 'application/json'
+                },
+                timeout: 5000,
+                validateStatus: () => true // Aceptar cualquier status para análisis
+            });
+
+            if (testResponse.status === 200) {
+                diagnostics.tests.network = {
+                    status: 'pass',
+                    message: 'Conectividad exitosa',
+                    details: `Servidor responde correctamente (${testResponse.status})`
+                };
+            } else if (testResponse.status === 401) {
+                diagnostics.tests.network = {
+                    status: 'partial',
+                    message: 'Red OK, pero credenciales inválidas',
+                    details: `Servidor alcanzable pero API Key incorrecta (${testResponse.status})`
+                };
+            } else {
+                diagnostics.tests.network = {
+                    status: 'fail',
+                    message: 'Error del servidor',
+                    details: `Servidor responde con error ${testResponse.status}`
+                };
+            }
+        } catch (networkError) {
+            if (networkError.code === 'ENOTFOUND' || networkError.code === 'ECONNREFUSED') {
+                diagnostics.tests.network = {
+                    status: 'fail',
+                    message: 'Sin conexión a internet',
+                    details: 'No se puede alcanzar el servidor de DeepSeek'
+                };
+            } else if (networkError.code === 'ECONNABORTED') {
+                diagnostics.tests.network = {
+                    status: 'fail',
+                    message: 'Timeout de conexión',
+                    details: 'El servidor tardó demasiado en responder'
+                };
+            } else {
+                diagnostics.tests.network = {
+                    status: 'fail',
+                    message: 'Error de red',
+                    details: networkError.message
+                };
+            }
+        }
+
+        // Test 3: API Functionality (solo si los tests anteriores pasan)
+        if (diagnostics.tests.apiKey.status === 'pass' && 
+            (diagnostics.tests.network.status === 'pass' || diagnostics.tests.network.status === 'partial')) {
+            console.log(`[TEST-${requestId}] 3. Verificando funcionalidad de API...`);
+            try {
+                const testPrompt = 'Responde solo con "OK" si este mensaje se recibe correctamente.';
+                const response = await callDeepseekAPI(testPrompt);
+                
+                if (response && response.trim().length > 0) {
+                    diagnostics.tests.apiFunction = {
+                        status: 'pass',
+                        message: 'API funciona correctamente',
+                        details: `Respuesta recibida: "${response.substring(0, 50)}..."`
+                    };
+                } else {
+                    diagnostics.tests.apiFunction = {
+                        status: 'fail',
+                        message: 'Respuesta vacía',
+                        details: 'La API responde pero no devuelve contenido'
+                    };
+                }
+            } catch (apiError) {
+                const errorDiagnosis = diagnoseDeepseekError(apiError, DEEPSEEK_API_KEY);
+                diagnostics.tests.apiFunction = {
+                    status: 'fail',
+                    message: errorDiagnosis.userMessage,
+                    details: errorDiagnosis.technicalMessage
+                };
+            }
+        } else {
+            diagnostics.tests.apiFunction = {
+                status: 'skip',
+                message: 'Saltado por fallos anteriores',
+                details: 'No se puede probar la API sin configuración válida'
+            };
+        }
+
+        // Determinar estado general
+        const failedTests = Object.values(diagnostics.tests).filter(test => test.status === 'fail').length;
+        const skippedTests = Object.values(diagnostics.tests).filter(test => test.status === 'skip').length;
+        const totalTests = Object.keys(diagnostics.tests).length - skippedTests;
+
+        if (failedTests === 0) {
+            diagnostics.overall = 'healthy';
+        } else if (failedTests <= totalTests / 2) {
+            diagnostics.overall = 'degraded';
+        } else {
+            diagnostics.overall = 'unhealthy';
+        }
+
+        console.log(`[TEST-${requestId}] ✅ Diagnóstico completado: ${diagnostics.overall}`);
+        
+        return {
+            success: true,
+            diagnostics: diagnostics,
+            summary: `Estado: ${diagnostics.overall} (${Object.keys(diagnostics.tests).length - skippedTests} tests ejecutados, ${failedTests} fallos)`
+        };
+
+    } catch (error) {
+        console.error(`[TEST-${requestId}] ❌ Error en diagnóstico:`, error.message);
+        return {
+            success: false,
+            error: error.message,
+            diagnostics: diagnostics
+        };
+    }
+});
