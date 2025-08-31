@@ -2,9 +2,6 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const axios = require('axios');
 
-// Cargar variables de entorno de forma segura
-require('dotenv').config();
-
 admin.initializeApp();
 const db = admin.firestore();
 
