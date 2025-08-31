@@ -1693,7 +1693,7 @@ function displayCopywritingResults(copies, params) {
         // Formatear hashtags para display
         const hashtagsDisplay = hashtags.length > 0 ? hashtags.join(' ') : '';
         
-        // Construir contenido completo para mostrar
+        // Construir contenido completo para mostrar - HASHTAGS INTEGRADOS
         let contenidoCompleto = contenidoPrincipal;
         if (callToAction && callToAction.trim()) {
             contenidoCompleto += `\n\n${callToAction}`;
@@ -1713,9 +1713,8 @@ function displayCopywritingResults(copies, params) {
                 </div>
                 <div class="copywriting-content">
                     <div class="copy-section content-section">
-                        <div class="section-content main-content">${contenidoPrincipal.replace(/\n/g, '<br>')}</div>
-                        ${callToAction ? `<div class="section-content cta-content"><strong>Call to Action:</strong><br>${callToAction}</div>` : ''}
-                        ${hashtagsDisplay ? `<div class="section-content hashtags-content"><strong>Hashtags:</strong><br><span class="hashtags">${hashtagsDisplay}</span></div>` : ''}
+                        <div class="section-content main-content">${contenidoCompleto.replace(/\n/g, '<br>')}</div>
+                        ${copy.formatoVisual ? `<div class="section-content visual-format-content"><strong>📱 Formato Visual para IA:</strong><br>${copy.formatoVisual}</div>` : ''}
                     </div>
                 </div>
                 <div class="copywriting-actions">

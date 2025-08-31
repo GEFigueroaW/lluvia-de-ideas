@@ -120,24 +120,25 @@ function buildPromptForPlatform(platform, keyword, userContext) {
 KEYWORD: "${keyword}"
 ESTRATEGIA: ${copyStrategy}
 
-FORMATO ${platform}:
+ESPECIFICACIONES TÉCNICAS PARA ${platform}:
 ${getFormatSpecsForPlatform(platform)}
 
-INSTRUCCIONES:
-1. Contenido único sobre "${keyword}"
-2. Tono: ${spec.tone}
-3. Longitud: ${spec.length}
-4. Incluye hashtags relevantes
-5. CTA específico para ${platform}
-
-RESPUESTA JSON:
+RESPONDE EN FORMATO JSON EXACTO:
 {
-  "contenido": "Copy optimizado para ${platform}",
-  "hashtags": ["#hashtag1", "#hashtag2", "#hashtag3"],
-  "cta": "Call to action específico"
+  "contenido": "[COPY COMPLETO con emojis y hashtags integrados al final del texto]",
+  "formatoVisual": "[DESCRIPCIÓN MUY ESPECÍFICA: dimensiones exactas, colores hex, tipografía, elementos visuales, estilo de imagen/video, props, escenario, iluminación - TODO para trabajar con IA generativa]",
+  "cta": "[Call to action específico para ${platform}]"
 }
 
-Responde SOLO el JSON, sin explicaciones.`;
+REQUISITOS OBLIGATORIOS:
+1. Contenido 100% único sobre "${keyword}" - NO usar plantillas genéricas
+2. Tono: ${spec.tone}
+3. Longitud: ${spec.length}
+4. HASHTAGS integrados AL FINAL del contenido (no por separado)
+5. FORMATO VISUAL obligatorio y específico al 100% para IA
+6. Respuesta SOLO en JSON válido, sin markdown ni explicaciones
+
+CRÍTICO: formatoVisual debe ser súper específico para generar imagen/video con IA (dimensiones, colores, estilo, elementos, props, etc.)`;
 }
 
 // FUNCIÓN PARA OBTENER ESPECIFICACIONES DE FORMATO POR PLATAFORMA
@@ -535,13 +536,13 @@ async function callDeepseekAPI(prompt) {
                         content: prompt
                     }
                 ],
-                max_tokens: 1500, // Reducido para respuestas más rápidas
-                temperature: 0.7,
+                max_tokens: 2500, // Aumentado para respuestas completas con formato visual
+                temperature: 0.8,
                 top_p: 0.9,
                 stream: false
             };
             
-            console.log(`[DEEPSEEK] 📡 Enviando request optimizado...`);
+            console.log(`[DEEPSEEK] 📡 Enviando request con timeout extendido...`);
             
             const response = await axios.post(`${DEEPSEEK_ENDPOINTS[0]}/chat/completions`, requestData, {
                 headers: {
@@ -549,7 +550,7 @@ async function callDeepseekAPI(prompt) {
                     'Content-Type': 'application/json',
                     'User-Agent': 'Firebase-Functions/1.0'
                 },
-                timeout: 10000, // Reducido a 10 segundos
+                timeout: 30000, // 30 segundos para evitar "aborted"
                 validateStatus: (status) => status < 500
             });
             
@@ -688,10 +689,12 @@ exports.generateIdeas = functions
                         console.log(`[API-${requestId}] 🔄 Usando fallback mejorado para ${platform}`);
                         const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
                         const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
+                        const fallbackVisual = generateVisualFormatForPlatform(platform, keyword);
                         ideas[platform] = { 
                             rawContent: fallbackContent,
                             hashtags: fallbackHashtags,
                             cta: '',
+                            formatoVisual: fallbackVisual,
                             formato: platform
                         };
                     }
@@ -699,10 +702,12 @@ exports.generateIdeas = functions
                     console.log(`[API-${requestId}] 🔄 Usando templates mejorados para ${platform} (Deepseek no disponible)`);
                     const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
                     const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
+                    const fallbackVisual = generateVisualFormatForPlatform(platform, keyword);
                     ideas[platform] = { 
                         rawContent: fallbackContent,
                         hashtags: fallbackHashtags,
                         cta: '',
+                        formatoVisual: fallbackVisual,
                         formato: platform
                     };
                 }
@@ -753,3 +758,28 @@ exports.generateIdeas = functions
             throw new functions.https.HttpsError('internal', 'Error interno del servidor');
         }
     });
+
+// FUNCIÓN PARA GENERAR FORMATO VISUAL ESPECÍFICO PARA IA
+function generateVisualFormatForPlatform(platform, keyword) {
+    const visualSpecs = {
+        'Facebook': `📱 FORMATO PARA IA: Post cuadrado 1080x1080px, colores vibrantes (#3b82f6, #ffffff), tipografía bold Sans-serif, imagen de persona sonriendo en ambiente cálido, iluminación natural dorada, props: laptop/café, texto legible en español latino, estilo profesional pero cercano, sin errores ortográficos`,
+        
+        'LinkedIn': `💼 FORMATO PARA IA: Post profesional 1080x1350px, paleta azul corporativo (#0077b5, #ffffff), tipografía moderna Helvetica, persona en oficina moderna o coworking, iluminación profesional clara, props: documentos/gráficos de éxito, vestimenta business casual, texto overlay con datos específicos sobre "${keyword}"`,
+        
+        'X / Twitter': `🐦 FORMATO PARA IA: Header 1200x675px, diseño minimalista, colores contrastantes (#1da1f2, #000000), tipografía impactante bold, imagen conceptual relacionada con "${keyword}", elementos gráficos simples pero efectivos, texto corto y directo, estilo editorial moderno`,
+        
+        'Instagram': `📸 FORMATO PARA IA: Cuadrado 1080x1080px, estética aspiracional, colores Instagram trending (#e4405f, gradientes), tipografía script elegante, lifestyle shot relacionado con "${keyword}", iluminación perfecta golden hour, props estéticos, composición regla de tercios, muy visual`,
+        
+        'WhatsApp': `💬 FORMATO PARA IA: Mensaje visual 800x600px, diseño casual como screenshot, colores WhatsApp (#25d366, #ffffff), tipografía de chat real, mockup de conversación sobre "${keyword}", burbujas de mensaje realistas, hora actual, estilo auténtico personal`,
+        
+        'TikTok': `🎵 FORMATO PARA IA: Video vertical 1080x1920px, colores vibrantes trending, tipografía bold visible, escena dinámica sobre "${keyword}", iluminación TikTok ring light, movimiento fluido, text overlay llamativo, estilo Gen Z, muy energético y moderno`,
+        
+        'Telegram': `📡 FORMATO PARA IA: Mensaje canal 1280x720px, diseño premium oscuro, colores Telegram (#0088cc, #2c2c2c), tipografía tech moderna, gráficos de datos sobre "${keyword}", estilo analytical dashboard, elementos informativos, muy profesional y exclusivo`,
+        
+        'Reddit': `🤓 FORMATO PARA IA: Post discussion 1200x800px, diseño simple Reddit-style, colores (#ff4500, #ffffff), tipografía clara readable, imagen auténtica sin overproduction sobre "${keyword}", estilo casual genuino, elementos community-focused`,
+        
+        'YouTube': `📺 FORMATO PARA IA: Thumbnail 1280x720px, colores llamativos high-contrast, tipografía YouTube bold, composición clickbait profesional sobre "${keyword}", rostro expresivo, elementos gráficos llamativos, texto overlay impactante, estilo YouTuber exitoso`
+    };
+    
+    return visualSpecs[platform] || visualSpecs['Facebook'];
+}
