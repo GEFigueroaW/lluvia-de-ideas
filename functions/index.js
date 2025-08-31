@@ -275,19 +275,19 @@ function getExamplesForNetwork(networkName, keyword, userContext) {
     }
 }
 
-// FUNCIÓN PARA LLAMAR A DEEPSEEK API CON TIMEOUT
+// FUNCIÓN PARA LLAMAR A DEEPSEEK API CON TIMEOUT Y RETRY
 async function callDeepseekAPI(prompt) {
     console.log(`[DEEPSEEK] 🚀 Iniciando llamada...`);
     
     const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-            reject(new Error('TIMEOUT: Deepseek API tardó más de 20 segundos'));
-        }, 20000);
+            reject(new Error('TIMEOUT: Deepseek API tardó más de 25 segundos'));
+        }, 25000);
     });
     
     const apiCall = async () => {
         try {
-            const response = await axios.post(`${DEEPSEEK_ENDPOINTS[0]}/chat/completions`, {
+            const requestData = {
                 model: 'deepseek-chat',
                 messages: [
                     {
@@ -296,29 +296,53 @@ async function callDeepseekAPI(prompt) {
                     }
                 ],
                 max_tokens: 3000,
-                temperature: 0.7
-            }, {
+                temperature: 0.7,
+                top_p: 0.9,
+                stream: false
+            };
+            
+            console.log(`[DEEPSEEK] 📡 Enviando request...`);
+            
+            const response = await axios.post(`${DEEPSEEK_ENDPOINTS[0]}/chat/completions`, requestData, {
                 headers: {
                     'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Firebase-Functions/1.0'
                 },
-                timeout: 15000
+                timeout: 20000,
+                validateStatus: (status) => status < 500 // Acepta 4xx pero rechaza 5xx
             });
             
             console.log(`[DEEPSEEK] ✅ Respuesta recibida:`, response.status);
             
+            if (response.status === 429) {
+                throw new Error('RATE_LIMIT: Too many requests');
+            }
+            
+            if (response.status >= 400) {
+                throw new Error(`API_ERROR: Status ${response.status} - ${JSON.stringify(response.data)}`);
+            }
+            
             if (response.data && response.data.choices && response.data.choices[0]) {
                 const content = response.data.choices[0].message.content.trim();
                 console.log(`[DEEPSEEK] ✅ Contenido generado: ${content.substring(0, 100)}...`);
+                
+                if (content.length < 30) {
+                    throw new Error('CONTENT_TOO_SHORT: Respuesta de Deepseek muy corta');
+                }
+                
                 return content;
             } else {
-                throw new Error('Respuesta de Deepseek vacía o malformada');
+                throw new Error('EMPTY_RESPONSE: Respuesta de Deepseek vacía o malformada');
             }
         } catch (axiosError) {
             console.error(`[DEEPSEEK] ❌ Error en API:`, axiosError.message);
             if (axiosError.response) {
                 console.error(`[DEEPSEEK] ❌ Status:`, axiosError.response.status);
-                console.error(`[DEEPSEEK] ❌ Data:`, axiosError.response.data);
+                console.error(`[DEEPSEEK] ❌ Headers:`, axiosError.response.headers);
+                if (axiosError.response.data) {
+                    console.error(`[DEEPSEEK] ❌ Data:`, JSON.stringify(axiosError.response.data).substring(0, 200));
+                }
             }
             throw axiosError;
         }
@@ -379,36 +403,56 @@ exports.generateIdeas = functions
             // Generar ideas usando Deepseek API (con fallback mejorado)
             const ideas = {};
             
+            // Verificar disponibilidad de Deepseek una sola vez
+            const useDeepseek = DEEPSEEK_API_KEY && DEEPSEEK_API_KEY.startsWith('sk-');
+            console.log(`[API-${requestId}] 🔍 Deepseek disponible: ${useDeepseek ? 'SÍ' : 'NO'}`);
+            
             for (const platform of platforms) {
                 console.log(`[API-${requestId}] Generando contenido para ${platform} con tipo: ${userContext}`);
                 
-                // Activar Deepseek si tenemos API key válida
-                const useDeepseek = DEEPSEEK_API_KEY && DEEPSEEK_API_KEY.startsWith('sk-');
-                
                 if (useDeepseek) {
-                    try {
-                        // Construir prompt específico para Deepseek
-                        const prompt = buildPromptForPlatform(platform, keyword, userContext);
-                        console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform}...`);
-                        
-                        // Llamar a Deepseek API
-                        const deepseekResponse = await callDeepseekAPI(prompt);
-                        
-                        if (deepseekResponse && deepseekResponse.trim().length > 50) {
-                            ideas[platform] = deepseekResponse.trim();
-                            console.log(`[API-${requestId}] ✅ Deepseek exitoso para ${platform}: ${deepseekResponse.substring(0, 100)}...`);
-                        } else {
-                            console.log(`[API-${requestId}] ⚠️ Respuesta de Deepseek insuficiente para ${platform}, usando fallback`);
-                            ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                    let attempt = 0;
+                    let deepseekSuccess = false;
+                    
+                    while (attempt < 2 && !deepseekSuccess) {
+                        attempt++;
+                        try {
+                            // Construir prompt específico para Deepseek
+                            const prompt = buildPromptForPlatform(platform, keyword, userContext);
+                            console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform} (intento ${attempt}/2)...`);
+                            
+                            // Llamar a Deepseek API con delay entre llamadas
+                            if (attempt > 1) {
+                                await new Promise(resolve => setTimeout(resolve, 1000)); // 1 segundo de delay
+                            }
+                            
+                            const deepseekResponse = await callDeepseekAPI(prompt);
+                            
+                            if (deepseekResponse && deepseekResponse.trim().length > 50) {
+                                ideas[platform] = { rawContent: deepseekResponse.trim() };
+                                console.log(`[API-${requestId}] ✅ Deepseek exitoso para ${platform}: ${deepseekResponse.substring(0, 100)}...`);
+                                deepseekSuccess = true;
+                            } else {
+                                console.log(`[API-${requestId}] ⚠️ Respuesta de Deepseek insuficiente para ${platform} (intento ${attempt})`);
+                            }
+                        } catch (deepseekError) {
+                            console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform} (intento ${attempt}): ${deepseekError.message}`);
                         }
-                    } catch (deepseekError) {
-                        console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform}: ${deepseekError.message}`);
-                        console.log(`[API-${requestId}] 🔄 Usando fallback para ${platform}`);
-                        ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                    }
+                    
+                    // Si Deepseek falló después de 2 intentos, usar fallback
+                    if (!deepseekSuccess) {
+                        console.log(`[API-${requestId}] 🔄 Usando fallback mejorado para ${platform} después de fallos en Deepseek`);
+                        ideas[platform] = { rawContent: getExamplesForNetwork(platform, keyword, userContext) };
                     }
                 } else {
                     console.log(`[API-${requestId}] 🔄 Usando templates mejorados para ${platform} (Deepseek no disponible)`);
-                    ideas[platform] = getExamplesForNetwork(platform, keyword, userContext);
+                    ideas[platform] = { rawContent: getExamplesForNetwork(platform, keyword, userContext) };
+                }
+                
+                // Pequeño delay entre plataformas para evitar rate limiting
+                if (platforms.indexOf(platform) < platforms.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }
             }
 
