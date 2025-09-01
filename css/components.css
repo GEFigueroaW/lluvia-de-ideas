@@ -212,15 +212,47 @@
 }
 
 /* Formato Visual Sugerido */
+.visual-section {
+    margin-top: 1rem;
+    border-radius: var(--radius-md);
+    border: 2px solid rgba(175, 82, 222, 0.2);
+    overflow: hidden;
+}
+
+.visual-section .section-header {
+    background: linear-gradient(135deg, #af52de, #8e44ad);
+    color: white;
+    padding: 0.75rem 1rem;
+    margin: 0;
+}
+
+.visual-section .section-header h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.visual-section .section-header small {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
 .visual-section .section-content {
-    background: linear-gradient(135deg, rgba(175, 82, 222, 0.1), rgba(255, 45, 85, 0.1));
-    border-left: 4px solid #af52de;
-    padding: 1rem;
-    border-radius: var(--radius-sm);
-    font-style: italic;
-    color: #8e44ad;
+    background: linear-gradient(135deg, rgba(175, 82, 222, 0.05), rgba(255, 45, 85, 0.05));
+    border: none;
+    border-left: none;
+    padding: 1.25rem;
+    margin: 0;
+    font-style: normal;
+    color: #5a2d66;
     font-size: 0.95rem;
-    line-height: 1.5;
+    line-height: 1.6;
+    border-radius: 0;
 }
 
 /* Hashtags mejorados */

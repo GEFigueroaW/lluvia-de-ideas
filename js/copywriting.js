@@ -1735,8 +1735,18 @@ function displayCopywritingResults(copies, params) {
                 <div class="copywriting-content">
                     <div class="copy-section content-section">
                         <div class="section-content main-content">${contenidoCompleto.replace(/\n/g, '<br>')}</div>
-                        ${copy.formatoVisual ? `<div class="section-content visual-format-content"><strong>📱 Formato Visual para IA:</strong><br>${copy.formatoVisual}</div>` : ''}
                     </div>
+                    ${copy.formatoVisual ? `
+                    <div class="copy-section visual-section">
+                        <div class="section-header">
+                            <h4>🎨 Formato Visual Sugerido</h4>
+                            <small>Especificaciones para IA generativa (${network.name})</small>
+                        </div>
+                        <div class="section-content visual-format-content">
+                            ${copy.formatoVisual.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
                 <div class="copywriting-actions">
                     <button class="copy-btn primary" onclick="copySingleCopy(${JSON.stringify({...copy, contenidoCompleto: contenidoCompleto}).replace(/"/g, '&quot;')}, '${network.name}')">>

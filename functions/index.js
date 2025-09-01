@@ -797,6 +797,7 @@ exports.generateIdeas = functions
                                         rawContent: deepseekResponse.contenido,
                                         hashtags: deepseekResponse.hashtags || [],
                                         cta: deepseekResponse.cta || '',
+                                        formatoVisual: deepseekResponse.formatoVisual || '',
                                         formato: platform
                                     }
                                 };
@@ -808,6 +809,7 @@ exports.generateIdeas = functions
                                         rawContent: deepseekResponse.trim(),
                                         hashtags: generateHashtagsForPlatform(platform, keyword),
                                         cta: '',
+                                        formatoVisual: generateVisualFormatForPlatform(platform, keyword),
                                         formato: platform
                                     }
                                 };
