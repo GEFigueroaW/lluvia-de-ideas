@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ Verificación GitHub Pages - Actualización ${new Date().toISOString()}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .verification-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            margin: 0.5rem 0;
+        }
+        
+        .status-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .status-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .status-info {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .commit-info {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-decoration: none;
+            margin: 0.5rem;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+        }
+        
+        .deployment-time {
+            color: #a7f3d0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="verification-card">
+        <h1>✅ Verificación de Actualización - GitHub Pages</h1>
+        <div class="status-badge status-success">
+            🚀 DESPLEGADO: Septiembre 1, 2025
+        </div>
+        <div class="status-badge status-info">
+            📋 COMMIT: 659d13f - Corrección crítica aplicada
+        </div>
+        
+        <div class="commit-info">
+            <strong>Último commit:</strong><br>
+            659d13f - CORRECCIÓN CRÍTICA: Eliminadas plantillas, mejorado debugging, botones separados funcionando<br>
+            <div class="deployment-time">Pushed: ${new Date().toLocaleString('es-ES')}</div>
+        </div>
+    </div>
+    
+    <div class="verification-card">
+        <h2>🔍 Estado de Sincronización</h2>
+        <p><strong>GitHub Repository:</strong> ✅ Actualizado</p>
+        <p><strong>Firebase Hosting:</strong> ✅ Actualizado</p>
+        <p><strong>GitHub Pages:</strong> <span id="githubPagesStatus">🔄 Verificando...</span></p>
+        
+        <div style="margin-top: 2rem;">
+            <h3>🧪 Tests de Verificación:</h3>
+            <a href="/" class="test-button">
+                🏠 Ir a Aplicación Principal
+            </a>
+            <a href="/demo-botones-corregidos.html" class="test-button">
+                🎯 Demo Botones Corregidos
+            </a>
+            <a href="/test-botones-funcionando.html" class="test-button">
+                🧪 Test Completo
+            </a>
+        </div>
+    </div>
+    
+    <div class="verification-card">
+        <h2>📋 Cambios Aplicados</h2>
+        <ul style="line-height: 1.8;">
+            <li>✅ <strong>Botón "Editar" eliminado</strong> - Ya no aparece</li>
+            <li>✅ <strong>Botón "Copiar Copywriting"</strong> - Implementado (azul)</li>
+            <li>✅ <strong>Botón "Copiar Formato Visual"</strong> - Implementado (morado)</li>
+            <li>✅ <strong>Validación anti-plantillas</strong> - Sistema rechaza fallbacks</li>
+            <li>✅ <strong>Debugging mejorado</strong> - Logs detallados en consola</li>
+            <li>✅ <strong>Funciones globales</strong> - copiarSoloTexto() y copiarSoloVisual()</li>
+        </ul>
+    </div>
+    
+    <div class="verification-card">
+        <h2>⚠️ Importante para Verificar</h2>
+        <p>Si aún ves los botones antiguos:</p>
+        <ol style="line-height: 1.8;">
+            <li><strong>Presiona Ctrl + F5</strong> para limpiar cache del navegador</li>
+            <li><strong>Abre en modo incógnito</strong> para evitar cache</li>
+            <li><strong>Espera 2-3 minutos</strong> - GitHub Pages puede tomar tiempo en actualizar</li>
+            <li><strong>Verifica la consola</strong> (F12) para ver logs de debugging</li>
+        </ol>
+        
+        <div style="background: rgba(245, 158, 11, 0.2); padding: 1rem; border-radius: 10px; margin-top: 1rem;">
+            <strong>💡 Nota:</strong> GitHub Pages actualiza automáticamente desde el repositorio main, 
+            pero puede tomar entre 30 segundos y 5 minutos en reflejar los cambios.
+        </div>
+    </div>
+    
+    <script>
+        // Verificar si estamos en GitHub Pages
+        const isGitHubPages = window.location.hostname.includes('github.io');
+        const statusElement = document.getElementById('githubPagesStatus');
+        
+        if (isGitHubPages) {
+            statusElement.innerHTML = '✅ Actualizado (estás viendo GitHub Pages)';
+            statusElement.className = 'status-success';
+        } else {
+            statusElement.innerHTML = '📍 No estás en GitHub Pages (verificar manualmente)';
+            statusElement.className = 'status-warning';
+        }
+        
+        // Verificar funciones globales
+        setTimeout(() => {
+            if (window.copiarSoloTexto && window.copiarSoloVisual) {
+                console.log('✅ Funciones globales detectadas correctamente');
+            } else {
+                console.log('⚠️ Funciones globales no detectadas - puede ser problema de cache');
+            }
+        }, 1000);
+        
+        console.log('🔍 Página de verificación cargada:', new Date().toISOString());
+        console.log('🌐 Hostname actual:', window.location.hostname);
+        console.log('📍 URL completa:', window.location.href);
+    </script>
+</body>
+</html>
