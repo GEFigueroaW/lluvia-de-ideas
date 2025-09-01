@@ -1248,9 +1248,41 @@ function processCopywritingResponse(ideas, params) {
 }
 
 /**
+ * Función de debug específica para LinkedIn
+ */
+function debugLinkedInContent(content, result) {
+    console.log('🔍 [LINKEDIN DEBUG] Contenido original:', content);
+    console.log('🔍 [LINKEDIN DEBUG] Resultado parseado:', result);
+    
+    // Verificar si el contenido contiene los iconos específicos de LinkedIn
+    const linkedinIcons = ['📊', '🔍'];
+    const hasLinkedInIcons = linkedinIcons.some(icon => content.includes(icon));
+    console.log('🔍 [LINKEDIN DEBUG] Contiene iconos de LinkedIn:', hasLinkedInIcons);
+    
+    // Verificar estructura específica
+    const hasGancho = result.gancho && result.gancho.length > 0;
+    const hasTexto = result.textoPost && result.textoPost.length > 0;
+    const hasFormatoVisual = result.formatoVisual && result.formatoVisual.length > 0;
+    
+    console.log('🔍 [LINKEDIN DEBUG] Estructura detectada:', {
+        gancho: hasGancho,
+        texto: hasTexto,
+        formatoVisual: hasFormatoVisual
+    });
+    
+    if (!hasGancho || !hasTexto || !hasFormatoVisual) {
+        console.error('❌ [LINKEDIN ERROR] Estructura incompleta detectada');
+    }
+    
+    return result;
+}
+
+/**
  * Parsea el contenido de texto de IA para extraer la nueva estructura específica
  */
 function parseAICopyContent(content, platform) {
+    console.log(`[DEBUG] parseAICopyContent para ${platform}:`, content);
+    
     const result = {
         gancho: '',
         textoPost: '',
@@ -1266,17 +1298,17 @@ function parseAICopyContent(content, platform) {
     lines.forEach(line => {
         const cleanLine = line.trim();
         
-        // Detectar Gancho Verbal Impactante
-        if (cleanLine.match(/^(🎯|Gancho Verbal Impactante:|Gancho:|Hook:)/i)) {
-            result.gancho = cleanLine.replace(/^(🎯|Gancho Verbal Impactante:|Gancho:|Hook:)\s*/i, '');
+        // Detectar Gancho Verbal Impactante (AMPLIADO para incluir todos los iconos específicos)
+        if (cleanLine.match(/^(🎯|📊|🚀|💥|📌|🎥|📰|🔥|💡|Gancho Verbal Impactante:|Gancho:|Hook:)/i)) {
+            result.gancho = cleanLine.replace(/^(🎯|📊|🚀|💥|📌|🎥|📰|🔥|💡|Gancho Verbal Impactante:|Gancho:|Hook:)\s*/i, '');
         }
-        // Detectar Texto del Post
-        else if (cleanLine.match(/^(📖|Texto del Post:|Texto:|Desarrollo:|Post:)/i)) {
-            result.textoPost = cleanLine.replace(/^(📖|Texto del Post:|Texto:|Desarrollo:|Post:)\s*/i, '');
+        // Detectar Texto del Post (AMPLIADO para incluir todos los iconos específicos)
+        else if (cleanLine.match(/^(📖|🔍|💡|⚡|💭|📝|Texto del Post:|Texto:|Desarrollo:|Post:)/i)) {
+            result.textoPost = cleanLine.replace(/^(📖|🔍|💡|⚡|💭|📝|Texto del Post:|Texto:|Desarrollo:|Post:)\s*/i, '');
         }
-        // Detectar Llamada a la Acción (CTA)
-        else if (cleanLine.match(/^(🚀|Llamada a la Acción|CTA:|Call to action:|🔔|❤️|💬|📢|👉|🤝)/i)) {
-            result.cta = cleanLine.replace(/^(🚀|Llamada a la Acción \(CTA\):|Llamada a la Acción:|CTA:|Call to action:|🔔|❤️|💬|📢|👉|🤝)\s*/i, '');
+        // Detectar Llamada a la Acción (CTA) (AMPLIADO para incluir todos los iconos específicos)
+        else if (cleanLine.match(/^(🚀|🤝|🔄|❤️|📲|👉|📢|💭|🔔|Llamada a la Acción|CTA:|Call to action:)/i)) {
+            result.cta = cleanLine.replace(/^(🚀|🤝|🔄|❤️|📲|👉|📢|💭|🔔|Llamada a la Acción \(CTA\):|Llamada a la Acción:|CTA:|Call to action:)\s*/i, '');
         }
         // Detectar hashtags
         else if (cleanLine.match(/^(#️⃣|Hashtags:|#)/i) || cleanLine.includes('#')) {
@@ -1293,7 +1325,7 @@ function parseAICopyContent(content, platform) {
             result.formatoVisual = cleanLine.replace(/^(🎨|Formato Visual Sugerido:|Visual:|Imagen:|Formato visual:)\s*/i, '');
         }
         // Si no coincide con ningún patrón específico, podría ser continuación del texto
-        else if (!cleanLine.match(/^(🎯|📖|🚀|#️⃣|🎨|---|VARIACIÓN|Variación)/i) && cleanLine.length > 10) {
+        else if (!cleanLine.match(/^(🎯|📊|🚀|💥|📌|🎥|📰|🔥|💡|📖|🔍|⚡|💭|📝|🤝|🔄|❤️|📲|👉|�|#️⃣|🎨|---|VARIACIÓN|Variación|\*\*)/i) && cleanLine.length > 10) {
             // Si no tenemos texto del post aún, esto podría ser parte de él
             if (!result.textoPost && result.gancho) {
                 result.textoPost = cleanLine;
@@ -1311,22 +1343,30 @@ function parseAICopyContent(content, platform) {
     result.cta = result.cta.replace(/^\[|\]$/g, '').trim();
     result.formatoVisual = result.formatoVisual.replace(/^\[|\]$/g, '').trim();
     
-        // Si no se detectó estructura específica, intentar extraer el contenido de manera más flexible
-        if (!result.gancho && !result.textoPost) {
-            const contentLines = lines.filter(line => 
-                !line.match(/^(---|VARIACIÓN|Variación|\*\*)/i) && 
-                line.length > 5
-            );
-            
-            if (contentLines.length > 0) {
-                result.gancho = contentLines[0] || '';
-                result.textoPost = contentLines.slice(1, -1).join(' ') || '';
-                result.cta = contentLines[contentLines.length - 1] || '';
-            }
-        }
+    // Si no se detectó estructura específica, intentar extraer el contenido de manera más flexible
+    if (!result.gancho && !result.textoPost) {
+        console.log(`[DEBUG] No se detectó estructura para ${platform}, intentando extracción flexible`);
+        const contentLines = lines.filter(line => 
+            !line.match(/^(---|VARIACIÓN|Variación|\*\*)/i) && 
+            line.length > 5
+        );
         
-        return result;
-    }/**
+        if (contentLines.length > 0) {
+            result.gancho = contentLines[0] || '';
+            result.textoPost = contentLines.slice(1, -1).join(' ') || '';
+            result.cta = contentLines[contentLines.length - 1] || '';
+        }
+    }
+    
+    console.log(`[DEBUG] Resultado parseado para ${platform}:`, result);
+    
+    // Debug específico para LinkedIn
+    if (platform === 'linkedin') {
+        return debugLinkedInContent(content, result);
+    }
+    
+    return result;
+}/**
  * Divide el texto en variaciones
  */
 function parseVariations(text) {

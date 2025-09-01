@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test LinkedIn Debug</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5; 
+        }
+        .test-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .debug-output { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-left: 4px solid #007bff; 
+            margin: 10px 0; 
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        button { 
+            background: #0077b5; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #005885; }
+        .error { background: #f8d7da; border-left-color: #dc3545; }
+        .success { background: #d4edda; border-left-color: #28a745; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Específico para LinkedIn</h1>
+    
+    <div class="test-container">
+        <h2>Test de Contenido LinkedIn</h2>
+        <p>Esta página ayuda a diagnosticar problemas específicos con la generación de contenido para LinkedIn.</p>
+        
+        <button onclick="testLinkedInParsing()">🧪 Test Parsing LinkedIn</button>
+        <button onclick="testLinkedInGeneration()">🎯 Test Generación LinkedIn</button>
+        <button onclick="clearDebug()">🗑️ Limpiar Debug</button>
+        
+        <div id="debugOutput" class="debug-output">
+            Resultados del debug aparecerán aquí...
+        </div>
+    </div>
+
+    <script type="module">
+        import { parseAICopyContent, debugLinkedInContent, SOCIAL_NETWORK_SPECS } from './js/copywriting.js';
+        
+        // Hacer funciones disponibles globalmente para testing
+        window.parseAICopyContent = parseAICopyContent;
+        window.debugLinkedInContent = debugLinkedInContent;
+        window.SOCIAL_NETWORK_SPECS = SOCIAL_NETWORK_SPECS;
+        
+        // Contenido de ejemplo para testing
+        const linkedinTestContent = `**VARIACIÓN 1 - EMOCIONAL:**
+
+📊 Gancho Verbal Impactante: ¿Te imaginas transformar tu carrera en solo 30 días?
+
+🔍 Texto del Post: Cada día veo profesionales increíbles que se sienten estancados en sus trabajos. El miedo al cambio los paraliza, pero ¿sabes qué? Las mejores oportunidades están del otro lado de tu zona de confort. Tu experiencia vale más de lo que crees.
+
+🤝 Llamada a la Acción (CTA): Comparte en comentarios: ¿Cuál es el cambio profesional que más miedo te da hacer?
+
+#️⃣ Hashtags: #DesarrolloProfesional #CrecimientoPersonal #LinkedIn #Carrera
+
+🎨 Formato Visual Sugerido: Imagen de una persona en una encrucijada con dos caminos: uno gris que representa la zona de confort y otro colorido que representa las nuevas oportunidades. Texto overlay: "El cambio que temes es el que necesitas".`;
+
+        window.testLinkedInParsing = function() {
+            const output = document.getElementById('debugOutput');
+            output.innerHTML = '🧪 Iniciando test de parsing para LinkedIn...\\n\\n';
+            
+            try {
+                console.log('Testing LinkedIn parsing...');
+                const result = parseAICopyContent(linkedinTestContent, 'linkedin');
+                
+                output.innerHTML += '✅ RESULTADO DEL PARSING:\\n';
+                output.innerHTML += JSON.stringify(result, null, 2);
+                output.innerHTML += '\\n\\n📊 VERIFICACIÓN:\\n';
+                output.innerHTML += `Gancho detectado: ${result.gancho ? '✅' : '❌'}\\n`;
+                output.innerHTML += `Texto detectado: ${result.textoPost ? '✅' : '❌'}\\n`;
+                output.innerHTML += `CTA detectado: ${result.cta ? '✅' : '❌'}\\n`;
+                output.innerHTML += `Formato Visual detectado: ${result.formatoVisual ? '✅' : '❌'}\\n`;
+                
+                output.className = 'debug-output success';
+                
+            } catch (error) {
+                output.innerHTML += '❌ ERROR:\\n' + error.message;
+                output.className = 'debug-output error';
+            }
+        };
+        
+        window.testLinkedInGeneration = function() {
+            const output = document.getElementById('debugOutput');
+            output.innerHTML = '🎯 Generando contenido para LinkedIn...\\n\\n';
+            
+            try {
+                const linkedinConfig = SOCIAL_NETWORK_SPECS.linkedin;
+                output.innerHTML += '📋 CONFIGURACIÓN LINKEDIN:\\n';
+                output.innerHTML += JSON.stringify(linkedinConfig, null, 2);
+                output.innerHTML += '\\n\\n';
+                
+                // Simular una generación con los iconos correctos
+                const testGeneration = {
+                    gancho: 'Test de gancho profesional',
+                    textoPost: 'Este es un test del texto del post para LinkedIn.',
+                    cta: 'Conecta conmigo si estás de acuerdo',
+                    hashtags: ['#LinkedIn', '#Test'],
+                    formatoVisual: 'Imagen profesional con gráfico de crecimiento'
+                };
+                
+                output.innerHTML += '🎯 GENERACIÓN TEST:\\n';
+                output.innerHTML += JSON.stringify(testGeneration, null, 2);
+                output.className = 'debug-output success';
+                
+            } catch (error) {
+                output.innerHTML += '❌ ERROR:\\n' + error.message;
+                output.className = 'debug-output error';
+            }
+        };
+        
+        window.clearDebug = function() {
+            document.getElementById('debugOutput').innerHTML = 'Debug limpiado. Listo para nuevas pruebas...';
+            document.getElementById('debugOutput').className = 'debug-output';
+        };
+    </script>
+</body>
+</html>
