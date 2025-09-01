@@ -123,6 +123,7 @@ function buildPromptForPlatform(platform, keyword, userContext) {
 KEYWORD: "${keyword}"
 ESTRATEGIA: ${copyStrategy}
 CTA INSTRUCTION: ${ctaInstruction}
+CONTEXTO ADICIONAL: ${userContext}
 
 ESPECIFICACIONES TÉCNICAS PARA ${platform}:
 ${getFormatSpecsForPlatform(platform)}
@@ -142,6 +143,7 @@ REQUISITOS OBLIGATORIOS:
 5. FORMATO VISUAL obligatorio y específico al 100% para IA
 6. Respuesta SOLO en JSON válido, sin markdown ni explicaciones
 7. CTA: ${ctaInstruction}
+8. CONTEXTO: Considera toda la información en "CONTEXTO ADICIONAL" para personalizar el contenido
 
 CRÍTICO: formatoVisual debe ser súper específico para generar imagen/video con IA (dimensiones, colores, estilo, elementos, props, etc.)`;
 }
