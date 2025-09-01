@@ -546,7 +546,7 @@ function diagnoseDeepseekError(error, apiKey) {
         return {
             type: 'TIMEOUT_ERROR',
             userMessage: 'Tiempo de espera agotado',
-            technicalMessage: 'La IA tardó demasiado en responder (más de 30 segundos). Intenta de nuevo.',
+            technicalMessage: 'La IA tardó demasiado en responder (más de 15 segundos). Intenta de nuevo.',
             canUseTemplates: true,
             severity: 'medium'
         };
@@ -640,7 +640,7 @@ async function callDeepseekAPI(prompt) {
                     'Content-Type': 'application/json',
                     'User-Agent': 'Firebase-Functions/1.0'
                 },
-                timeout: 30000, // 30 segundos para evitar "aborted"
+                timeout: 15000, // 15 segundos para cumplir límite Firebase (60s total)
                 validateStatus: (status) => status < 500
             });
             
@@ -835,10 +835,7 @@ exports.generateIdeas = functions
                     };
                 }
                 
-                // Delay más pequeño entre plataformas
-                if (platforms.indexOf(platform) < platforms.length - 1) {
-                    await new Promise(resolve => setTimeout(resolve, 200)); // Reducido a 200ms
-                }
+                // Sin delay entre plataformas para acelerar el proceso
             }
 
             // Actualizar contador
