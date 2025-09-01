@@ -546,7 +546,7 @@ function diagnoseDeepseekError(error, apiKey) {
         return {
             type: 'TIMEOUT_ERROR',
             userMessage: 'Tiempo de espera agotado',
-            technicalMessage: 'La IA tardó demasiado en responder (más de 12 segundos). Intenta de nuevo.',
+            technicalMessage: 'La IA tardó demasiado en responder (más de 30 segundos). Intenta de nuevo.',
             canUseTemplates: true,
             severity: 'medium'
         };
@@ -612,8 +612,8 @@ async function callDeepseekAPI(prompt) {
     
     const timeoutPromise = new Promise((_, reject) => {
         setTimeout(() => {
-            reject(new Error('TIMEOUT: Deepseek API tardó más de 12 segundos'));
-        }, 12000); // Reducido a 12 segundos
+            reject(new Error('TIMEOUT: Deepseek API tardó más de 30 segundos'));
+        }, 30000); // Aumentado a 30 segundos para permitir respuestas de DeepSeek
     });
     
     const apiCall = async () => {
