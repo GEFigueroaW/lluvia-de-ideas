@@ -546,7 +546,7 @@ function diagnoseDeepseekError(error, apiKey) {
         return {
             type: 'TIMEOUT_ERROR',
             userMessage: 'Tiempo de espera agotado',
-            technicalMessage: 'La IA tardó demasiado en responder (más de 20 segundos). Intenta de nuevo.',
+            technicalMessage: 'La IA tardó demasiado en responder (más de 25 segundos). Intenta de nuevo.',
             canUseTemplates: true,
             severity: 'medium'
         };
@@ -640,7 +640,7 @@ async function callDeepseekAPI(prompt) {
                     'Content-Type': 'application/json',
                     'User-Agent': 'Firebase-Functions/1.0'
                 },
-                timeout: 20000, // 20 segundos - equilibrio entre velocidad y éxito DeepSeek
+                timeout: 25000, // 25 segundos - último intento antes de procesamiento por lotes
                 validateStatus: (status) => status < 500
             });
             
@@ -706,9 +706,19 @@ exports.generateIdeas = functions
                 throw new functions.https.HttpsError('invalid-argument', 'Keyword y platforms son requeridos');
             }
 
-            // Límite de 3 redes sociales
-            if (platforms.length > 3) {
-                throw new functions.https.HttpsError('invalid-argument', 'Máximo 3 redes sociales');
+            // Límite de 2 redes sociales para evitar timeout de Firebase (60s)
+            // Con DeepSeek tardando ~25s por plataforma, 2 plataformas = ~50s (seguro)
+            if (platforms.length > 2) {
+                console.log(`[API-${requestId}] ⚠️ Limitando de ${platforms.length} a 2 plataformas para evitar timeout`);
+                // Priorizar plataformas: Facebook y LinkedIn son las más usadas
+                const prioritizedPlatforms = ['Facebook', 'LinkedIn', 'Telegram', 'WhatsApp', 'Instagram', 'TikTok', 'X / Twitter', 'YouTube', 'Reddit'];
+                platforms = platforms.sort((a, b) => {
+                    const aIndex = prioritizedPlatforms.indexOf(a);
+                    const bIndex = prioritizedPlatforms.indexOf(b);
+                    return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
+                }).slice(0, 2);
+                
+                console.log(`[API-${requestId}] 📋 Plataformas seleccionadas: [${platforms.join(', ')}]`);
             }
 
             const userRef = db.collection('users').doc(uid);
