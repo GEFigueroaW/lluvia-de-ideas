@@ -706,18 +706,18 @@ exports.generateIdeas = functions
                 throw new functions.https.HttpsError('invalid-argument', 'Keyword y platforms son requeridos');
             }
 
-            // Límite de 2 redes sociales para evitar timeout de Firebase (60s)
-            // Con DeepSeek tardando ~25s por plataforma, 2 plataformas = ~50s (seguro)
+            // Límite de 3 redes sociales (procesamiento paralelo para cumplir tiempo)
+            // Con procesamiento paralelo: 3 plataformas × ~25s = ~25s total (en paralelo)
             let selectedPlatforms = platforms;
-            if (platforms.length > 2) {
-                console.log(`[API-${requestId}] ⚠️ Limitando de ${platforms.length} a 2 plataformas para evitar timeout`);
-                // Priorizar plataformas: Facebook y LinkedIn son las más usadas
+            if (platforms.length > 3) {
+                console.log(`[API-${requestId}] ⚠️ Limitando de ${platforms.length} a 3 plataformas (máximo permitido)`);
+                // Priorizar plataformas: Facebook, LinkedIn y Telegram son las más usadas
                 const prioritizedPlatforms = ['Facebook', 'LinkedIn', 'Telegram', 'WhatsApp', 'Instagram', 'TikTok', 'X / Twitter', 'YouTube', 'Reddit'];
                 selectedPlatforms = platforms.sort((a, b) => {
                     const aIndex = prioritizedPlatforms.indexOf(a);
                     const bIndex = prioritizedPlatforms.indexOf(b);
                     return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
-                }).slice(0, 2);
+                }).slice(0, 3);
                 
                 console.log(`[API-${requestId}] 📋 Plataformas seleccionadas: [${selectedPlatforms.join(', ')}]`);
             }
