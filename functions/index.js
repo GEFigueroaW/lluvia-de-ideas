@@ -708,17 +708,18 @@ exports.generateIdeas = functions
 
             // Límite de 2 redes sociales para evitar timeout de Firebase (60s)
             // Con DeepSeek tardando ~25s por plataforma, 2 plataformas = ~50s (seguro)
+            let selectedPlatforms = platforms;
             if (platforms.length > 2) {
                 console.log(`[API-${requestId}] ⚠️ Limitando de ${platforms.length} a 2 plataformas para evitar timeout`);
                 // Priorizar plataformas: Facebook y LinkedIn son las más usadas
                 const prioritizedPlatforms = ['Facebook', 'LinkedIn', 'Telegram', 'WhatsApp', 'Instagram', 'TikTok', 'X / Twitter', 'YouTube', 'Reddit'];
-                platforms = platforms.sort((a, b) => {
+                selectedPlatforms = platforms.sort((a, b) => {
                     const aIndex = prioritizedPlatforms.indexOf(a);
                     const bIndex = prioritizedPlatforms.indexOf(b);
                     return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex);
                 }).slice(0, 2);
                 
-                console.log(`[API-${requestId}] 📋 Plataformas seleccionadas: [${platforms.join(', ')}]`);
+                console.log(`[API-${requestId}] 📋 Plataformas seleccionadas: [${selectedPlatforms.join(', ')}]`);
             }
 
             const userRef = db.collection('users').doc(uid);
@@ -749,7 +750,7 @@ exports.generateIdeas = functions
             const useDeepseek = DEEPSEEK_API_KEY && DEEPSEEK_API_KEY.startsWith('sk-');
             console.log(`[API-${requestId}] 🔍 Deepseek disponible: ${useDeepseek ? 'SÍ' : 'NO'}`);
             
-            for (const platform of platforms) {
+            for (const platform of selectedPlatforms) {
                 console.log(`[API-${requestId}] Generando contenido para ${platform} con tipo: ${userContext}`);
                 
                 if (useDeepseek) {
