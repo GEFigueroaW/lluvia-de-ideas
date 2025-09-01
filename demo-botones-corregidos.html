@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demostración de Botones Corregidos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .demo-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .demo-content {
+            padding: 2rem;
+        }
+
+        .copywriting-result-item {
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .copywriting-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .social-network-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+        }
+
+        .copywriting-content {
+            padding: 1.5rem;
+        }
+
+        .main-content {
+            background: #f8f9fa;
+            padding: 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .visual-section {
+            margin-top: 1rem;
+            border: 2px solid #af52de;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #af52de, #8e44ad);
+            color: white;
+            padding: 0.75rem 1rem;
+        }
+
+        .section-header h4 {
+            margin: 0;
+            font-size: 1rem;
+        }
+
+        .visual-format-content {
+            background: rgba(175, 82, 222, 0.05);
+            padding: 1.25rem;
+            color: #5a2d66;
+            line-height: 1.6;
+        }
+
+        .copywriting-actions {
+            display: flex;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e1e5e9;
+        }
+
+        .copy-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .copy-btn.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .copy-btn.primary:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6a4190);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .copy-btn.visual {
+            background: linear-gradient(135deg, #af52de, #8e44ad);
+            color: white;
+        }
+
+        .copy-btn.visual:hover {
+            background: linear-gradient(135deg, #9c3bcf, #7d3c98);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(175, 82, 222, 0.4);
+        }
+
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .old-buttons {
+            opacity: 0.6;
+            margin-bottom: 2rem;
+        }
+
+        .old-buttons h3 {
+            color: #dc3545;
+            text-decoration: line-through;
+        }
+
+        .old-buttons .copy-btn.secondary {
+            background: transparent;
+            color: #6c757d;
+            border: 2px solid #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .copywriting-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>📝 Demostración: Botones Corregidos</h1>
+            <p>Comparación ANTES vs DESPUÉS</p>
+        </div>
+
+        <div class="demo-content">
+            <!-- ANTES -->
+            <div class="old-buttons">
+                <h3>❌ ANTES (Incorrecto)</h3>
+                <div class="copywriting-result-item">
+                    <div class="copywriting-header">
+                        <div class="social-network-badge">
+                            <i class="fab fa-facebook-f" style="color: #1877F2;"></i>
+                            <span>Facebook</span>
+                        </div>
+                    </div>
+
+                    <div class="copywriting-content">
+                        <div class="main-content">
+                            ¿Sabías que el 87% de las personas exitosas tienen este hábito matutino?<br><br>
+                            Durante años busqué la clave del éxito hasta que descubrí este simple secreto...<br><br>
+                            ¡Empieza HOY mismo y transforma tu vida!<br><br>
+                            #motivacion #exito #transformacion
+                        </div>
+                    </div>
+
+                    <div class="copywriting-actions">
+                        <button class="copy-btn primary" disabled>
+                            <i class="fas fa-copy"></i> Copiar (todo junto)
+                        </button>
+                        <button class="copy-btn secondary" disabled>
+                            <i class="fas fa-edit"></i> Editar (innecesario)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DESPUÉS -->
+            <h3 style="color: #28a745;">✅ DESPUÉS (Correcto)</h3>
+            
+            <!-- Ejemplo 1: Con formato visual -->
+            <div class="copywriting-result-item">
+                <div class="copywriting-header">
+                    <div class="social-network-badge">
+                        <i class="fab fa-facebook-f" style="color: #1877F2;"></i>
+                        <span>Facebook</span>
+                    </div>
+                </div>
+
+                <div class="copywriting-content">
+                    <div class="main-content">
+                        ¿Sabías que el 87% de las personas exitosas tienen este hábito matutino?<br><br>
+                        Durante años busqué la clave del éxito hasta que descubrí este simple secreto que cambió mi perspectiva para siempre.<br><br>
+                        ¡Empieza HOY mismo y transforma tu vida!<br><br>
+                        #motivacion #exito #transformacion #vida
+                    </div>
+
+                    <div class="visual-section">
+                        <div class="section-header">
+                            <h4>🎨 Formato Visual Sugerido</h4>
+                            <small>Especificaciones para IA generativa (Facebook)</small>
+                        </div>
+                        <div class="visual-format-content">
+                            Imagen cuadrada: persona sonriendo en paisaje natural, luz dorada del amanecer, texto motivacional en español latino legible, tipografía sans-serif moderna, colores cálidos #FF6B35 y #F7931E, composición equilibrada con espacio negativo.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="copywriting-actions">
+                    <button class="copy-btn primary" onclick="copiarTexto1()">
+                        <i class="fas fa-copy"></i> Copiar Copywriting
+                    </button>
+                    <button class="copy-btn visual" onclick="copiarVisual1()">
+                        <i class="fas fa-palette"></i> Copiar Formato Visual
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ejemplo 2: Sin formato visual -->
+            <div class="copywriting-result-item">
+                <div class="copywriting-header">
+                    <div class="social-network-badge">
+                        <i class="fab fa-linkedin-in" style="color: #0A66C2;"></i>
+                        <span>LinkedIn</span>
+                    </div>
+                </div>
+
+                <div class="copywriting-content">
+                    <div class="main-content">
+                        En mis 10 años como CEO he aprendido que el liderazgo no es solo sobre tomar decisiones, sino sobre inspirar a otros a dar lo mejor de sí mismos.<br><br>
+                        ¡Implementa esta estrategia HOY y ve la diferencia!<br><br>
+                        #liderazgo #CEO #estrategia #resultados
+                    </div>
+                </div>
+
+                <div class="copywriting-actions">
+                    <button class="copy-btn primary" onclick="copiarTexto2()">
+                        <i class="fas fa-copy"></i> Copiar Copywriting
+                    </button>
+                    <span style="color: #6c757d; font-style: italic; display: flex; align-items: center;">
+                        ← Solo un botón (sin formato visual)
+                    </span>
+                </div>
+            </div>
+
+            <div id="status" class="status" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        function mostrarEstado(mensaje, tipo = 'success') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = mensaje;
+            statusDiv.className = `status ${tipo}`;
+            statusDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function copiarTexto1() {
+            const texto = `¿Sabías que el 87% de las personas exitosas tienen este hábito matutino?
+
+Durante años busqué la clave del éxito hasta que descubrí este simple secreto que cambió mi perspectiva para siempre.
+
+¡Empieza HOY mismo y transforma tu vida!
+
+#motivacion #exito #transformacion #vida`;
+
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarEstado('📝 Copywriting de Facebook copiado al portapapeles', 'success');
+            }).catch(err => {
+                mostrarEstado('❌ Error al copiar: ' + err.message, 'error');
+            });
+        }
+
+        function copiarVisual1() {
+            const visual = `🎨 FORMATO VISUAL PARA FACEBOOK:
+
+Imagen cuadrada: persona sonriendo en paisaje natural, luz dorada del amanecer, texto motivacional en español latino legible, tipografía sans-serif moderna, colores cálidos #FF6B35 y #F7931E, composición equilibrada con espacio negativo.`;
+
+            navigator.clipboard.writeText(visual).then(() => {
+                mostrarEstado('🎨 Formato visual de Facebook copiado al portapapeles', 'success');
+            }).catch(err => {
+                mostrarEstado('❌ Error al copiar: ' + err.message, 'error');
+            });
+        }
+
+        function copiarTexto2() {
+            const texto = `En mis 10 años como CEO he aprendido que el liderazgo no es solo sobre tomar decisiones, sino sobre inspirar a otros a dar lo mejor de sí mismos.
+
+¡Implementa esta estrategia HOY y ve la diferencia!
+
+#liderazgo #CEO #estrategia #resultados`;
+
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarEstado('📝 Copywriting de LinkedIn copiado al portapapeles', 'success');
+            }).catch(err => {
+                mostrarEstado('❌ Error al copiar: ' + err.message, 'error');
+            });
+        }
+    </script>
+</body>
+</html>
