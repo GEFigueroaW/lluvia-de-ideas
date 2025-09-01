@@ -1781,13 +1781,19 @@ function displayCopywritingResults(copies, params) {
                         <i class="fas fa-copy"></i> Copiar Copywriting
                     </button>
                     ${copy.formatoVisual ? `
-                    <button class="copy-btn visual" onclick="copyVisualFormat('${copy.formatoVisual.replace(/'/g, "\\'")}', '${network.name}')">
+                    <button class="copy-btn visual" onclick="copyVisualFormat(\`${copy.formatoVisual.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, '${network.name}')">
                         <i class="fas fa-palette"></i> Copiar Formato Visual
                     </button>
                     ` : ''}
                 </div>
             </div>
         `;
+        
+        console.log('[DEBUG] HTML generado para', network.name, ':', {
+            hasFormatoVisual: !!copy.formatoVisual,
+            formatoVisual: copy.formatoVisual,
+            contenidoCompleto: contenidoCompleto
+        });
     });
     
     html += `
@@ -1827,6 +1833,7 @@ function displayCopywritingResults(copies, params) {
  * Copia solo el texto del copywriting (sin formato visual)
  */
 function copyCopywritingText(copyObject, networkName) {
+    console.log('[DEBUG] copyCopywritingText llamada con:', copyObject, networkName);
     let copyText = '';
     
     if (typeof copyObject === 'string') {
@@ -1857,6 +1864,7 @@ function copyCopywritingText(copyObject, networkName) {
         }
     }
     
+    console.log('[DEBUG] Texto a copiar:', copyText);
     navigator.clipboard.writeText(copyText.trim()).then(() => {
         showNotification(`📝 Copywriting de ${networkName} copiado al portapapeles`, 'success');
     }).catch(err => {
@@ -1869,8 +1877,10 @@ function copyCopywritingText(copyObject, networkName) {
  * Copia solo el formato visual sugerido
  */
 function copyVisualFormat(formatoVisual, networkName) {
+    console.log('[DEBUG] copyVisualFormat llamada con:', formatoVisual, networkName);
     const visualText = `🎨 FORMATO VISUAL PARA ${networkName.toUpperCase()}:\n\n${formatoVisual}`;
     
+    console.log('[DEBUG] Formato visual a copiar:', visualText);
     navigator.clipboard.writeText(visualText).then(() => {
         showNotification(`🎨 Formato visual de ${networkName} copiado al portapapeles`, 'success');
     }).catch(err => {
