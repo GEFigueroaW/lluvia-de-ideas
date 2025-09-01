@@ -607,6 +607,28 @@ function diagnoseDeepseekError(error, apiKey) {
 }
 
 // FUNCIÓN PARA LLAMAR A DEEPSEEK API CON TIMEOUT Y RETRY OPTIMIZADO
+// FUNCIÓN MEJORADA CON REINTENTOS AUTOMÁTICOS
+async function callDeepseekAPIWithRetry(prompt, platform = 'unknown', maxRetries = 2) {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+        try {
+            console.log(`[DEEPSEEK] 🚀 Intento ${attempt}/${maxRetries} para ${platform}...`);
+            const result = await callDeepseekAPI(prompt);
+            console.log(`[DEEPSEEK] ✅ Éxito en intento ${attempt} para ${platform}`);
+            return result;
+        } catch (error) {
+            console.log(`[DEEPSEEK] ❌ Intento ${attempt}/${maxRetries} falló para ${platform}: ${error.message}`);
+            
+            if (attempt === maxRetries) {
+                console.log(`[DEEPSEEK] 💔 Todos los intentos fallaron para ${platform}`);
+                throw error;
+            }
+            
+            // Pequeña pausa antes del reintento (solo 1 segundo para no alargar mucho)
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+}
+
 async function callDeepseekAPI(prompt) {
     console.log(`[DEEPSEEK] 🚀 Iniciando llamada optimizada...`);
     
@@ -640,7 +662,7 @@ async function callDeepseekAPI(prompt) {
                     'Content-Type': 'application/json',
                     'User-Agent': 'Firebase-Functions/1.0'
                 },
-                timeout: 28000, // 28 segundos - ajuste final basado en logs reales de DeepSeek
+                timeout: 35000, // 35 segundos - aumento para procesamiento paralelo sin competencia
                 validateStatus: (status) => status < 500
             });
             
@@ -707,8 +729,8 @@ exports.generateIdeas = functions
             }
 
             // Límite de 3 redes sociales (procesamiento paralelo para cumplir tiempo)
-            // Con procesamiento paralelo: 3 plataformas × ~28s = ~30s total (simultáneo)
-            // vs secuencial: 3 × 28s = ~84s (excedía el límite de 60s)
+            // Con procesamiento paralelo: 3 plataformas × ~35s = ~40s total (simultáneo + reintentos)
+            // vs secuencial: 3 × 35s = ~105s (excedía el límite de 60s)
             let selectedPlatforms = platforms;
             if (platforms.length > 3) {
                 console.log(`[API-${requestId}] ⚠️ Limitando de ${platforms.length} a 3 plataformas (máximo permitido)`);
@@ -763,7 +785,7 @@ exports.generateIdeas = functions
                         const prompt = buildPromptForPlatform(platform, keyword, userContext);
                         console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform}...`);
                         
-                        const deepseekResponse = await callDeepseekAPI(prompt);
+                        const deepseekResponse = await callDeepseekAPIWithRetry(prompt, platform);
                         
                         if (deepseekResponse && (deepseekResponse.contenido || deepseekResponse.length > 30)) {
                             // Manejar respuesta estructurada de Deepseek
