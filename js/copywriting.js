@@ -1668,10 +1668,10 @@ function updateTemplatePreview() {
 }
 
 /**
- * Muestra los resultados del copywriting generado
+ * Muestra los resultados del copywriting generado - VERSIÓN CORREGIDA
  */
-// FUNCIÓN SIMPLIFICADA PARA MOSTRAR SOLO CONTENIDO UNIFICADO
 function displayCopywritingResults(copies, params) {
+    console.log('[DEBUG] displayCopywritingResults llamada con:', copies, params);
     const container = document.getElementById('ideasContainer');
     if (!container) return;
     
@@ -1696,50 +1696,28 @@ function displayCopywritingResults(copies, params) {
         const networkKey = generationMode === 'single' ? socialNetworks[0] : socialNetworks[index % socialNetworks.length];
         const network = SOCIAL_NETWORKS[networkKey];
         
-        // Determinar qué contenido mostrar - MANEJO MEJORADO CON HASHTAGS Y ERRORES
-        let contenidoPrincipal = '';
-        let hashtags = [];
-        let callToAction = '';
-        let isTemplateUsed = false;
-        let errorInfo = null;
-        
-        // Verificar si se usó fallback
-        if (copy.isFallback) {
-            isTemplateUsed = true;
-            errorInfo = {
-                type: copy.errorType || 'UNKNOWN',
-                message: copy.errorMessage || 'Error desconocido'
-            };
-        }
-        
+        // Construir contenido completo para mostrar
+        let contenidoCompleto = '';
         if (copy.rawContent) {
-            contenidoPrincipal = copy.rawContent;
-            hashtags = copy.hashtags || [];
-            callToAction = copy.cta || '';
+            contenidoCompleto = copy.rawContent;
         } else if (copy.gancho && copy.textoPost && copy.cta) {
-            // Combinar las partes en un solo texto fluido (formato legacy)
-            contenidoPrincipal = `${copy.gancho} ${copy.textoPost}`;
-            callToAction = copy.cta;
-            hashtags = copy.hashtags || [];
+            contenidoCompleto = `${copy.gancho}\n\n${copy.textoPost}\n\n${copy.cta}`;
+            if (copy.hashtags && copy.hashtags.length > 0) {
+                contenidoCompleto += `\n\n${copy.hashtags.join(' ')}`;
+            }
         } else if (copy.gancho) {
-            contenidoPrincipal = copy.gancho;
+            contenidoCompleto = copy.gancho;
         } else if (copy.textoPost) {
-            contenidoPrincipal = copy.textoPost;
+            contenidoCompleto = copy.textoPost;
         } else {
-            contenidoPrincipal = 'Sin contenido generado';
+            contenidoCompleto = 'Sin contenido generado';
         }
         
-        // Formatear hashtags para display
-        const hashtagsDisplay = hashtags.length > 0 ? hashtags.join(' ') : '';
+        // Limpiar formato visual si existe
+        const formatoVisual = copy.formatoVisual || '';
+        const tieneFormatoVisual = formatoVisual.trim().length > 0;
         
-        // Construir contenido completo para mostrar - HASHTAGS INTEGRADOS
-        let contenidoCompleto = contenidoPrincipal;
-        if (callToAction && callToAction.trim()) {
-            contenidoCompleto += `\n\n${callToAction}`;
-        }
-        if (hashtagsDisplay) {
-            contenidoCompleto += `\n\n${hashtagsDisplay}`;
-        }
+        console.log(`[DEBUG] Red ${network.name}: tieneFormatoVisual=${tieneFormatoVisual}, formatoVisual="${formatoVisual}"`);
         
         html += `
             <div class="copywriting-result-item animate__animated animate__fadeInUp" style="animation-delay: ${index * 0.1}s">
@@ -1749,51 +1727,37 @@ function displayCopywritingResults(copies, params) {
                         <span>${network.name}</span>
                     </div>
                     ${copy.variation ? `<span class="variation-badge">Variación ${copy.variation}</span>` : ''}
-                    ${isTemplateUsed ? `<span class="template-warning-badge" title="Se usaron plantillas por: ${errorInfo.message}">⚠️ Template</span>` : ''}
                 </div>
-                ${isTemplateUsed ? `
-                <div class="error-warning-banner">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div class="error-details">
-                        <strong>Generado con plantillas:</strong> ${errorInfo.message}
-                        <br><small>Para contenido personalizado por IA, verifica la configuración o conexión.</small>
-                    </div>
-                </div>
-                ` : ''}
+                
                 <div class="copywriting-content">
                     <div class="copy-section content-section">
                         <div class="section-content main-content">${contenidoCompleto.replace(/\n/g, '<br>')}</div>
                     </div>
-                    ${copy.formatoVisual ? `
+                    ${tieneFormatoVisual ? `
                     <div class="copy-section visual-section">
                         <div class="section-header">
                             <h4>🎨 Formato Visual Sugerido</h4>
                             <small>Especificaciones para IA generativa (${network.name})</small>
                         </div>
                         <div class="section-content visual-format-content">
-                            ${copy.formatoVisual.replace(/\n/g, '<br>')}
+                            ${formatoVisual.replace(/\n/g, '<br>')}
                         </div>
                     </div>
                     ` : ''}
                 </div>
+                
                 <div class="copywriting-actions">
-                    <button class="copy-btn primary" onclick="window.copyTextOnly(\`${contenidoCompleto.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, '${network.name}')">
+                    <button class="copy-btn primary" onclick="copiarSoloTexto('${contenidoCompleto.replace(/'/g, "\\'")}', '${network.name}')">
                         <i class="fas fa-copy"></i> Copiar Copywriting
                     </button>
-                    ${copy.formatoVisual ? `
-                    <button class="copy-btn visual" onclick="window.copyVisualOnly(\`${copy.formatoVisual.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, '${network.name}')">
+                    ${tieneFormatoVisual ? `
+                    <button class="copy-btn visual" onclick="copiarSoloVisual('${formatoVisual.replace(/'/g, "\\'")}', '${network.name}')">
                         <i class="fas fa-palette"></i> Copiar Formato Visual
                     </button>
                     ` : ''}
                 </div>
             </div>
         `;
-        
-        console.log('[DEBUG] HTML generado para', network.name, ':', {
-            hasFormatoVisual: !!copy.formatoVisual,
-            formatoVisual: copy.formatoVisual,
-            contenidoCompleto: contenidoCompleto
-        });
     });
     
     html += `
@@ -1818,6 +1782,7 @@ function displayCopywritingResults(copies, params) {
         </div>
     `;
     
+    console.log('[DEBUG] HTML generado:', html);
     container.innerHTML = html;
     
     // Hacer scroll automático a los resultados
@@ -2095,33 +2060,33 @@ function closeDiagnostic() {
     }
 }
 
+// FUNCIONES GLOBALES SIMPLES PARA BOTONES
+window.copiarSoloTexto = function(contenido, plataforma) {
+    console.log('[DEBUG] copiarSoloTexto:', contenido, plataforma);
+    navigator.clipboard.writeText(contenido).then(() => {
+        showNotification(`📝 Copywriting de ${plataforma} copiado`, 'success');
+    }).catch(err => {
+        console.error('Error al copiar:', err);
+        showNotification('❌ Error al copiar', 'error');
+    });
+};
+
+window.copiarSoloVisual = function(formatoVisual, plataforma) {
+    console.log('[DEBUG] copiarSoloVisual:', formatoVisual, plataforma);
+    const texto = `🎨 FORMATO VISUAL PARA ${plataforma.toUpperCase()}:\n\n${formatoVisual}`;
+    navigator.clipboard.writeText(texto).then(() => {
+        showNotification(`🎨 Formato visual de ${plataforma} copiado`, 'success');
+    }).catch(err => {
+        console.error('Error al copiar:', err);
+        showNotification('❌ Error al copiar formato visual', 'error');
+    });
+};
+
 // Exportar funciones para uso global - NUEVA UBICACIÓN AL FINAL DEL ARCHIVO
 window.runDeepSeekDiagnostic = runDeepSeekDiagnostic;
 window.closeDiagnostic = closeDiagnostic;
 window.copyCopywritingText = copyCopywritingText;
 window.copyVisualFormat = copyVisualFormat;
-
-// NUEVA FUNCIÓN SIMPLIFICADA PARA BOTONES
-window.copyTextOnly = function(contenido, plataforma) {
-    console.log('[DEBUG] copyTextOnly llamada:', contenido, plataforma);
-    navigator.clipboard.writeText(contenido).then(() => {
-        showNotification(`📝 Copywriting de ${plataforma} copiado`, 'success');
-    }).catch(err => {
-        console.error('Error:', err);
-        showNotification('❌ Error al copiar', 'error');
-    });
-};
-
-window.copyVisualOnly = function(formatoVisual, plataforma) {
-    console.log('[DEBUG] copyVisualOnly llamada:', formatoVisual, plataforma);
-    const texto = `🎨 FORMATO VISUAL PARA ${plataforma.toUpperCase()}:\n\n${formatoVisual}`;
-    navigator.clipboard.writeText(texto).then(() => {
-        showNotification(`🎨 Formato visual de ${plataforma} copiado`, 'success');
-    }).catch(err => {
-        console.error('Error:', err);
-        showNotification('❌ Error al copiar formato visual', 'error');
-    });
-};
 
 /* FUNCIONES DE EDICIÓN REMOVIDAS - Ya no son necesarias
 /**
