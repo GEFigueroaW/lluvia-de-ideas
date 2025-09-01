@@ -1777,11 +1777,11 @@ function displayCopywritingResults(copies, params) {
                     ` : ''}
                 </div>
                 <div class="copywriting-actions">
-                    <button class="copy-btn primary" onclick="copyCopywritingText(${JSON.stringify({...copy, contenidoCompleto: contenidoCompleto}).replace(/"/g, '&quot;')}, '${network.name}')">
+                    <button class="copy-btn primary" onclick="window.copyTextOnly(\`${contenidoCompleto.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, '${network.name}')">
                         <i class="fas fa-copy"></i> Copiar Copywriting
                     </button>
                     ${copy.formatoVisual ? `
-                    <button class="copy-btn visual" onclick="copyVisualFormat(\`${copy.formatoVisual.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, '${network.name}')">
+                    <button class="copy-btn visual" onclick="window.copyVisualOnly(\`${copy.formatoVisual.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`, '${network.name}')">
                         <i class="fas fa-palette"></i> Copiar Formato Visual
                     </button>
                     ` : ''}
@@ -2095,11 +2095,33 @@ function closeDiagnostic() {
     }
 }
 
-// Exportar funciones para uso global
+// Exportar funciones para uso global - NUEVA UBICACIÓN AL FINAL DEL ARCHIVO
 window.runDeepSeekDiagnostic = runDeepSeekDiagnostic;
 window.closeDiagnostic = closeDiagnostic;
 window.copyCopywritingText = copyCopywritingText;
 window.copyVisualFormat = copyVisualFormat;
+
+// NUEVA FUNCIÓN SIMPLIFICADA PARA BOTONES
+window.copyTextOnly = function(contenido, plataforma) {
+    console.log('[DEBUG] copyTextOnly llamada:', contenido, plataforma);
+    navigator.clipboard.writeText(contenido).then(() => {
+        showNotification(`📝 Copywriting de ${plataforma} copiado`, 'success');
+    }).catch(err => {
+        console.error('Error:', err);
+        showNotification('❌ Error al copiar', 'error');
+    });
+};
+
+window.copyVisualOnly = function(formatoVisual, plataforma) {
+    console.log('[DEBUG] copyVisualOnly llamada:', formatoVisual, plataforma);
+    const texto = `🎨 FORMATO VISUAL PARA ${plataforma.toUpperCase()}:\n\n${formatoVisual}`;
+    navigator.clipboard.writeText(texto).then(() => {
+        showNotification(`🎨 Formato visual de ${plataforma} copiado`, 'success');
+    }).catch(err => {
+        console.error('Error:', err);
+        showNotification('❌ Error al copiar formato visual', 'error');
+    });
+};
 
 /* FUNCIONES DE EDICIÓN REMOVIDAS - Ya no son necesarias
 /**

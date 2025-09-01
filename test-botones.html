@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Botones de Copia</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-container { 
+            border: 1px solid #ccc; 
+            padding: 20px; 
+            margin: 20px 0; 
+            border-radius: 8px; 
+        }
+        .copy-btn { 
+            margin: 5px; 
+            padding: 10px 15px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            color: white;
+            font-weight: bold;
+        }
+        .copy-btn.primary { background: #007bff; }
+        .copy-btn.visual { background: #8e44ad; }
+        .copy-btn:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Botones de Copia</h1>
+    
+    <div class="test-container">
+        <h3>Facebook - Con Formato Visual</h3>
+        <p><strong>Copywriting:</strong> ¿Sabías que el 87% de las personas exitosas tienen este hábito? Durante años busqué la clave del éxito... ¡Empieza HOY mismo!</p>
+        <p><strong>Formato Visual:</strong> Imagen cuadrada: persona sonriendo, luz natural, colores cálidos...</p>
+        
+        <button class="copy-btn primary" onclick="testCopyCopywriting()">
+            <i class="fas fa-copy"></i> Copiar Copywriting
+        </button>
+        
+        <button class="copy-btn visual" onclick="testCopyVisual()">
+            <i class="fas fa-palette"></i> Copiar Formato Visual
+        </button>
+    </div>
+
+    <div class="test-container">
+        <h3>LinkedIn - Sin Formato Visual</h3>
+        <p><strong>Copywriting:</strong> En mis 10 años como CEO he aprendido que el liderazgo no es solo sobre tomar decisiones...</p>
+        
+        <button class="copy-btn primary" onclick="testCopyCopywriting2()">
+            <i class="fas fa-copy"></i> Copiar Copywriting
+        </button>
+        
+        <span style="color: #666;">← Solo un botón porque no hay formato visual</span>
+    </div>
+
+    <div id="status" style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px;"></div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = `<strong>[${type.toUpperCase()}]</strong> ${message}`;
+            statusDiv.style.background = type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : '#f0f0f0';
+        }
+
+        function testCopyCopywriting() {
+            const copyText = `¿Sabías que el 87% de las personas exitosas tienen este hábito?
+
+Durante años busqué la clave del éxito hasta que descubrí este simple secreto que cambió mi perspectiva para siempre.
+
+¡Empieza HOY mismo y transforma tu vida!
+
+#motivacion #exito #transformacion #vida`;
+
+            navigator.clipboard.writeText(copyText).then(() => {
+                showStatus('📝 Copywriting de Facebook copiado al portapapeles', 'success');
+            }).catch(err => {
+                showStatus('❌ Error al copiar el copywriting: ' + err.message, 'error');
+            });
+        }
+
+        function testCopyVisual() {
+            const visualText = `🎨 FORMATO VISUAL PARA FACEBOOK:
+
+Imagen cuadrada: persona sonriendo, luz natural, colores cálidos, texto motivacional en español latino legible, sin errores ortográficos. Fondo con degradado suave, tipografía sans-serif limpia, elementos gráficos minimalistas que refuercen el mensaje.`;
+
+            navigator.clipboard.writeText(visualText).then(() => {
+                showStatus('🎨 Formato visual de Facebook copiado al portapapeles', 'success');
+            }).catch(err => {
+                showStatus('❌ Error al copiar el formato visual: ' + err.message, 'error');
+            });
+        }
+
+        function testCopyCopywriting2() {
+            const copyText = `En mis 10 años como CEO he aprendido que el liderazgo no es solo sobre tomar decisiones, sino sobre inspirar a otros a dar lo mejor de sí mismos.
+
+¡Implementa esta estrategia HOY y ve la diferencia!
+
+#liderazgo #CEO #estrategia #resultados`;
+
+            navigator.clipboard.writeText(copyText).then(() => {
+                showStatus('📝 Copywriting de LinkedIn copiado al portapapeles', 'success');
+            }).catch(err => {
+                showStatus('❌ Error al copiar el copywriting: ' + err.message, 'error');
+            });
+        }
+
+        // Mostrar información inicial
+        showStatus('Página de prueba cargada. Prueba los botones para verificar la funcionalidad.');
+    </script>
+</body>
+</html>
