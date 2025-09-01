@@ -1777,12 +1777,14 @@ function displayCopywritingResults(copies, params) {
                     ` : ''}
                 </div>
                 <div class="copywriting-actions">
-                    <button class="copy-btn primary" onclick="copySingleCopy(${JSON.stringify({...copy, contenidoCompleto: contenidoCompleto}).replace(/"/g, '&quot;')}, '${network.name}')">>
-                        <i class="fas fa-copy"></i> Copiar
+                    <button class="copy-btn primary" onclick="copyCopywritingText(${JSON.stringify({...copy, contenidoCompleto: contenidoCompleto}).replace(/"/g, '&quot;')}, '${network.name}')">
+                        <i class="fas fa-copy"></i> Copiar Copywriting
                     </button>
-                    <button class="copy-btn secondary" onclick="editCopy(${index})">
-                        <i class="fas fa-edit"></i> Editar
+                    ${copy.formatoVisual ? `
+                    <button class="copy-btn visual" onclick="copyVisualFormat('${copy.formatoVisual.replace(/'/g, "\\'")}', '${network.name}')">
+                        <i class="fas fa-palette"></i> Copiar Formato Visual
                     </button>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -1822,7 +1824,63 @@ function displayCopywritingResults(copies, params) {
 }
 
 /**
- * Copia un copy individual
+ * Copia solo el texto del copywriting (sin formato visual)
+ */
+function copyCopywritingText(copyObject, networkName) {
+    let copyText = '';
+    
+    if (typeof copyObject === 'string') {
+        copyText = copyObject;
+    } else if (copyObject.contenidoCompleto) {
+        copyText = copyObject.contenidoCompleto;
+    } else {
+        // Construir el copywriting sin formato visual
+        if (copyObject.gancho) {
+            copyText += `${copyObject.gancho}\n\n`;
+        }
+        
+        if (copyObject.textoPost) {
+            copyText += `${copyObject.textoPost}\n\n`;
+        }
+        
+        if (copyObject.cta) {
+            copyText += `${copyObject.cta}\n\n`;
+        }
+        
+        if (copyObject.hashtags && copyObject.hashtags.length > 0) {
+            copyText += `${copyObject.hashtags.join(' ')}`;
+        }
+        
+        // Si no hay estructura, usar el contenido raw
+        if (!copyText && copyObject.rawContent) {
+            copyText = copyObject.rawContent;
+        }
+    }
+    
+    navigator.clipboard.writeText(copyText.trim()).then(() => {
+        showNotification(`📝 Copywriting de ${networkName} copiado al portapapeles`, 'success');
+    }).catch(err => {
+        console.error('Error al copiar copywriting:', err);
+        showNotification('❌ Error al copiar el copywriting', 'error');
+    });
+}
+
+/**
+ * Copia solo el formato visual sugerido
+ */
+function copyVisualFormat(formatoVisual, networkName) {
+    const visualText = `🎨 FORMATO VISUAL PARA ${networkName.toUpperCase()}:\n\n${formatoVisual}`;
+    
+    navigator.clipboard.writeText(visualText).then(() => {
+        showNotification(`🎨 Formato visual de ${networkName} copiado al portapapeles`, 'success');
+    }).catch(err => {
+        console.error('Error al copiar formato visual:', err);
+        showNotification('❌ Error al copiar el formato visual', 'error');
+    });
+}
+
+/**
+ * Copia un copy individual (función legacy mantenida para compatibilidad)
  */
 function copySingleCopy(copyObject, networkName) {
     let copyText = '';
@@ -2030,76 +2088,30 @@ function closeDiagnostic() {
 // Exportar funciones para uso global
 window.runDeepSeekDiagnostic = runDeepSeekDiagnostic;
 window.closeDiagnostic = closeDiagnostic;
+window.copyCopywritingText = copyCopywritingText;
+window.copyVisualFormat = copyVisualFormat;
 
+/* FUNCIONES DE EDICIÓN REMOVIDAS - Ya no son necesarias
 /**
  * Permite editar un copy específico
  */
-function editCopy(copyIndex) {
-    const copyItems = document.querySelectorAll('.copywriting-result-item');
-    const copyItem = copyItems[copyIndex];
-    
-    if (!copyItem) return;
-    
-    const contentDiv = copyItem.querySelector('.copywriting-content');
-    const isEditing = contentDiv.classList.contains('editing');
-    
-    if (isEditing) {
-        // Guardar cambios
-        saveCopyEdits(copyIndex);
-    } else {
-        // Entrar en modo edición
-        enterEditMode(copyIndex);
-    }
+/* function editCopy(copyIndex) {
+    // Función removida - ya no se usa el botón de editar
 }
 
 /**
  * Entra en modo edición para un copy
  */
-function enterEditMode(copyIndex) {
-    const copyItems = document.querySelectorAll('.copywriting-result-item');
-    const copyItem = copyItems[copyIndex];
-    const contentDiv = copyItem.querySelector('.copywriting-content');
-    const editBtn = copyItem.querySelector('.copy-btn.secondary');
-    
-    // Marcar como editando
-    contentDiv.classList.add('editing');
-    editBtn.innerHTML = '<i class="fas fa-save"></i> Guardar';
-    editBtn.classList.add('save-mode');
-    
-    // Hacer editables todas las secciones de contenido
-    const sections = contentDiv.querySelectorAll('.section-content');
-    sections.forEach(section => {
-        const currentText = section.innerText || section.textContent;
-        section.innerHTML = `<textarea class="edit-textarea">${currentText}</textarea>`;
-    });
-    
-    showNotification('✏️ Modo edición activado. Modifica el texto y guarda los cambios.', 'info');
+/* function enterEditMode(copyIndex) {
+    // Función removida - ya no se usa el botón de editar
 }
 
 /**
  * Guarda las ediciones realizadas
  */
-function saveCopyEdits(copyIndex) {
-    const copyItems = document.querySelectorAll('.copywriting-result-item');
-    const copyItem = copyItems[copyIndex];
-    const contentDiv = copyItem.querySelector('.copywriting-content');
-    const editBtn = copyItem.querySelector('.copy-btn.secondary');
-    
-    // Obtener los nuevos valores
-    const textareas = contentDiv.querySelectorAll('.edit-textarea');
-    textareas.forEach(textarea => {
-        const newText = textarea.value;
-        const sectionContent = textarea.parentElement;
-        sectionContent.innerHTML = newText.replace(/\n/g, '<br>');
-    });
-    
-    // Salir del modo edición
-    contentDiv.classList.remove('editing');
-    editBtn.innerHTML = '<i class="fas fa-edit"></i> Editar';
-    editBtn.classList.remove('save-mode');
-    
-    showNotification('✅ Cambios guardados correctamente', 'success');
-}
+/* function saveCopyEdits(copyIndex) {
+    // Función removida - ya no se usa el botón de editar
+} */
 
 /**
  * Copia todos los copies generados

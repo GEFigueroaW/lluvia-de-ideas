@@ -662,6 +662,16 @@
     transform: translateY(-1px);
 }
 
+.copy-btn.visual {
+    background: linear-gradient(135deg, #af52de, #8e44ad);
+    color: white;
+}
+
+.copy-btn.visual:hover {
+    background: linear-gradient(135deg, #9c3bcf, #7d3c98);
+    transform: translateY(-1px);
+}
+
 .copy-btn.secondary {
     background: transparent;
     color: var(--text-color);
