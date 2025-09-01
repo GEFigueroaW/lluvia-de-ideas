@@ -558,11 +558,27 @@ async function generateCopywriting(params) {
         
         const result = await generateFunction(cloudFunctionParams);
         
-        console.log('[COPYWRITING] Resultado de generateIdeas:', result);
+        console.log('[COPYWRITING] Resultado RAW de generateIdeas:', result);
+        console.log('[COPYWRITING] Resultado.data:', result.data);
+        
+        // Verificar que la respuesta no sea un fallback de plantillas
+        if (result.data && result.data.ideas) {
+            console.log('[COPYWRITING] Ideas recibidas:', result.data.ideas);
+            
+            // Verificar si son plantillas
+            const ideasString = JSON.stringify(result.data.ideas);
+            if (ideasString.includes('GENERADO CON TEMPLATES') || ideasString.includes('Tiempo de espera agotado')) {
+                console.error('[COPYWRITING] ¡DETECTADO FALLBACK DE PLANTILLAS!');
+                throw new Error('El sistema está usando plantillas predefinidas en lugar de IA. La configuración de DeepSeek puede tener problemas.');
+            }
+        } else {
+            console.error('[COPYWRITING] Respuesta de generateIdeas no tiene formato esperado:', result);
+            throw new Error('La respuesta de la IA no tiene el formato esperado');
+        }
         
         // La función generateIdeas devuelve { ideas: {}, remainingUses: ..., isPremium: ..., isAdmin: ... }
         const ideas = result.data.ideas;
-        console.log('[COPYWRITING] Ideas generadas:', ideas);
+        console.log('[COPYWRITING] Ideas extraídas para procesar:', ideas);
         
         // Procesar y formatear las ideas para copywriting
         const copies = processCopywritingResponse(ideas, params);
@@ -1155,12 +1171,29 @@ const SOCIAL_NETWORK_SPECS = {
  * Procesa la respuesta de la IA para copywriting
  */
 function processCopywritingResponse(ideas, params) {
+    console.log('[DEBUG] processCopywritingResponse recibió:', ideas);
+    console.log('[DEBUG] Parámetros:', params);
+    
     const { socialNetworks, generationMode } = params;
     const copies = [];
+    
+    // VALIDACIÓN CRÍTICA: Detectar si son plantillas en lugar de IA real
+    if (typeof ideas === 'string' && ideas.includes('GENERADO CON TEMPLATES')) {
+        console.error('[ERROR] ¡Sistema usando plantillas fallback en lugar de IA!');
+        throw new Error('El sistema está usando plantillas predefinidas. La IA no está funcionando correctamente.');
+    }
     
     // Si la respuesta es un objeto con plataformas como claves
     if (typeof ideas === 'object' && !Array.isArray(ideas)) {
         Object.entries(ideas).forEach(([platform, content]) => {
+            console.log(`[DEBUG] Procesando plataforma ${platform}:`, content);
+            
+            // Validar que no sean plantillas
+            if (typeof content === 'string' && content.includes('GENERADO CON TEMPLATES')) {
+                console.error(`[ERROR] Plantilla detectada en ${platform}:`, content);
+                throw new Error(`Contenido de plantilla detectado para ${platform}. La IA no está generando contenido real.`);
+            }
+            
             if (typeof content === 'string') {
                 // Procesar el texto para extraer estructura
                 const processedCopy = parseAICopyContent(content, platform);
@@ -1179,6 +1212,12 @@ function processCopywritingResponse(ideas, params) {
     } 
     // Si la respuesta es texto plano
     else if (typeof ideas === 'string') {
+        // Validar que no sean plantillas
+        if (ideas.includes('GENERADO CON TEMPLATES') || ideas.includes('Tiempo de espera agotado')) {
+            console.error('[ERROR] Respuesta de plantilla detectada:', ideas);
+            throw new Error('El sistema está devolviendo plantillas en lugar de contenido generado por IA. Verifica la configuración de DeepSeek.');
+        }
+        
         if (generationMode === 'single' && socialNetworks.length === 1) {
             // Dividir en variaciones para una sola plataforma
             const variations = parseVariations(ideas);
@@ -1199,8 +1238,12 @@ function processCopywritingResponse(ideas, params) {
                 });
             });
         }
+    } else {
+        console.error('[ERROR] Tipo de respuesta no reconocido:', typeof ideas, ideas);
+        throw new Error('Formato de respuesta de IA no reconocido. Contacta al administrador.');
     }
     
+    console.log('[DEBUG] Copies procesados:', copies);
     return copies;
 }
 
