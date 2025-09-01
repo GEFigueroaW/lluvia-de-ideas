@@ -42,6 +42,12 @@ function buildPromptForPlatform(platform, keyword, userContext) {
     const isUrgency = copyType.includes('urgencia') || copyType.includes('escasez');
     const isDirectSale = copyType.includes('venta directa') || copyType.includes('persuasivo');
     
+    // Detectar si debe incluir CTA o no
+    const includeCTA = !copyType.includes('sin llamada a la acción') && !copyType.includes('contenido reflexivo');
+    const ctaInstruction = includeCTA 
+        ? 'INCLUIR llamada a la acción específica y persuasiva'
+        : 'NO incluir llamada a la acción - contenido puramente reflexivo o informativo';
+    
     let copyStrategy = '';
     if (isPositioning) {
         copyStrategy = 'POSICIONAMIENTO Y BRANDING - Enfócate en identidad, autenticidad, mindset, filosofía personal, transformación de identidad, construcción de marca personal';
@@ -116,6 +122,7 @@ function buildPromptForPlatform(platform, keyword, userContext) {
 
 KEYWORD: "${keyword}"
 ESTRATEGIA: ${copyStrategy}
+CTA INSTRUCTION: ${ctaInstruction}
 
 ESPECIFICACIONES TÉCNICAS PARA ${platform}:
 ${getFormatSpecsForPlatform(platform)}
@@ -124,7 +131,7 @@ RESPONDE EN FORMATO JSON EXACTO:
 {
   "contenido": "[COPY COMPLETO con emojis y hashtags integrados al final del texto]",
   "formatoVisual": "[DESCRIPCIÓN MUY ESPECÍFICA: dimensiones exactas, colores hex, tipografía, elementos visuales, estilo de imagen/video, props, escenario, iluminación - TODO para trabajar con IA generativa]",
-  "cta": "[Call to action específico para ${platform}]"
+  "cta": "[Call to action específico para ${platform} - SOLO si se requiere según CTA INSTRUCTION]"
 }
 
 REQUISITOS OBLIGATORIOS:
@@ -134,6 +141,7 @@ REQUISITOS OBLIGATORIOS:
 4. HASHTAGS integrados AL FINAL del contenido (no por separado)
 5. FORMATO VISUAL obligatorio y específico al 100% para IA
 6. Respuesta SOLO en JSON válido, sin markdown ni explicaciones
+7. CTA: ${ctaInstruction}
 
 CRÍTICO: formatoVisual debe ser súper específico para generar imagen/video con IA (dimensiones, colores, estilo, elementos, props, etc.)`;
 }

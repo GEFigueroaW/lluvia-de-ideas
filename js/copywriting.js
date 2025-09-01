@@ -322,6 +322,14 @@ function setupEventListeners() {
         });
     }
 
+    // CTA Toggle
+    const ctaToggle = document.getElementById('includeCTA');
+    if (ctaToggle) {
+        ctaToggle.addEventListener('change', (e) => {
+            updateCTADescription(e.target.checked);
+        });
+    }
+
     // Formulario
     const form = document.getElementById('copywritingForm');
     if (form) {
@@ -427,6 +435,24 @@ function showCopyTypeDescription(copyTypeKey) {
 }
 
 /**
+ * Actualiza la descripción del CTA toggle
+ */
+function updateCTADescription(includeCTA) {
+    const onText = document.querySelector('.cta-on-text');
+    const offText = document.querySelector('.cta-off-text');
+    
+    if (onText && offText) {
+        if (includeCTA) {
+            onText.style.display = 'inline';
+            offText.style.display = 'none';
+        } else {
+            onText.style.display = 'none';
+            offText.style.display = 'inline';
+        }
+    }
+}
+
+/**
  * Actualiza el estado del usuario internamente (solo cuando sea necesario)
  * NOTA: No debe sobrescribir isUserPremium cuando viene desde main.js
  */
@@ -452,6 +478,7 @@ async function handleCopywritingSubmit(e) {
     const keyword = document.getElementById('copyKeyword').value.trim();
     const copyType = document.getElementById('copyType').value;
     const context = document.getElementById('copyContext').value.trim();
+    const includeCTA = document.getElementById('includeCTA').checked;
     
     if (!keyword) {
         showNotification('Por favor ingresa una palabra clave o tema', 'warning');
@@ -473,6 +500,7 @@ async function handleCopywritingSubmit(e) {
             keyword,
             copyType,
             context,
+            includeCTA,
             socialNetworks: Array.from(selectedSocialNetworks),
             generationMode: currentGenerationMode
         });
@@ -514,7 +542,7 @@ async function generateCopywriting(params) {
         const cloudFunctionParams = {
             keyword: params.keyword.trim(),
             platforms: params.socialNetworks.map(net => SOCIAL_NETWORKS[net] ? SOCIAL_NETWORKS[net].name : net), // Nombres de las redes
-            userContext: `Tipo de copy: ${COPY_TYPES[params.copyType] ? COPY_TYPES[params.copyType].name : params.copyType}. ${params.context || ''}`.trim()
+            userContext: `Tipo de copy: ${COPY_TYPES[params.copyType] ? COPY_TYPES[params.copyType].name : params.copyType}. ${params.includeCTA ? 'Incluir llamada a la acción específica.' : 'Contenido reflexivo SIN llamada a la acción.'} ${params.context || ''}`.trim()
         };
         
         // Validar parámetros antes de enviar
