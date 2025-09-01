@@ -542,11 +542,11 @@ function diagnoseDeepseekError(error, apiKey) {
     }
     
     // Verificar timeout
-    if (error.code === 'ECONNABORTED' || error.message.includes('TIMEOUT') || error.message.includes('timeout')) {
+    if (error.code === 'ECONNABORTED' || error.message.includes('TIMEOUT') || error.message.includes('timeout') || error.message.includes('aborted')) {
         return {
             type: 'TIMEOUT_ERROR',
             userMessage: 'Tiempo de espera agotado',
-            technicalMessage: 'La IA tardó demasiado en responder (más de 15 segundos). Intenta de nuevo.',
+            technicalMessage: 'La IA tardó demasiado en responder (más de 20 segundos). Intenta de nuevo.',
             canUseTemplates: true,
             severity: 'medium'
         };
@@ -640,7 +640,7 @@ async function callDeepseekAPI(prompt) {
                     'Content-Type': 'application/json',
                     'User-Agent': 'Firebase-Functions/1.0'
                 },
-                timeout: 15000, // 15 segundos para cumplir límite Firebase (60s total)
+                timeout: 20000, // 20 segundos - equilibrio entre velocidad y éxito DeepSeek
                 validateStatus: (status) => status < 500
             });
             
@@ -1063,3 +1063,101 @@ exports.testDeepseekConnection = functions.https.onCall(async (data, context) =>
         };
     }
 });
+
+// Función auxiliar para generar contenido de una plataforma específica
+async function generateContentForPlatform(platform, keyword, userContext, useDeepseek, DEEPSEEK_API_KEY, requestId) {
+    console.log(`[API-${requestId}] Generando contenido para ${platform} con tipo: ${userContext}`);
+    
+    if (useDeepseek) {
+        try {
+            // Una sola llamada optimizada por plataforma
+            const prompt = buildPromptForPlatform(platform, keyword, userContext);
+            console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform}...`);
+            
+            const deepseekResponse = await callDeepseekAPI(prompt);
+            
+            if (deepseekResponse && (deepseekResponse.contenido || deepseekResponse.length > 30)) {
+                // Manejar respuesta estructurada de Deepseek
+                if (deepseekResponse.contenido) {
+                    // Respuesta JSON estructurada
+                    console.log(`[API-${requestId}] ✅ Deepseek JSON exitoso para ${platform} con ${deepseekResponse.hashtags?.length || 0} hashtags`);
+                    return {
+                        rawContent: deepseekResponse.contenido,
+                        hashtags: deepseekResponse.hashtags || [],
+                        cta: deepseekResponse.cta || '',
+                        formato: platform
+                    };
+                } else {
+                    // Respuesta de texto plano (fallback)
+                    console.log(`[API-${requestId}] ✅ Deepseek texto exitoso para ${platform}`);
+                    return {
+                        rawContent: deepseekResponse.trim(),
+                        hashtags: generateHashtagsForPlatform(platform, keyword),
+                        cta: '',
+                        formato: platform
+                    };
+                }
+            } else {
+                throw new Error('RESPUESTA_INSUFICIENTE');
+            }
+        } catch (deepseekError) {
+            console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform}: ${deepseekError.message}`);
+            
+            // Diagnosticar el error específico
+            const errorDiagnosis = diagnoseDeepseekError(deepseekError, DEEPSEEK_API_KEY);
+            console.log(`[API-${requestId}] 🔍 Diagnóstico: ${errorDiagnosis.type} - ${errorDiagnosis.technicalMessage}`);
+            
+            // Si es un error crítico que no permite usar templates, lanzar error
+            if (!errorDiagnosis.canUseTemplates) {
+                throw new functions.https.HttpsError('failed-precondition', 
+                    `❌ ${errorDiagnosis.userMessage}: ${errorDiagnosis.technicalMessage}`);
+            }
+            
+            // Solo usar fallback para errores que lo permiten, pero informar al usuario
+            console.log(`[API-${requestId}] ⚠️ Usando contenido de respaldo por: ${errorDiagnosis.userMessage}`);
+            
+            const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
+            const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
+            const fallbackVisual = generateVisualFormatForPlatform(platform, keyword);
+            
+            // Marcar que se usó fallback e incluir el motivo
+            return { 
+                rawContent: `⚠️ GENERADO CON TEMPLATES (${errorDiagnosis.userMessage})\n\n${fallbackContent}`,
+                hashtags: fallbackHashtags,
+                cta: '',
+                formatoVisual: fallbackVisual,
+                formato: platform,
+                isFallback: true,
+                errorType: errorDiagnosis.type,
+                errorMessage: errorDiagnosis.userMessage
+            };
+        }
+    } else {
+        // DeepSeek no está disponible - verificar por qué
+        const errorDiagnosis = diagnoseDeepseekError(new Error('API Key no configurada'), DEEPSEEK_API_KEY);
+        console.log(`[API-${requestId}] ⚠️ DeepSeek no disponible: ${errorDiagnosis.technicalMessage}`);
+        
+        // Si es un error crítico, informar al usuario
+        if (!errorDiagnosis.canUseTemplates) {
+            throw new functions.https.HttpsError('failed-precondition', 
+                `❌ ${errorDiagnosis.userMessage}: ${errorDiagnosis.technicalMessage}`);
+        }
+        
+        // Usar templates pero informar claramente por qué
+        console.log(`[API-${requestId}] 🔄 Usando contenido de respaldo para ${platform}`);
+        const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
+        const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
+        const fallbackVisual = generateVisualFormatForPlatform(platform, keyword);
+        
+        return { 
+            rawContent: `⚠️ GENERADO CON TEMPLATES (${errorDiagnosis.userMessage})\n\n${fallbackContent}`,
+            hashtags: fallbackHashtags,
+            cta: '',
+            formatoVisual: fallbackVisual,
+            formato: platform,
+            isFallback: true,
+            errorType: errorDiagnosis.type,
+            errorMessage: errorDiagnosis.userMessage
+        };
+    }
+}
