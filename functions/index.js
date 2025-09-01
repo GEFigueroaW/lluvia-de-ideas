@@ -546,7 +546,7 @@ function diagnoseDeepseekError(error, apiKey) {
         return {
             type: 'TIMEOUT_ERROR',
             userMessage: 'Tiempo de espera agotado',
-            technicalMessage: 'La IA tardó demasiado en responder (más de 25 segundos). Intenta de nuevo.',
+            technicalMessage: 'La IA tardó demasiado en responder (más de 28 segundos). Intenta de nuevo.',
             canUseTemplates: true,
             severity: 'medium'
         };
@@ -640,7 +640,7 @@ async function callDeepseekAPI(prompt) {
                     'Content-Type': 'application/json',
                     'User-Agent': 'Firebase-Functions/1.0'
                 },
-                timeout: 25000, // 25 segundos - último intento antes de procesamiento por lotes
+                timeout: 28000, // 28 segundos - ajuste final basado en logs reales de DeepSeek
                 validateStatus: (status) => status < 500
             });
             
@@ -1080,68 +1080,83 @@ async function generateContentForPlatform(platform, keyword, userContext, useDee
     console.log(`[API-${requestId}] Generando contenido para ${platform} con tipo: ${userContext}`);
     
     if (useDeepseek) {
-        try {
-            // Una sola llamada optimizada por plataforma
-            const prompt = buildPromptForPlatform(platform, keyword, userContext);
-            console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform}...`);
-            
-            const deepseekResponse = await callDeepseekAPI(prompt);
-            
-            if (deepseekResponse && (deepseekResponse.contenido || deepseekResponse.length > 30)) {
-                // Manejar respuesta estructurada de Deepseek
-                if (deepseekResponse.contenido) {
-                    // Respuesta JSON estructurada
-                    console.log(`[API-${requestId}] ✅ Deepseek JSON exitoso para ${platform} con ${deepseekResponse.hashtags?.length || 0} hashtags`);
-                    return {
-                        rawContent: deepseekResponse.contenido,
-                        hashtags: deepseekResponse.hashtags || [],
-                        cta: deepseekResponse.cta || '',
-                        formato: platform
+        // Sistema de reintentos para DeepSeek
+        let attempt = 1;
+        const maxAttempts = 2;
+        
+        while (attempt <= maxAttempts) {
+            try {
+                console.log(`[API-${requestId}] 🚀 Llamando a Deepseek API para ${platform} (intento ${attempt}/${maxAttempts})...`);
+                
+                // Una sola llamada optimizada por plataforma
+                const prompt = buildPromptForPlatform(platform, keyword, userContext);
+                const deepseekResponse = await callDeepseekAPI(prompt);
+                
+                if (deepseekResponse && (deepseekResponse.contenido || deepseekResponse.length > 30)) {
+                    // Manejar respuesta estructurada de Deepseek
+                    if (deepseekResponse.contenido) {
+                        // Respuesta JSON estructurada
+                        console.log(`[API-${requestId}] ✅ Deepseek JSON exitoso para ${platform} con ${deepseekResponse.hashtags?.length || 0} hashtags (intento ${attempt})`);
+                        return {
+                            rawContent: deepseekResponse.contenido,
+                            hashtags: deepseekResponse.hashtags || [],
+                            cta: deepseekResponse.cta || '',
+                            formato: platform
+                        };
+                    } else {
+                        // Respuesta de texto plano (fallback)
+                        console.log(`[API-${requestId}] ✅ Deepseek texto exitoso para ${platform} (intento ${attempt})`);
+                        return {
+                            rawContent: deepseekResponse.trim(),
+                            hashtags: generateHashtagsForPlatform(platform, keyword),
+                            cta: '',
+                            formato: platform
+                        };
+                    }
+                } else {
+                    throw new Error('RESPUESTA_INSUFICIENTE');
+                }
+            } catch (deepseekError) {
+                console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform} (intento ${attempt}/${maxAttempts}): ${deepseekError.message}`);
+                
+                // Si es el último intento o un error no relacionado con timeout, procesar error
+                if (attempt === maxAttempts || !deepseekError.message.includes('aborted')) {
+                    // Diagnosticar el error específico
+                    const errorDiagnosis = diagnoseDeepseekError(deepseekError, DEEPSEEK_API_KEY);
+                    console.log(`[API-${requestId}] 🔍 Diagnóstico final: ${errorDiagnosis.type} - ${errorDiagnosis.technicalMessage}`);
+                    
+                    // Si es un error crítico que no permite usar templates, lanzar error
+                    if (!errorDiagnosis.canUseTemplates) {
+                        throw new functions.https.HttpsError('failed-precondition', 
+                            `❌ ${errorDiagnosis.userMessage}: ${errorDiagnosis.technicalMessage}`);
+                    }
+                    
+                    // Solo usar fallback para errores que lo permiten, pero informar al usuario
+                    console.log(`[API-${requestId}] ⚠️ Usando contenido de respaldo por: ${errorDiagnosis.userMessage} (después de ${maxAttempts} intentos)`);
+                    
+                    const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
+                    const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
+                    const fallbackVisual = generateVisualFormatForPlatform(platform, keyword);
+                    
+                    // Marcar que se usó fallback e incluir el motivo
+                    return { 
+                        rawContent: `⚠️ GENERADO CON TEMPLATES (${errorDiagnosis.userMessage} tras ${maxAttempts} intentos)\n\n${fallbackContent}`,
+                        hashtags: fallbackHashtags,
+                        cta: '',
+                        formatoVisual: fallbackVisual,
+                        formato: platform,
+                        isFallback: true,
+                        errorType: errorDiagnosis.type,
+                        errorMessage: errorDiagnosis.userMessage
                     };
                 } else {
-                    // Respuesta de texto plano (fallback)
-                    console.log(`[API-${requestId}] ✅ Deepseek texto exitoso para ${platform}`);
-                    return {
-                        rawContent: deepseekResponse.trim(),
-                        hashtags: generateHashtagsForPlatform(platform, keyword),
-                        cta: '',
-                        formato: platform
-                    };
+                    // Es un timeout y no es el último intento, reintentar
+                    console.log(`[API-${requestId}] 🔄 Reintentando debido a timeout...`);
+                    attempt++;
+                    // Pequeño delay antes del reintento
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
-            } else {
-                throw new Error('RESPUESTA_INSUFICIENTE');
             }
-        } catch (deepseekError) {
-            console.log(`[API-${requestId}] ❌ Error en Deepseek para ${platform}: ${deepseekError.message}`);
-            
-            // Diagnosticar el error específico
-            const errorDiagnosis = diagnoseDeepseekError(deepseekError, DEEPSEEK_API_KEY);
-            console.log(`[API-${requestId}] 🔍 Diagnóstico: ${errorDiagnosis.type} - ${errorDiagnosis.technicalMessage}`);
-            
-            // Si es un error crítico que no permite usar templates, lanzar error
-            if (!errorDiagnosis.canUseTemplates) {
-                throw new functions.https.HttpsError('failed-precondition', 
-                    `❌ ${errorDiagnosis.userMessage}: ${errorDiagnosis.technicalMessage}`);
-            }
-            
-            // Solo usar fallback para errores que lo permiten, pero informar al usuario
-            console.log(`[API-${requestId}] ⚠️ Usando contenido de respaldo por: ${errorDiagnosis.userMessage}`);
-            
-            const fallbackContent = getExamplesForNetwork(platform, keyword, userContext);
-            const fallbackHashtags = generateHashtagsForPlatform(platform, keyword);
-            const fallbackVisual = generateVisualFormatForPlatform(platform, keyword);
-            
-            // Marcar que se usó fallback e incluir el motivo
-            return { 
-                rawContent: `⚠️ GENERADO CON TEMPLATES (${errorDiagnosis.userMessage})\n\n${fallbackContent}`,
-                hashtags: fallbackHashtags,
-                cta: '',
-                formatoVisual: fallbackVisual,
-                formato: platform,
-                isFallback: true,
-                errorType: errorDiagnosis.type,
-                errorMessage: errorDiagnosis.userMessage
-            };
         }
     } else {
         // DeepSeek no está disponible - verificar por qué
