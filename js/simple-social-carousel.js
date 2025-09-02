@@ -94,19 +94,6 @@ class SimpleSocialCarousel {
                     <button class="nav-btn next-btn" id="nextBtn">Siguiente →</button>
                 </div>
                 
-                <div class="network-grid">
-                    ${this.socialNetworks.map((network, index) => `
-                        <div class="network-item ${index === 0 ? 'active' : ''}" 
-                             data-index="${index}" 
-                             data-network="${network.name}">
-                            <div class="network-icon" style="background: ${network.color};">
-                                ${network.svg}
-                            </div>
-                            <span class="network-name">${network.name}</span>
-                        </div>
-                    `).join('')}
-                </div>
-                
                 <input type="hidden" id="singleSocialNetwork" name="socialNetwork" value="${this.socialNetworks[0].name}">
             </div>
         `;
@@ -118,7 +105,6 @@ class SimpleSocialCarousel {
         this.currentName = this.container.querySelector('#currentName');
         this.prevBtn = this.container.querySelector('#prevBtn');
         this.nextBtn = this.container.querySelector('#nextBtn');
-        this.networkItems = this.container.querySelectorAll('.network-item');
         this.hiddenInput = this.container.querySelector('#singleSocialNetwork');
     }
 
@@ -126,11 +112,6 @@ class SimpleSocialCarousel {
         // Botones de navegación
         this.prevBtn.addEventListener('click', () => this.prev());
         this.nextBtn.addEventListener('click', () => this.next());
-
-        // Click en items del grid
-        this.networkItems.forEach((item, index) => {
-            item.addEventListener('click', () => this.selectNetwork(index));
-        });
 
         // Teclado
         document.addEventListener('keydown', (e) => {
@@ -169,11 +150,6 @@ class SimpleSocialCarousel {
         this.currentIcon.innerHTML = selectedNetwork.svg;
         this.currentIcon.style.background = selectedNetwork.color;
         this.currentName.textContent = selectedNetwork.name;
-        
-        // Actualizar grid
-        this.networkItems.forEach((item, index) => {
-            item.classList.toggle('active', index === this.currentIndex);
-        });
         
         // Actualizar input oculto
         this.hiddenInput.value = selectedNetwork.name;
