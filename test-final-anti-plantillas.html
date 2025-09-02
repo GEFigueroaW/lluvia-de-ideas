@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 Test Final - Verificación Anti-Plantillas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            backdrop-filter: blur(5px);
+        }
+        .success { background: rgba(76, 175, 80, 0.3); border: 1px solid #4caf50; }
+        .error { background: rgba(244, 67, 54, 0.3); border: 1px solid #f44336; }
+        .warning { background: rgba(255, 193, 7, 0.3); border: 1px solid #ffc107; }
+        .info { background: rgba(33, 150, 243, 0.3); border: 1px solid #2196f3; }
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: translateY(-2px); }
+        button:disabled { 
+            background: rgba(150,150,150,0.5); 
+            cursor: not-allowed;
+            transform: none;
+        }
+        pre {
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .test-card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .result-item {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .ai-content {
+            background: rgba(76, 175, 80, 0.2);
+            border-left-color: #4caf50;
+        }
+        .template-content {
+            background: rgba(244, 67, 54, 0.2);
+            border-left-color: #f44336;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Final - Verificación Anti-Plantillas</h1>
+        <p>Esta prueba verificará que las optimizaciones están funcionando y que el sistema ya NO usa plantillas.</p>
+        
+        <div id="status-container">
+            <div class="info">
+                <strong>🔧 Estado:</strong> Configuraciones aplicadas - Listo para probar
+            </div>
+        </div>
+        
+        <div style="margin: 25px 0;">
+            <button onclick="runAntiTemplateTest()" id="testBtn">🚀 Probar Sistema Anti-Plantillas</button>
+            <button onclick="runMultiPlatformTest()" id="multiTestBtn">📱 Test Multi-Plataforma</button>
+            <button onclick="clearResults()" id="clearBtn">🗑️ Limpiar Resultados</button>
+        </div>
+        
+        <div id="results-container"></div>
+        
+        <div class="test-grid">
+            <div class="test-card">
+                <h3>✅ Qué Esperamos Ver</h3>
+                <ul>
+                    <li><strong>Contenido único:</strong> Cada generación debe ser diferente</li>
+                    <li><strong>Sin "GENERADO CON TEMPLATES":</strong> No debe aparecer este texto</li>
+                    <li><strong>Velocidad adecuada:</strong> 25-30 segundos máximo</li>
+                    <li><strong>Contenido coherente:</strong> Relacionado al tema solicitado</li>
+                </ul>
+            </div>
+            
+            <div class="test-card">
+                <h3>❌ Qué NO Queremos Ver</h3>
+                <ul>
+                    <li><strong>Texto de plantilla:</strong> "⚠️ GENERADO CON TEMPLATES"</li>
+                    <li><strong>Contenido genérico:</strong> Siempre igual para el mismo tema</li>
+                    <li><strong>Timeouts frecuentes:</strong> Más de 30 segundos</li>
+                    <li><strong>Errores de API:</strong> Problemas de configuración</li>
+                </ul>
+            </div>
+            
+            <div class="test-card">
+                <h3>🔧 Optimizaciones Aplicadas</h3>
+                <ul>
+                    <li><strong>API Key:</strong> DeepSeek configurada</li>
+                    <li><strong>Timeouts:</strong> Reducidos a 25 segundos</li>
+                    <li><strong>Reintentos:</strong> 3 intentos agresivos</li>
+                    <li><strong>Anti-plantillas:</strong> Lógica estricta activada</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { httpsCallable } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js';
+        import { functions } from './js/firebase-config.js';
+
+        window.runAntiTemplateTest = async function() {
+            const testBtn = document.getElementById('testBtn');
+            const statusContainer = document.getElementById('status-container');
+            const resultsContainer = document.getElementById('results-container');
+            
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<span class="loading"></span> Probando sistema optimizado...';
+            
+            statusContainer.innerHTML = `
+                <div class="info">
+                    <strong>🧪 Estado:</strong> Ejecutando test anti-plantillas... <span class="loading"></span>
+                </div>
+            `;
+            
+            try {
+                const generateFunction = httpsCallable(functions, 'generateIdeas');
+                
+                // Test con un tema específico
+                const testKeyword = 'productividad personal con inteligencia artificial';
+                const testPlatforms = ['Facebook', 'LinkedIn'];
+                
+                console.log('🧪 Iniciando test anti-plantillas...');
+                
+                const startTime = Date.now();
+                const result = await generateFunction({
+                    keyword: testKeyword,
+                    platforms: testPlatforms,
+                    userContext: 'Informativo o educativo - Test de verificación anti-plantillas'
+                });
+                const endTime = Date.now();
+                const duration = (endTime - startTime) / 1000;
+                
+                console.log('📊 Resultado del test:', result.data);
+                
+                if (result.data.success && result.data.ideas) {
+                    let hasTemplates = false;
+                    let aiContent = 0;
+                    let templateContent = 0;
+                    
+                    statusContainer.innerHTML = `
+                        <div class="success">
+                            <strong>✅ Test Completado:</strong> Generación exitosa en ${duration.toFixed(1)} segundos
+                        </div>
+                    `;
+                    
+                    let resultsHtml = `
+                        <h3>📊 Resultados del Test Anti-Plantillas</h3>
+                        <div class="info">
+                            <strong>⏱️ Tiempo de generación:</strong> ${duration.toFixed(1)} segundos<br>
+                            <strong>🎯 Tema probado:</strong> ${testKeyword}<br>
+                            <strong>📱 Plataformas:</strong> ${testPlatforms.join(', ')}
+                        </div>
+                    `;
+                    
+                    // Analizar cada plataforma
+                    Object.entries(result.data.ideas).forEach(([platform, content]) => {
+                        const isTemplate = content.rawContent && content.rawContent.includes('GENERADO CON TEMPLATES');
+                        
+                        if (isTemplate) {
+                            hasTemplates = true;
+                            templateContent++;
+                        } else {
+                            aiContent++;
+                        }
+                        
+                        const statusClass = isTemplate ? 'template-content' : 'ai-content';
+                        const statusIcon = isTemplate ? '❌' : '✅';
+                        const statusText = isTemplate ? 'PLANTILLA DETECTADA' : 'CONTENIDO IA REAL';
+                        
+                        resultsHtml += `
+                            <div class="result-item ${statusClass}">
+                                <h4>${statusIcon} ${platform}: ${statusText}</h4>
+                                <div style="font-size: 14px; opacity: 0.9;">
+                                    <strong>Contenido (primeros 200 caracteres):</strong><br>
+                                    <pre style="font-size: 12px; margin: 5px 0;">${content.rawContent.substring(0, 200)}...</pre>
+                                </div>
+                                ${content.formatoVisual ? `
+                                    <details style="margin-top: 10px;">
+                                        <summary style="cursor: pointer; font-weight: bold;">Ver formato visual</summary>
+                                        <pre style="font-size: 11px; margin: 5px 0;">${content.formatoVisual}</pre>
+                                    </details>
+                                ` : ''}
+                            </div>
+                        `;
+                    });
+                    
+                    // Resumen final
+                    if (hasTemplates) {
+                        resultsHtml += `
+                            <div class="error">
+                                <strong>❌ PROBLEMA DETECTADO:</strong> Se encontraron ${templateContent} plantilla(s) y ${aiContent} contenido(s) de IA<br>
+                                <strong>🔧 Solución:</strong> Algunas plataformas aún usan plantillas. Verifica logs de error en Firebase Console.
+                            </div>
+                        `;
+                        
+                        statusContainer.innerHTML += `
+                            <div class="warning">
+                                <strong>⚠️ Advertencia:</strong> Algunas plataformas aún usan plantillas
+                            </div>
+                        `;
+                    } else {
+                        resultsHtml += `
+                            <div class="success">
+                                <strong>🎉 ¡PERFECTO!</strong> Todas las plataformas (${aiContent}) generaron contenido real de IA<br>
+                                <strong>✅ Sistema optimizado:</strong> Ya no se usan plantillas como fallback
+                            </div>
+                        `;
+                        
+                        statusContainer.innerHTML += `
+                            <div class="success">
+                                <strong>🎉 ¡Éxito Total!</strong> Sistema anti-plantillas funcionando perfectamente
+                            </div>
+                        `;
+                    }
+                    
+                    resultsContainer.innerHTML = resultsHtml;
+                    
+                } else {
+                    throw new Error('La función no devolvió resultados válidos');
+                }
+                
+            } catch (error) {
+                console.error('Error en test:', error);
+                
+                statusContainer.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error en el test:</strong> ${error.message}
+                    </div>
+                `;
+                
+                resultsContainer.innerHTML = `
+                    <h3>❌ Error en Test Anti-Plantillas</h3>
+                    <div class="error">
+                        <strong>Error:</strong> ${error.message}<br>
+                        <strong>Posibles causas:</strong>
+                        <ul>
+                            <li>Firebase Functions aún no desplegadas completamente</li>
+                            <li>Usuario no autenticado</li>
+                            <li>API Key de DeepSeek aún no configurada</li>
+                            <li>Error de red o conectividad</li>
+                        </ul>
+                    </div>
+                `;
+            }
+            
+            testBtn.disabled = false;
+            testBtn.innerHTML = '🚀 Probar Sistema Anti-Plantillas';
+        };
+        
+        window.runMultiPlatformTest = async function() {
+            const multiTestBtn = document.getElementById('multiTestBtn');
+            const statusContainer = document.getElementById('status-container');
+            const resultsContainer = document.getElementById('results-container');
+            
+            multiTestBtn.disabled = true;
+            multiTestBtn.innerHTML = '<span class="loading"></span> Test multi-plataforma...';
+            
+            try {
+                const generateFunction = httpsCallable(functions, 'generateIdeas');
+                
+                const testKeyword = 'marketing digital con IA en 2025';
+                const testPlatforms = ['Facebook', 'LinkedIn', 'Instagram'];
+                
+                const startTime = Date.now();
+                const result = await generateFunction({
+                    keyword: testKeyword,
+                    platforms: testPlatforms,
+                    userContext: 'De beneficio o solución - Test multi-plataforma'
+                });
+                const endTime = Date.now();
+                const duration = (endTime - startTime) / 1000;
+                
+                if (result.data.success) {
+                    const platformCount = Object.keys(result.data.ideas).length;
+                    const templatesDetected = Object.values(result.data.ideas).filter(content => 
+                        content.rawContent && content.rawContent.includes('GENERADO CON TEMPLATES')
+                    ).length;
+                    
+                    let statusClass = 'success';
+                    let statusText = `✅ Test exitoso: ${platformCount} plataformas, 0 plantillas`;
+                    
+                    if (templatesDetected > 0) {
+                        statusClass = 'warning';
+                        statusText = `⚠️ Test parcial: ${platformCount} plataformas, ${templatesDetected} plantillas detectadas`;
+                    }
+                    
+                    statusContainer.innerHTML = `
+                        <div class="${statusClass}">
+                            <strong>📱 Test Multi-Plataforma:</strong> ${statusText}<br>
+                            <strong>⏱️ Tiempo:</strong> ${duration.toFixed(1)} segundos
+                        </div>
+                    `;
+                    
+                    resultsContainer.innerHTML = `
+                        <h3>📱 Resultados Multi-Plataforma</h3>
+                        <div class="info">
+                            <strong>Tema:</strong> ${testKeyword}<br>
+                            <strong>Plataformas:</strong> ${testPlatforms.join(', ')}<br>
+                            <strong>Tiempo total:</strong> ${duration.toFixed(1)} segundos<br>
+                            <strong>Promedio por plataforma:</strong> ${(duration / platformCount).toFixed(1)} segundos
+                        </div>
+                        ${Object.entries(result.data.ideas).map(([platform, content]) => {
+                            const isTemplate = content.rawContent && content.rawContent.includes('GENERADO CON TEMPLATES');
+                            return `
+                                <div class="result-item ${isTemplate ? 'template-content' : 'ai-content'}">
+                                    <h4>${isTemplate ? '❌' : '✅'} ${platform}</h4>
+                                    <pre style="font-size: 12px;">${content.rawContent.substring(0, 150)}...</pre>
+                                </div>
+                            `;
+                        }).join('')}
+                    `;
+                }
+                
+            } catch (error) {
+                statusContainer.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Error multi-plataforma:</strong> ${error.message}
+                    </div>
+                `;
+            }
+            
+            multiTestBtn.disabled = false;
+            multiTestBtn.innerHTML = '📱 Test Multi-Plataforma';
+        };
+        
+        window.clearResults = function() {
+            document.getElementById('status-container').innerHTML = `
+                <div class="info">
+                    <strong>🔧 Estado:</strong> Configuraciones aplicadas - Listo para probar
+                </div>
+            `;
+            document.getElementById('results-container').innerHTML = '';
+        };
+    </script>
+</body>
+</html>

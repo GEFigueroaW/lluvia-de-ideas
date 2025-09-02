@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DeepSeek API - Diagnóstico Rápido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Diagnóstico DeepSeek API</h1>
+        <p>Esta herramienta te ayudará a diagnosticar por qué el sistema está usando plantillas en lugar de IA.</p>
+        
+        <div id="status-container">
+            <div class="info">
+                <strong>Estado:</strong> Listo para diagnosticar
+            </div>
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <button onclick="runCompleteTest()" id="testBtn">🚀 Ejecutar Diagnóstico Completo</button>
+            <button onclick="clearResults()" id="clearBtn">🗑️ Limpiar Resultados</button>
+        </div>
+        
+        <div id="results-container"></div>
+        
+        <h3>🔍 ¿Qué verifica este diagnóstico?</h3>
+        <ul>
+            <li><strong>Configuración de API Key:</strong> Si DeepSeek está configurado correctamente</li>
+            <li><strong>Conectividad:</strong> Si puede alcanzar los servidores de DeepSeek</li>
+            <li><strong>Funcionalidad:</strong> Si la IA genera contenido real</li>
+            <li><strong>Timeouts:</strong> Si los tiempos de espera son apropiados</li>
+        </ul>
+        
+        <h3>💡 Soluciones Rápidas</h3>
+        <div class="info">
+            <strong>Si el diagnóstico falla:</strong>
+            <ol>
+                <li>Verifica que tengas una API Key válida de DeepSeek</li>
+                <li>Asegúrate de que esté configurada en Firebase Functions</li>
+                <li>Revisa tu conexión a internet</li>
+                <li>Considera aumentar los timeouts si es necesario</li>
+            </ol>
+        </div>
+    </div>
+
+    <script type="module">
+        import { httpsCallable } from 'https://www.gstatic.com/firebasejs/9.21.0/firebase-functions.js';
+        import { functions } from './js/firebase-config.js';
+
+        window.runCompleteTest = async function() {
+            const testBtn = document.getElementById('testBtn');
+            const statusContainer = document.getElementById('status-container');
+            const resultsContainer = document.getElementById('results-container');
+            
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<span class="loading"></span> Ejecutando diagnóstico...';
+            
+            statusContainer.innerHTML = `
+                <div class="info">
+                    <strong>Estado:</strong> Ejecutando pruebas de diagnóstico... <span class="loading"></span>
+                </div>
+            `;
+            
+            resultsContainer.innerHTML = '';
+            
+            try {
+                // Test 1: Diagnóstico de Cloud Function
+                console.log('🔧 Iniciando diagnóstico de DeepSeek...');
+                
+                const testFunction = httpsCallable(functions, 'testDeepseekConnection');
+                const diagnosticResult = await testFunction();
+                
+                console.log('📊 Resultado del diagnóstico:', diagnosticResult.data);
+                
+                if (diagnosticResult.data.success) {
+                    const diagnostics = diagnosticResult.data.diagnostics;
+                    const overall = diagnostics.overall;
+                    
+                    let statusClass = 'error';
+                    let statusText = 'DeepSeek NO FUNCIONA';
+                    let statusIcon = '❌';
+                    
+                    if (overall === 'healthy') {
+                        statusClass = 'success';
+                        statusText = 'DeepSeek FUNCIONA CORRECTAMENTE';
+                        statusIcon = '✅';
+                    } else if (overall === 'degraded') {
+                        statusClass = 'warning';
+                        statusText = 'DeepSeek FUNCIONA PARCIALMENTE';
+                        statusIcon = '⚠️';
+                    }
+                    
+                    statusContainer.innerHTML = `
+                        <div class="${statusClass}">
+                            <strong>${statusIcon} Estado:</strong> ${statusText}
+                        </div>
+                    `;
+                    
+                    // Mostrar detalles de cada test
+                    let detailsHtml = '<h3>📋 Detalles del Diagnóstico:</h3>';
+                    
+                    Object.entries(diagnostics.tests).forEach(([testName, result]) => {
+                        let testClass = 'error';
+                        let testIcon = '❌';
+                        
+                        if (result.status === 'pass') {
+                            testClass = 'success';
+                            testIcon = '✅';
+                        } else if (result.status === 'partial') {
+                            testClass = 'warning';
+                            testIcon = '⚠️';
+                        } else if (result.status === 'skip') {
+                            testClass = 'info';
+                            testIcon = '⏭️';
+                        }
+                        
+                        detailsHtml += `
+                            <div class="${testClass}">
+                                <strong>${testIcon} ${testName.toUpperCase()}:</strong> ${result.message}<br>
+                                <small>${result.details}</small>
+                            </div>
+                        `;
+                    });
+                    
+                    resultsContainer.innerHTML = detailsHtml;
+                    
+                    // Test 2: Probar generación real
+                    if (overall === 'healthy') {
+                        statusContainer.innerHTML += `
+                            <div class="info">
+                                <strong>🧪 Prueba adicional:</strong> Probando generación de contenido real... <span class="loading"></span>
+                            </div>
+                        `;
+                        
+                        try {
+                            const generateFunction = httpsCallable(functions, 'generateIdeas');
+                            const testGeneration = await generateFunction({
+                                keyword: 'test motivación',
+                                platforms: ['Facebook'],
+                                userContext: 'Test de funcionalidad - Informativo o educativo'
+                            });
+                            
+                            if (testGeneration.data.success && testGeneration.data.ideas) {
+                                const facebookContent = testGeneration.data.ideas.Facebook;
+                                
+                                if (facebookContent && facebookContent.rawContent && !facebookContent.rawContent.includes('GENERADO CON TEMPLATES')) {
+                                    statusContainer.innerHTML += `
+                                        <div class="success">
+                                            <strong>🎉 ¡PERFECTO!</strong> La IA está generando contenido real, no plantillas
+                                        </div>
+                                    `;
+                                    
+                                    resultsContainer.innerHTML += `
+                                        <h3>✅ Ejemplo de Contenido Generado:</h3>
+                                        <pre>${facebookContent.rawContent.substring(0, 300)}...</pre>
+                                    `;
+                                } else if (facebookContent && facebookContent.rawContent && facebookContent.rawContent.includes('GENERADO CON TEMPLATES')) {
+                                    statusContainer.innerHTML += `
+                                        <div class="error">
+                                            <strong>❌ PROBLEMA DETECTADO:</strong> El sistema está usando plantillas aunque el diagnóstico dice que funciona
+                                        </div>
+                                    `;
+                                    
+                                    resultsContainer.innerHTML += `
+                                        <h3>❌ Contenido de Plantilla Detectado:</h3>
+                                        <pre>${facebookContent.rawContent}</pre>
+                                        <div class="warning">
+                                            <strong>Diagnóstico:</strong> ${facebookContent.errorMessage || 'Error no especificado'}
+                                        </div>
+                                    `;
+                                } else {
+                                    statusContainer.innerHTML += `
+                                        <div class="warning">
+                                            <strong>⚠️ RESPUESTA INESPERADA:</strong> La función responde pero el formato no es el esperado
+                                        </div>
+                                    `;
+                                    
+                                    resultsContainer.innerHTML += `
+                                        <h3>⚠️ Respuesta Completa:</h3>
+                                        <pre>${JSON.stringify(testGeneration.data, null, 2)}</pre>
+                                    `;
+                                }
+                            } else {
+                                throw new Error('La función generateIdeas falló');
+                            }
+                        } catch (generationError) {
+                            statusContainer.innerHTML += `
+                                <div class="error">
+                                    <strong>❌ ERROR en generación:</strong> ${generationError.message}
+                                </div>
+                            `;
+                            
+                            resultsContainer.innerHTML += `
+                                <h3>❌ Error en Generación de Contenido:</h3>
+                                <pre>${generationError.message}</pre>
+                            `;
+                        }
+                    }
+                    
+                } else {
+                    statusContainer.innerHTML = `
+                        <div class="error">
+                            <strong>❌ Estado:</strong> Error en el diagnóstico
+                        </div>
+                    `;
+                    
+                    resultsContainer.innerHTML = `
+                        <h3>❌ Error en Diagnóstico:</h3>
+                        <pre>${diagnosticResult.data.error || 'Error desconocido'}</pre>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Error en diagnóstico:', error);
+                
+                statusContainer.innerHTML = `
+                    <div class="error">
+                        <strong>❌ Estado:</strong> Fallo crítico en el diagnóstico
+                    </div>
+                `;
+                
+                resultsContainer.innerHTML = `
+                    <h3>❌ Error Crítico:</h3>
+                    <pre>${error.message}</pre>
+                    
+                    <h3>🔧 Posibles Causas:</h3>
+                    <ul>
+                        <li><strong>Firebase no autenticado:</strong> Debes estar logueado</li>
+                        <li><strong>Cloud Functions no deployadas:</strong> Las funciones no están disponibles</li>
+                        <li><strong>Configuración incorrecta:</strong> DeepSeek API no configurada</li>
+                        <li><strong>Error de red:</strong> Problemas de conectividad</li>
+                    </ul>
+                `;
+            }
+            
+            testBtn.disabled = false;
+            testBtn.innerHTML = '🚀 Ejecutar Diagnóstico Completo';
+        };
+        
+        window.clearResults = function() {
+            document.getElementById('status-container').innerHTML = `
+                <div class="info">
+                    <strong>Estado:</strong> Listo para diagnosticar
+                </div>
+            `;
+            document.getElementById('results-container').innerHTML = '';
+        };
+    </script>
+</body>
+</html>

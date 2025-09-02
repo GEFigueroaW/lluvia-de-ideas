@@ -138,6 +138,119 @@ body {
 }
 
 /* =========================================
+   COPY TYPES GRID - NUEVA ESTRUCTURA
+   ========================================= */
+.copy-types-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.copy-type-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,249,250,0.9));
+    border: 2px solid transparent;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.copy-type-checkbox::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(247, 148, 164, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.copy-type-checkbox:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: rgba(102, 126, 234, 0.3);
+}
+
+.copy-type-checkbox:hover::before {
+    opacity: 1;
+}
+
+.copy-type-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+.checkbox-custom {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    margin-top: 2px;
+}
+
+.checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    transition: transform 0.2s ease;
+}
+
+.copy-type-checkbox input[type="checkbox"]:checked + .checkbox-custom {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: #667eea;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.copy-type-checkbox input[type="checkbox"]:checked + .checkbox-custom::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.copy-type-content {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+.copy-type-content h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #2d3748;
+    line-height: 1.3;
+}
+
+.copy-type-content p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #718096;
+    line-height: 1.4;
+}
+
+.copy-type-checkbox input[type="checkbox"]:checked ~ .copy-type-content h4 {
+    color: #667eea;
+}
+
+.copy-type-checkbox input[type="checkbox"]:checked ~ .copy-type-content p {
+    color: #4a5568;
+}
+
+/* =========================================
    RESPONSIVE
    ========================================= */
 @media (max-width: 768px) {
@@ -155,5 +268,18 @@ body {
     
     .column {
         width: 100% !important;
+    }
+    
+    .copy-type-checkbox {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+    
+    .copy-type-content h4 {
+        font-size: 0.9rem;
+    }
+    
+    .copy-type-content p {
+        font-size: 0.8rem;
     }
 }

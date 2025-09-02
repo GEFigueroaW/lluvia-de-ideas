@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Test Nueva Estructura - 3 Ideas para 1 Red</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .test-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .copy-types {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .copy-type-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .copy-type-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .copy-type-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        button {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin: 20px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 5px solid #4ecdc4;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            border-left-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+        .success {
+            border-left-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+        .timer {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 15px 0;
+            color: #feca57;
+            font-weight: bold;
+        }
+        .status {
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .new-features {
+            background: rgba(76, 175, 80, 0.2);
+            border-left: 5px solid #4caf50;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Test Nueva Estructura</h1>
+        
+        <div class="new-features">
+            <h3>🚀 Nueva Estructura Implementada</h3>
+            <p><strong>Antes:</strong> Múltiples redes + 1 idea cada una = Timeout</p>
+            <p><strong>Ahora:</strong> 1 red social + 3 ideas diferentes = Más rápido</p>
+            <ul>
+                <li>✅ 1 sola red social seleccionada</li>
+                <li>✅ 1-3 tipos de copy diferentes</li>
+                <li>✅ 3 ideas únicas generadas</li>
+                <li>✅ Tiempo optimizado (menos de 60s)</li>
+            </ul>
+        </div>
+        
+        <div class="test-section">
+            <h3>🧪 Formulario de Prueba</h3>
+            
+            <div class="input-group">
+                <label for="platform">🎯 Red Social (selecciona 1):</label>
+                <select id="platform" required>
+                    <option value="">Selecciona una red social...</option>
+                    <option value="Facebook">📘 Facebook</option>
+                    <option value="Instagram">📸 Instagram</option>
+                    <option value="LinkedIn">💼 LinkedIn</option>
+                    <option value="X / Twitter">🐦 X / Twitter</option>
+                    <option value="TikTok">🎵 TikTok</option>
+                    <option value="WhatsApp">💬 WhatsApp</option>
+                    <option value="Telegram">📡 Telegram</option>
+                    <option value="YouTube">📺 YouTube</option>
+                    <option value="Reddit">🤓 Reddit</option>
+                </select>
+            </div>
+            
+            <div class="input-group">
+                <label for="keyword">🔑 Palabra Clave:</label>
+                <input type="text" id="keyword" value="productividad con inteligencia artificial" placeholder="Ej: marketing digital">
+            </div>
+            
+            <div class="input-group">
+                <label>📝 Tipos de Copy (selecciona 1-3):</label>
+                <div class="copy-types">
+                    <div class="copy-type-item">
+                        <input type="checkbox" id="copy1" value="Informativo y educativo" checked>
+                        <label for="copy1">📚 Informativo y educativo</label>
+                    </div>
+                    <div class="copy-type-item">
+                        <input type="checkbox" id="copy2" value="Venta directa y persuasivo">
+                        <label for="copy2">💰 Venta directa y persuasivo</label>
+                    </div>
+                    <div class="copy-type-item">
+                        <input type="checkbox" id="copy3" value="Posicionamiento y branding">
+                        <label for="copy3">🏆 Posicionamiento y branding</label>
+                    </div>
+                    <div class="copy-type-item">
+                        <input type="checkbox" id="copy4" value="Urgencia y escasez">
+                        <label for="copy4">⚡ Urgencia y escasez</label>
+                    </div>
+                </div>
+                <small id="copyNote">Distribución: Si eliges 3 tipos = 1 idea de cada tipo</small>
+            </div>
+            
+            <div class="input-group">
+                <label for="context">💬 Contexto Adicional (opcional):</label>
+                <textarea id="context" rows="3" placeholder="Audiencia, tono específico, etc."></textarea>
+            </div>
+            
+            <button onclick="testNewStructure()" id="testBtn">
+                🚀 PROBAR NUEVA ESTRUCTURA
+            </button>
+            
+            <div class="timer" id="timer"></div>
+            <div class="status" id="status"></div>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let startTime;
+        let timerInterval;
+        
+        function updateTimer() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            document.getElementById('timer').textContent = `⏱️ Tiempo transcurrido: ${elapsed}s`;
+        }
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+        }
+        
+        // Manejar selección de tipos de copy
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const selected = document.querySelectorAll('input[type="checkbox"]:checked');
+                const note = document.getElementById('copyNote');
+                
+                if (selected.length > 3) {
+                    this.checked = false;
+                    alert('⚠️ Máximo 3 tipos de copy permitidos');
+                    return;
+                }
+                
+                // Actualizar nota
+                if (selected.length === 0) {
+                    note.textContent = 'Selecciona al menos 1 tipo de copy';
+                } else if (selected.length === 1) {
+                    note.textContent = 'Distribución: 3 variaciones del mismo tipo';
+                } else if (selected.length === 2) {
+                    note.textContent = 'Distribución: 2 ideas del primer tipo + 1 del segundo';
+                } else if (selected.length === 3) {
+                    note.textContent = 'Distribución: 1 idea de cada tipo seleccionado';
+                }
+            });
+        });
+        
+        async function testNewStructure() {
+            const platform = document.getElementById('platform').value;
+            const keyword = document.getElementById('keyword').value.trim();
+            const copyTypes = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+            const context = document.getElementById('context').value.trim();
+            
+            if (!platform) {
+                alert('⚠️ Por favor selecciona una red social');
+                return;
+            }
+            
+            if (!keyword) {
+                alert('⚠️ Por favor ingresa una palabra clave');
+                return;
+            }
+            
+            if (copyTypes.length === 0) {
+                alert('⚠️ Por favor selecciona al menos un tipo de copy');
+                return;
+            }
+            
+            // UI
+            const btn = document.getElementById('testBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ PROBANDO NUEVA ESTRUCTURA...';
+            
+            // Timer
+            startTime = Date.now();
+            timerInterval = setInterval(updateTimer, 1000);
+            updateStatus('🚀 Iniciando test de nueva estructura...', 'info');
+            
+            // Limpiar resultados anteriores
+            document.getElementById('results').innerHTML = '';
+            
+            try {
+                updateStatus('📡 Llamando a API con nueva estructura...', 'info');
+                
+                const response = await fetch('http://localhost:8143/lluvia-de-ideas-4e1b3/us-central1/generateIdeas', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        keyword: keyword,
+                        platform: platform,
+                        copyTypes: copyTypes,
+                        userContext: context,
+                        uid: 'test-user-' + Date.now()
+                    })
+                });
+                
+                clearInterval(timerInterval);
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    updateStatus(`✅ Nueva estructura exitosa en ${totalTime}s`, 'success');
+                    displayTestResults(result.data, totalTime, platform, copyTypes);
+                } else {
+                    const errorData = await response.json();
+                    updateStatus(`❌ Error ${response.status} en ${totalTime}s`, 'error');
+                    displayError('Error del servidor', errorData);
+                }
+                
+            } catch (error) {
+                clearInterval(timerInterval);
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+                
+                console.error('Error en test:', error);
+                updateStatus(`❌ Error en ${totalTime}s`, 'error');
+                displayError('Error de conexión', error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 PROBAR NUEVA ESTRUCTURA';
+            }
+        }
+        
+        function displayTestResults(data, totalTime, platform, copyTypes) {
+            const resultsDiv = document.getElementById('results');
+            
+            let html = `
+                <div class="result success">
+                    <h3>✅ NUEVA ESTRUCTURA EXITOSA</h3>
+                    <strong>⏱️ Tiempo total: ${totalTime} segundos</strong>
+                    <strong>🎯 Red social: ${platform}</strong>
+                    <strong>📝 Tipos seleccionados: ${copyTypes.length}</strong>
+                    <strong>🔄 Usos restantes: ${data.remainingUses}</strong>
+                    
+                    <h4>🎯 Análisis de las 3 Ideas:</h4>
+            `;
+            
+            let templateCount = 0;
+            let aiCount = 0;
+            const ideaKeys = Object.keys(data.ideas).sort();
+            
+            ideaKeys.forEach((ideaKey, index) => {
+                const idea = data.ideas[ideaKey];
+                const isTemplate = idea.rawContent.includes('⚠️ GENERADO CON TEMPLATES');
+                
+                if (isTemplate) {
+                    templateCount++;
+                } else {
+                    aiCount++;
+                }
+                
+                html += `
+                    <div style="margin: 15px 0; padding: 15px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                        <strong>💡 Idea ${index + 1} - ${idea.copyType}:</strong> 
+                        ${isTemplate ? '❌ TEMPLATE' : '✅ IA'} 
+                        ${idea.isFallback ? `(Motivo: ${idea.errorMessage})` : ''}
+                        <div style="margin-top: 8px; font-size: 0.9em; opacity: 0.8;">
+                            ${idea.rawContent.substring(0, 150)}...
+                        </div>
+                        ${idea.hashtags && idea.hashtags.length > 0 ? `
+                            <div style="margin-top: 8px; font-size: 0.8em;">
+                                <strong>Hashtags:</strong> ${idea.hashtags.slice(0, 5).join(' ')}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+            
+            html += `
+                    <div style="margin: 20px 0; padding: 15px; background: ${aiCount === 3 ? 'rgba(78, 205, 196, 0.2)' : 'rgba(255, 107, 107, 0.2)'}; border-radius: 10px;">
+                        <strong>📈 RESULTADO FINAL:</strong><br>
+                        ✅ Ideas con IA: ${aiCount}/3<br>
+                        ❌ Templates: ${templateCount}/3<br>
+                        🎯 Plataforma: ${platform}<br>
+                        ⏰ Tiempo: ${totalTime}s (${totalTime < 60 ? 'ÓPTIMO' : 'LENTO'})<br>
+                        <strong>${aiCount === 3 && totalTime < 60 ? '🎉 ÉXITO TOTAL: Nueva estructura funciona perfectamente' : '⚠️ Necesita optimización'}</strong>
+                    </div>
+                    
+                    <h4>🔍 Verificación de Mejoras:</h4>
+                    <div style="margin: 15px 0; padding: 15px; background: rgba(33, 150, 243, 0.1); border-radius: 8px;">
+                        ✅ Una sola red social: ${platform}<br>
+                        ✅ 3 ideas generadas: ${ideaKeys.length}<br>
+                        ✅ Tipos de copy usados: ${copyTypes.length}<br>
+                        ✅ Sin timeout (< 60s): ${totalTime < 60 ? 'SÍ' : 'NO'}<br>
+                        ✅ Mayoría con IA: ${aiCount >= 2 ? 'SÍ' : 'NO'}
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function displayError(title, error) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="result error">
+                    <h3>${title}</h3>
+                    <strong>Código:</strong> ${error.error?.code || error.code || 'N/A'}<br>
+                    <strong>Mensaje:</strong> ${error.error?.message || error.message || JSON.stringify(error)}<br>
+                    <strong>Detalles:</strong> ${error.error?.details || error.details || 'N/A'}
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

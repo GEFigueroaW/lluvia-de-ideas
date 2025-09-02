@@ -1,0 +1,25 @@
+# ===============================================
+# COMANDOS PARA CONFIGURAR DEEPSEEK API KEY
+# ===============================================
+
+# 🔑 PASO 1: Configura tu API Key (reemplaza TU_API_KEY_AQUI)
+firebase functions:config:set deepseek.key="TU_API_KEY_AQUI"
+
+# 🚀 PASO 2: Despliega las funciones actualizadas
+firebase deploy --only functions
+
+# ✅ PASO 3: Verifica que funciona
+# Ve a tu aplicación y prueba generar copywriting
+
+# ===============================================
+# EJEMPLO CON API KEY REAL:
+# ===============================================
+# firebase functions:config:set deepseek.key="sk-1234567890abcdef..."
+# firebase deploy --only functions
+
+# ===============================================
+# SI TIENES PROBLEMAS:
+# ===============================================
+# 1. Verifica que estés logueado: firebase login
+# 2. Verifica el proyecto: firebase projects:list
+# 3. Verifica la configuración: firebase functions:config:get

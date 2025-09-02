@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/modern.css">
     <link rel="stylesheet" href="css/autocorrector.css">
+    <link rel="stylesheet" href="css/new-structure.css">
     
     <!-- Meta tags para SEO -->
     <meta name="description" content="Generador de ideas inteligente impulsado por IA para potenciar tu creatividad">
@@ -233,41 +234,30 @@
                         </h2>
                         
                         <form id="copywritingForm">
-                            <!-- 1. Modo de generación -->
-                            <div class="modern-field">
-                                <label class="modern-label">
-                                    <i class="fas fa-cog mr-2"></i>
-                                    Modo de Generación
-                                </label>
-                                <div class="modern-radio-group">
-                                    <label class="modern-radio">
-                                        <input type="radio" name="generationMode" value="multi" checked>
-                                        <span class="radio-custom"></span>
-                                        <span class="radio-text">1 idea por cada red social seleccionada</span>
-                                    </label>
-                                    <label class="modern-radio">
-                                        <input type="radio" name="generationMode" value="single">
-                                        <span class="radio-custom"></span>
-                                        <span class="radio-text">3 ideas para una sola red social</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- 2. Selección de redes sociales -->
+                            <!-- 1. Selección de red social única -->
                             <div class="modern-field">
                                 <label class="modern-label">
                                     <i class="fas fa-share-alt mr-2"></i>
-                                    Redes Sociales
+                                    Red Social (Selecciona 1)
                                 </label>
-                                <div id="socialNetworksContainer" class="social-networks-grid">
-                                    <!-- Se llena dinámicamente -->
-                                </div>
-                                <p id="socialNetworkNote" class="field-note">
-                                    👑 Usuarios premium pueden acceder a todas las redes sociales
+                                <select id="singleSocialNetwork" class="modern-select" required>
+                                    <option value="">Selecciona una red social...</option>
+                                    <option value="Facebook">📘 Facebook</option>
+                                    <option value="Instagram">📸 Instagram</option>
+                                    <option value="LinkedIn">💼 LinkedIn</option>
+                                    <option value="X / Twitter">🐦 X / Twitter</option>
+                                    <option value="TikTok">🎵 TikTok</option>
+                                    <option value="WhatsApp">💬 WhatsApp</option>
+                                    <option value="Telegram">📡 Telegram</option>
+                                    <option value="YouTube">📺 YouTube</option>
+                                    <option value="Reddit">🤓 Reddit</option>
+                                </select>
+                                <p class="field-note">
+                                    🎯 Obtendrás 3 ideas diferentes para la red social seleccionada
                                 </p>
                             </div>
 
-                            <!-- 3. Palabra clave / tema central -->
+                            <!-- 2. Palabra clave / tema central -->
                             <div class="modern-field">
                                 <label class="modern-label">
                                     <i class="fas fa-key mr-2"></i>
@@ -281,25 +271,55 @@
                                 </p>
                             </div>
 
-                            <!-- 4. Tipo de Copy -->
+                            <!-- 3. Tipos de Copy (múltiples selecciones) -->
                             <div class="modern-field">
                                 <label class="modern-label">
                                     <i class="fas fa-edit mr-2"></i>
-                                    Tipo de Copy
+                                    Tipos de Copy (Selecciona 1-3)
                                 </label>
-                                <select id="copyType" class="modern-select" required>
-                                    <option value="">Selecciona el tipo de copy...</option>
-                                    <!-- Se llena dinámicamente -->
-                                </select>
-                                <div id="copyTypeDescription" class="copy-type-description">
-                                    Selecciona un tipo de copy para ver su descripción
+                                <div class="copy-types-grid">
+                                    <label class="copy-type-checkbox">
+                                        <input type="checkbox" name="copyTypes" value="Informativo y educativo" checked>
+                                        <span class="checkbox-custom"></span>
+                                        <div class="copy-type-content">
+                                            <h4>📚 Informativo y educativo</h4>
+                                            <p>Comparte conocimiento útil y educa a tu audiencia</p>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="copy-type-checkbox">
+                                        <input type="checkbox" name="copyTypes" value="Venta directa y persuasivo">
+                                        <span class="checkbox-custom"></span>
+                                        <div class="copy-type-content">
+                                            <h4>💰 Venta directa y persuasivo</h4>
+                                            <p>Impulsa ventas con llamadas a la acción directas</p>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="copy-type-checkbox">
+                                        <input type="checkbox" name="copyTypes" value="Posicionamiento y branding">
+                                        <span class="checkbox-custom"></span>
+                                        <div class="copy-type-content">
+                                            <h4>🏆 Posicionamiento y branding</h4>
+                                            <p>Fortalece tu marca y construye autoridad</p>
+                                        </div>
+                                    </label>
+                                    
+                                    <label class="copy-type-checkbox">
+                                        <input type="checkbox" name="copyTypes" value="Urgencia y escasez">
+                                        <span class="checkbox-custom"></span>
+                                        <div class="copy-type-content">
+                                            <h4>⚡ Urgencia y escasez</h4>
+                                            <p>Crea FOMO y acelera decisiones de compra</p>
+                                        </div>
+                                    </label>
                                 </div>
-                                <p id="copyTypeNote" class="field-note">
-                                    💎 Algunos tipos de copy están disponibles solo para usuarios premium
+                                <p class="field-note">
+                                    🎯 Selecciona máximo 3 tipos. Si eliges 3, obtendrás 1 idea de cada tipo.
                                 </p>
                             </div>
 
-                            <!-- 4.5. Opción de Llamada a la Acción -->
+                            <!-- 4. Opción de Llamada a la Acción -->
                             <div class="modern-field">
                                 <label class="modern-label">
                                     <i class="fas fa-bullhorn mr-2"></i>
@@ -333,7 +353,7 @@
                             <div class="modern-field">
                                 <button id="generateCopyBtn" type="submit" class="modern-btn is-primary">
                                     <i class="fas fa-magic mr-2"></i>
-                                    Generar Copywriting
+                                    Generar 3 Ideas de Copywriting
                                 </button>
                             </div>
                         </form>
@@ -412,9 +432,9 @@
                             </h3>
                             
                             <p style="font-size: 1.1rem; color: var(--text-secondary); max-width: 400px; line-height: 1.6; margin-bottom: 2rem;">
-                                Completa el formulario de la izquierda y presiona 
-                                <strong style="color: var(--text-primary);">"Generar Copywriting"</strong> 
-                                para obtener textos optimizados para cada red social.
+                                Elige una red social y los tipos de copy, luego presiona 
+                                <strong style="color: var(--text-primary);">"Generar 3 Ideas"</strong> 
+                                para obtener textos únicos y persuasivos.
                             </p>
                             
                             <!-- Características destacadas -->
@@ -423,16 +443,16 @@
                                     <div style="width: 50px; height: 50px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
                                         <i class="fas fa-share-alt" style="color: white; font-size: 1.25rem;"></i>
                                     </div>
-                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">Multi-Plataforma</h4>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">9 redes sociales</p>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">9 Redes Sociales</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Elige tu favorita</p>
                                 </div>
                                 
                                 <div style="text-align: center; padding: 1rem;">
                                     <div style="width: 50px; height: 50px; background: var(--secondary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem auto;">
                                         <i class="fas fa-palette" style="color: white; font-size: 1.25rem;"></i>
                                     </div>
-                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">12 Tipos de Copy</h4>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Estilos especializados</p>
+                                    <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">3 Ideas Únicas</h4>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Tipos de copy diferentes</p>
                                 </div>
                                 
                                 <div style="text-align: center; padding: 1rem;">
@@ -440,7 +460,7 @@
                                         <i class="fas fa-brain" style="color: white; font-size: 1.25rem;"></i>
                                     </div>
                                     <h4 style="font-size: 0.875rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">IA Especializada</h4>
-                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Copywriting persuasivo</p>
+                                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Copywriting enfocado</p>
                                 </div>
                             </div>
                         </div>
@@ -453,6 +473,7 @@
     <!-- Scripts -->
     <script src="simple-bypass.js"></script>
     <script src="js/copywriting-init.js"></script>
+    <script src="js/new-structure.js"></script>
     <script type="module" src="js/main.js"></script>
     <script src="js/autocorrector.js"></script>
     <script src="debug-helpers.js"></script>
