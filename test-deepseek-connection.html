@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test DeepSeek Connection</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5; 
+        }
+        .test-container { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-left: 4px solid #007bff; 
+            margin: 10px 0; 
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .success { background: #d4edda; border-left-color: #28a745; }
+        .error { background: #f8d7da; border-left-color: #dc3545; }
+        .warning { background: #fff3cd; border-left-color: #ffc107; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Conexión DeepSeek</h1>
+    
+    <div class="test-container">
+        <h2>Diagnóstico de API DeepSeek</h2>
+        <p>Esta página prueba la conectividad con la API de DeepSeek y diagnostica problemas.</p>
+        
+        <button onclick="testDeepseekConnection()">🔌 Test Conexión DeepSeek</button>
+        <button onclick="testGenerateIdeas()">🎯 Test Generación de Ideas</button>
+        <button onclick="clearResults()">🗑️ Limpiar Resultados</button>
+        
+        <div id="testResults" class="result">
+            Presiona un botón para comenzar las pruebas...
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-functions.js';
+        
+        // Tu configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8gCbU2FQ2dB9Vs3V_3tXy_5xCgR1N2p4",
+            authDomain: "brain-storm-8f0d8.firebaseapp.com",
+            projectId: "brain-storm-8f0d8",
+            storageBucket: "brain-storm-8f0d8.appspot.com",
+            messagingSenderId: "973377142966",
+            appId: "1:973377142966:web:0c8c3b4a6e47e91c4b5d8e"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const functions = getFunctions(app);
+        
+        window.testDeepseekConnection = async function() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '🔄 Probando conexión con DeepSeek...\\n\\n';
+            results.className = 'result';
+            
+            try {
+                const testConnection = httpsCallable(functions, 'testDeepseekConnection');
+                const result = await testConnection();
+                
+                results.innerHTML += '✅ CONEXIÓN EXITOSA:\\n';
+                results.innerHTML += JSON.stringify(result.data, null, 2);
+                results.className = 'result success';
+                
+            } catch (error) {
+                results.innerHTML += '❌ ERROR DE CONEXIÓN:\\n';
+                results.innerHTML += `Código: ${error.code}\\n`;
+                results.innerHTML += `Mensaje: ${error.message}\\n`;
+                results.innerHTML += `Detalles: ${JSON.stringify(error.details || {}, null, 2)}`;
+                results.className = 'result error';
+            }
+        };
+        
+        window.testGenerateIdeas = async function() {
+            const results = document.getElementById('testResults');
+            results.innerHTML = '🎯 Probando generación de ideas...\\n\\n';
+            results.className = 'result';
+            
+            try {
+                const generateIdeas = httpsCallable(functions, 'generateIdeas');
+                const result = await generateIdeas({
+                    keyword: 'Test de conexión',
+                    platforms: ['facebook'],
+                    userContext: 'Test técnico'
+                });
+                
+                results.innerHTML += '✅ GENERACIÓN EXITOSA:\\n';
+                results.innerHTML += JSON.stringify(result.data, null, 2);
+                
+                // Verificar si son plantillas
+                const resultString = JSON.stringify(result.data);
+                if (resultString.includes('GENERADO CON TEMPLATES')) {
+                    results.innerHTML += '\\n\\n⚠️ NOTA: Se detectaron plantillas de respaldo - La IA puede no estar funcionando correctamente';
+                    results.className = 'result warning';
+                } else {
+                    results.className = 'result success';
+                }
+                
+            } catch (error) {
+                results.innerHTML += '❌ ERROR EN GENERACIÓN:\\n';
+                results.innerHTML += `Código: ${error.code}\\n`;
+                results.innerHTML += `Mensaje: ${error.message}\\n`;
+                results.innerHTML += `Detalles: ${JSON.stringify(error.details || {}, null, 2)}`;
+                results.className = 'result error';
+            }
+        };
+        
+        window.clearResults = function() {
+            document.getElementById('testResults').innerHTML = 'Resultados limpiados. Listo para nuevas pruebas...';
+            document.getElementById('testResults').className = 'result';
+        };
+    </script>
+</body>
+</html>

@@ -565,11 +565,23 @@ async function generateCopywriting(params) {
         if (result.data && result.data.ideas) {
             console.log('[COPYWRITING] Ideas recibidas:', result.data.ideas);
             
-            // Verificar si son plantillas
+            // Verificar si son plantillas y mostrar warning pero no bloquear
             const ideasString = JSON.stringify(result.data.ideas);
             if (ideasString.includes('GENERADO CON TEMPLATES') || ideasString.includes('Tiempo de espera agotado')) {
-                console.error('[COPYWRITING] ¡DETECTADO FALLBACK DE PLANTILLAS!');
-                throw new Error('El sistema está usando plantillas predefinidas en lugar de IA. La configuración de DeepSeek puede tener problemas.');
+                console.warn('[COPYWRITING] ⚠️ DETECTADO FALLBACK DE PLANTILLAS - La IA no está disponible, usando contenido de respaldo');
+                
+                // Mostrar notificación al usuario pero permitir el contenido
+                const notificationElement = document.querySelector('.copywriting-results');
+                if (notificationElement) {
+                    const warningDiv = document.createElement('div');
+                    warningDiv.className = 'alert alert-warning';
+                    warningDiv.innerHTML = `
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Modo de Respaldo Activado:</strong> La IA no está disponible temporalmente. 
+                        Se está usando contenido de plantillas como alternativa.
+                    `;
+                    notificationElement.insertBefore(warningDiv, notificationElement.firstChild);
+                }
             }
         } else {
             console.error('[COPYWRITING] Respuesta de generateIdeas no tiene formato esperado:', result);
@@ -1177,10 +1189,10 @@ function processCopywritingResponse(ideas, params) {
     const { socialNetworks, generationMode } = params;
     const copies = [];
     
-    // VALIDACIÓN CRÍTICA: Detectar si son plantillas en lugar de IA real
+    // VALIDACIÓN: Detectar si son plantillas y mostrar aviso pero continuar
     if (typeof ideas === 'string' && ideas.includes('GENERADO CON TEMPLATES')) {
-        console.error('[ERROR] ¡Sistema usando plantillas fallback en lugar de IA!');
-        throw new Error('El sistema está usando plantillas predefinidas. La IA no está funcionando correctamente.');
+        console.warn('[WARNING] Sistema usando plantillas de respaldo - La IA no está disponible temporalmente');
+        // Continuar procesando pero marcar como contenido de respaldo
     }
     
     // Si la respuesta es un objeto con plataformas como claves
