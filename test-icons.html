@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Iconos del Carrusel</title>
+    
+    <!-- Font Awesome CDNs -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .icon-test {
+            display: inline-block;
+            margin: 10px;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+        }
+        .icon-test i {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .icon-test span {
+            font-size: 12px;
+            font-weight: bold;
+        }
+        h1 { color: #333; text-align: center; }
+        h2 { color: #666; margin-top: 30px; }
+        .device-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔍 Test de Iconos del Carrusel</h1>
+        
+        <div class="device-info">
+            <strong>Información del dispositivo:</strong><br>
+            <span id="deviceInfo"></span>
+        </div>
+        
+        <h2>Iconos Principales:</h2>
+        <div class="icon-test">
+            <i class="fab fa-facebook-f"></i>
+            <span>Facebook</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-instagram"></i>
+            <span>Instagram</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-linkedin-in"></i>
+            <span>LinkedIn</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-x-twitter"></i>
+            <span>X/Twitter</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-tiktok"></i>
+            <span>TikTok</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-telegram-plane"></i>
+            <span>Telegram</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-youtube"></i>
+            <span>YouTube</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-reddit-alien"></i>
+            <span>Reddit</span>
+        </div>
+        
+        <h2>Iconos Fallback:</h2>
+        <div class="icon-test">
+            <i class="fab fa-facebook"></i>
+            <span>Facebook Alt</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-instagram"></i>
+            <span>Instagram Alt</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-linkedin"></i>
+            <span>LinkedIn Alt</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-twitter"></i>
+            <span>Twitter Alt</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-tiktok"></i>
+            <span>TikTok Alt</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-whatsapp"></i>
+            <span>WhatsApp Alt</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-telegram"></i>
+            <span>Telegram Alt</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-youtube"></i>
+            <span>YouTube Alt</span>
+        </div>
+        <div class="icon-test">
+            <i class="fab fa-reddit"></i>
+            <span>Reddit Alt</span>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 15px; background: #fff3cd; border-radius: 8px;">
+            <strong>⚠️ Instrucciones:</strong><br>
+            1. Verifica que todos los iconos sean visibles<br>
+            2. Si algunos no se ven, anota cuáles faltan<br>
+            3. Comprueba tanto en computador como en celular<br>
+            4. Los iconos deben aparecer como símbolos, no como cuadrados vacíos
+        </div>
+    </div>
+
+    <script>
+        // Mostrar información del dispositivo
+        const deviceInfo = document.getElementById('deviceInfo');
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const screenWidth = window.screen.width;
+        const viewportWidth = window.innerWidth;
+        
+        deviceInfo.innerHTML = `
+            Dispositivo: ${isMobile ? 'Móvil' : 'Escritorio'}<br>
+            Pantalla: ${screenWidth}px<br>
+            Viewport: ${viewportWidth}px<br>
+            User Agent: ${navigator.userAgent.substring(0, 100)}...
+        `;
+        
+        // Verificar si Font Awesome se cargó
+        setTimeout(() => {
+            const testIcon = document.querySelector('.fab');
+            const computedStyle = window.getComputedStyle(testIcon, '::before');
+            const fontFamily = computedStyle.getPropertyValue('font-family');
+            
+            console.log('Font Awesome cargado:', fontFamily.includes('Font Awesome'));
+            console.log('Familia de fuente:', fontFamily);
+        }, 1000);
+    </script>
+</body>
+</html>

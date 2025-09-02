@@ -9,15 +9,15 @@ class SocialCarousel {
         this.container = document.getElementById(containerId);
         this.currentIndex = 0;
         this.socialNetworks = [
-            { name: 'Facebook', icon: 'fab fa-facebook-f', emoji: 'fab fa-facebook-f' },
-            { name: 'Instagram', icon: 'fab fa-instagram', emoji: 'fab fa-instagram' },
-            { name: 'LinkedIn', icon: 'fab fa-linkedin-in', emoji: 'fab fa-linkedin-in' },
-            { name: 'X / Twitter', icon: 'fab fa-x-twitter', emoji: 'fab fa-x-twitter' },
-            { name: 'TikTok', icon: 'fab fa-tiktok', emoji: 'fab fa-tiktok' },
-            { name: 'WhatsApp', icon: 'fab fa-whatsapp', emoji: 'fab fa-whatsapp' },
-            { name: 'Telegram', icon: 'fab fa-telegram-plane', emoji: 'fab fa-telegram-plane' },
-            { name: 'YouTube', icon: 'fab fa-youtube', emoji: 'fab fa-youtube' },
-            { name: 'Reddit', icon: 'fab fa-reddit-alien', emoji: 'fab fa-reddit-alien' }
+            { name: 'Facebook', icon: 'fab fa-facebook-f', fallback: 'fab fa-facebook', text: 'f' },
+            { name: 'Instagram', icon: 'fab fa-instagram', fallback: 'fab fa-instagram', text: '📷' },
+            { name: 'LinkedIn', icon: 'fab fa-linkedin-in', fallback: 'fab fa-linkedin', text: 'in' },
+            { name: 'X / Twitter', icon: 'fab fa-x-twitter', fallback: 'fab fa-twitter', text: '🐦' },
+            { name: 'TikTok', icon: 'fab fa-tiktok', fallback: 'fab fa-tiktok', text: '♪' },
+            { name: 'WhatsApp', icon: 'fab fa-whatsapp', fallback: 'fab fa-whatsapp', text: '💬' },
+            { name: 'Telegram', icon: 'fab fa-telegram-plane', fallback: 'fab fa-telegram', text: '✈️' },
+            { name: 'YouTube', icon: 'fab fa-youtube', fallback: 'fab fa-youtube', text: '▶️' },
+            { name: 'Reddit', icon: 'fab fa-reddit-alien', fallback: 'fab fa-reddit', text: '👽' }
         ];
         
         this.init();
@@ -30,6 +30,62 @@ class SocialCarousel {
         
         // Auto-seleccionar el primer elemento
         this.selectNetwork(0);
+        
+        // Verificar y aplicar fallbacks para íconos
+        this.checkIconFallbacks();
+    }
+
+    checkIconFallbacks() {
+        // Esperar un poco para que los íconos se carguen
+        setTimeout(() => {
+            this.items.forEach((item, index) => {
+                const primaryIcon = item.querySelector('.social-icon i:first-child');
+                const fallbackIcon = item.querySelector('.social-icon i:last-child');
+                const textFallback = item.querySelector('.icon-text-fallback');
+                
+                if (primaryIcon && fallbackIcon && textFallback) {
+                    // Verificar si el ícono principal se cargó correctamente
+                    const computedStyle = window.getComputedStyle(primaryIcon, '::before');
+                    const content = computedStyle.getPropertyValue('content');
+                    
+                    // Si no hay contenido o es "none", usar fallback
+                    if (!content || content === 'none' || content === '""') {
+                        primaryIcon.style.display = 'none';
+                        fallbackIcon.style.display = 'inline-block';
+                        
+                        // Si el fallback tampoco funciona, usar texto
+                        setTimeout(() => {
+                            const fallbackStyle = window.getComputedStyle(fallbackIcon, '::before');
+                            const fallbackContent = fallbackStyle.getPropertyValue('content');
+                            
+                            if (!fallbackContent || fallbackContent === 'none' || fallbackContent === '""') {
+                                fallbackIcon.style.display = 'none';
+                                textFallback.style.display = 'inline-block';
+                            }
+                        }, 200);
+                    }
+                }
+            });
+        }, 500);
+        
+        // Verificación adicional para asegurar que algo se muestre
+        setTimeout(() => {
+            this.items.forEach((item) => {
+                const socialIcon = item.querySelector('.social-icon');
+                const allIcons = socialIcon.querySelectorAll('i');
+                const textFallback = socialIcon.querySelector('.icon-text-fallback');
+                
+                // Si ningún ícono es visible, mostrar el texto
+                const hasVisibleIcon = Array.from(allIcons).some(icon => {
+                    return window.getComputedStyle(icon).display !== 'none';
+                });
+                
+                if (!hasVisibleIcon && textFallback) {
+                    textFallback.style.display = 'inline-block';
+                    console.log('Usando fallback de texto para:', item.dataset.network);
+                }
+            });
+        }, 1000);
     }
 
     render() {
@@ -44,7 +100,9 @@ class SocialCarousel {
                         ${this.socialNetworks.map((network, index) => `
                             <div class="social-item" data-network="${network.name}" data-index="${index}">
                                 <div class="social-icon">
-                                    <i class="${network.icon}"></i>
+                                    <i class="${network.icon}" style="display: inline-block;"></i>
+                                    <i class="${network.fallback}" style="display: none;"></i>
+                                    <span class="icon-text-fallback" style="display: none; font-size: inherit; font-weight: bold;">${network.text}</span>
                                 </div>
                                 <div class="social-name">${network.name}</div>
                             </div>
