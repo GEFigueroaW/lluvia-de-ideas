@@ -135,8 +135,8 @@ const COPY_TYPES = {
 // Variables globales
 let selectedSocialNetworks = new Set(['facebook']); // Facebook por defecto
 let currentGenerationMode = 'multi';
-
 let isUserPremium = false; // Se actualizará con el estado real del usuario
+let currentCopywritingData = []; // Almacenar datos de copywriting seguros
 
 // Permitir que el main.js actualice el estado premium y refresque la UI
 window.setCopywritingPremiumStatus = function(premium) {
@@ -1770,25 +1770,9 @@ function displayCopywritingResults(copies, params) {
     const container = document.getElementById('ideasContainer');
     if (!container) return;
     
-    const { socialNetworks, generationMode, keyword, copyType } = params;
-    const copyTypeInfo = COPY_TYPES[copyType];
-    
-    let html = `
-        <div class="modern-copywriting-results animate__animated animate__fadeInUp">
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h3 style="font-size: 2rem; font-weight: 700; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
-                    ✍️ Copywriting Generado
-                </h3>
-                <p style="color: var(--text-secondary); font-size: 1rem;">
-                    <strong>${keyword}</strong> • ${copyTypeInfo.name}
-                </p>
-            </div>
-            
-            <div class="copywriting-results-grid">
-    `;
-    
-    copies.forEach((copy, index) => {
-        const networkKey = generationMode === 'single' ? socialNetworks[0] : socialNetworks[index % socialNetworks.length];
+    // Almacenar datos seguros para las funciones de copia
+    currentCopywritingData = copies.map((copy, index) => {
+        const networkKey = params.generationMode === 'single' ? params.socialNetworks[0] : params.socialNetworks[index % params.socialNetworks.length];
         const network = SOCIAL_NETWORKS[networkKey];
         
         // Construir contenido completo para mostrar
@@ -1808,8 +1792,37 @@ function displayCopywritingResults(copies, params) {
             contenidoCompleto = 'Sin contenido generado';
         }
         
-        // Limpiar formato visual si existe
-        const formatoVisual = copy.formatoVisual || '';
+        return {
+            contenido: contenidoCompleto,
+            formatoVisual: copy.formatoVisual || '',
+            networkName: network.name,
+            networkKey: networkKey,
+            variation: copy.variation
+        };
+    });
+    
+    const { socialNetworks, generationMode, keyword, copyType } = params;
+    const copyTypeInfo = COPY_TYPES[copyType];
+    
+    let html = `
+        <div class="modern-copywriting-results animate__animated animate__fadeInUp">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="font-size: 2rem; font-weight: 700; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">
+                    ✍️ Copywriting Generado
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 1rem;">
+                    <strong>${keyword}</strong> • ${copyTypeInfo.name}
+                </p>
+            </div>
+            
+            <div class="copywriting-results-grid">
+    `;
+    
+    currentCopywritingData.forEach((copyData, index) => {
+        const { contenido, formatoVisual, networkName, networkKey, variation } = copyData;
+        const network = SOCIAL_NETWORKS[networkKey];
+        
+        // Verificar si hay formato visual
         const tieneFormatoVisual = formatoVisual.trim().length > 0;
         
         console.log(`[DEBUG] Red ${network.name}: tieneFormatoVisual=${tieneFormatoVisual}, formatoVisual="${formatoVisual}"`);
@@ -1821,12 +1834,12 @@ function displayCopywritingResults(copies, params) {
                         <i class="${network.icon}" style="color: ${network.color}"></i>
                         <span>${network.name}</span>
                     </div>
-                    ${copy.variation ? `<span class="variation-badge">Variación ${copy.variation}</span>` : ''}
+                    ${variation ? `<span class="variation-badge">Variación ${variation}</span>` : ''}
                 </div>
                 
                 <div class="copywriting-content">
                     <div class="copy-section content-section">
-                        <div class="section-content main-content">${contenidoCompleto.replace(/\n/g, '<br>')}</div>
+                        <div class="section-content main-content">${contenido.replace(/\n/g, '<br>')}</div>
                     </div>
                     ${tieneFormatoVisual ? `
                     <div class="copy-section visual-section">
@@ -1842,11 +1855,11 @@ function displayCopywritingResults(copies, params) {
                 </div>
                 
                 <div class="copywriting-actions">
-                    <button class="copy-btn primary" onclick="copiarSoloTexto('${contenidoCompleto.replace(/'/g, "\\'")}', '${network.name}')">
+                    <button class="copy-btn primary" onclick="copiarCopywritingSeguro(${index}, 'contenido')">
                         <i class="fas fa-copy"></i> Copiar Copywriting
                     </button>
                     ${tieneFormatoVisual ? `
-                    <button class="copy-btn visual" onclick="copiarSoloVisual('${formatoVisual.replace(/'/g, "\\'")}', '${network.name}')">
+                    <button class="copy-btn visual" onclick="copiarCopywritingSeguro(${index}, 'visual')">
                         <i class="fas fa-palette"></i> Copiar Formato Visual
                     </button>
                     ` : ''}
@@ -1877,7 +1890,7 @@ function displayCopywritingResults(copies, params) {
         </div>
     `;
     
-    console.log('[DEBUG] HTML generado:', html);
+    console.log('[DEBUG] HTML generado correctamente');
     container.innerHTML = html;
     
     // Hacer scroll automático a los resultados
@@ -2155,9 +2168,40 @@ function closeDiagnostic() {
     }
 }
 
-// FUNCIONES GLOBALES SIMPLES PARA BOTONES
+// FUNCIONES GLOBALES SEGURAS PARA BOTONES
+window.copiarCopywritingSeguro = function(index, tipo) {
+    console.log('[DEBUG] copiarCopywritingSeguro:', index, tipo);
+    
+    if (!currentCopywritingData || !currentCopywritingData[index]) {
+        console.error('Datos de copywriting no encontrados:', index);
+        showNotification('❌ Error: Datos no disponibles', 'error');
+        return;
+    }
+    
+    const copyData = currentCopywritingData[index];
+    let textoACopiar = '';
+    
+    if (tipo === 'contenido') {
+        textoACopiar = copyData.contenido;
+        navigator.clipboard.writeText(textoACopiar).then(() => {
+            showNotification(`📝 Copywriting de ${copyData.networkName} copiado`, 'success');
+        }).catch(err => {
+            console.error('Error al copiar:', err);
+            showNotification('❌ Error al copiar', 'error');
+        });
+    } else if (tipo === 'visual') {
+        textoACopiar = `🎨 FORMATO VISUAL PARA ${copyData.networkName.toUpperCase()}:\n\n${copyData.formatoVisual}`;
+        navigator.clipboard.writeText(textoACopiar).then(() => {
+            showNotification(`🎨 Formato visual de ${copyData.networkName} copiado`, 'success');
+        }).catch(err => {
+            console.error('Error al copiar:', err);
+            showNotification('❌ Error al copiar formato visual', 'error');
+        });
+    }
+};
+
 window.copiarSoloTexto = function(contenido, plataforma) {
-    console.log('[DEBUG] copiarSoloTexto:', contenido, plataforma);
+    console.log('[DEBUG] copiarSoloTexto (legacy):', contenido, plataforma);
     navigator.clipboard.writeText(contenido).then(() => {
         showNotification(`📝 Copywriting de ${plataforma} copiado`, 'success');
     }).catch(err => {
@@ -2167,7 +2211,7 @@ window.copiarSoloTexto = function(contenido, plataforma) {
 };
 
 window.copiarSoloVisual = function(formatoVisual, plataforma) {
-    console.log('[DEBUG] copiarSoloVisual:', formatoVisual, plataforma);
+    console.log('[DEBUG] copiarSoloVisual (legacy):', formatoVisual, plataforma);
     const texto = `🎨 FORMATO VISUAL PARA ${plataforma.toUpperCase()}:\n\n${formatoVisual}`;
     navigator.clipboard.writeText(texto).then(() => {
         showNotification(`🎨 Formato visual de ${plataforma} copiado`, 'success');
@@ -2209,30 +2253,38 @@ window.copyVisualFormat = copyVisualFormat;
  * Copia todos los copies generados
  */
 function copyAllCopywriting() {
-    const copyItems = document.querySelectorAll('.copywriting-result-item');
-    if (copyItems.length === 0) return;
+    if (!currentCopywritingData || currentCopywritingData.length === 0) {
+        showNotification('❌ No hay copywriting para copiar', 'warning');
+        return;
+    }
     
     let allCopies = '';
-    copyItems.forEach((item, index) => {
-        const networkName = item.querySelector('.social-network-badge span').textContent;
-        const copyContent = item.querySelector('.copywriting-content');
+    currentCopywritingData.forEach((copyData, index) => {
+        const { contenido, formatoVisual, networkName, variation } = copyData;
         
-        // Extraer todo el contenido del copy
-        let copyText = `=== ${networkName} ===\n`;
-        const sections = copyContent.querySelectorAll('.copy-section');
-        sections.forEach(section => {
-            copyText += section.textContent + '\n';
-        });
-        copyText += '\n';
+        // Agregar encabezado de la red social
+        allCopies += `=== ${networkName.toUpperCase()}`;
+        if (variation) {
+            allCopies += ` - VARIACIÓN ${variation}`;
+        }
+        allCopies += ` ===\n\n`;
         
-        allCopies += copyText;
+        // Agregar contenido del copy
+        allCopies += `📝 COPYWRITING:\n${contenido}\n\n`;
+        
+        // Agregar formato visual si existe
+        if (formatoVisual && formatoVisual.trim().length > 0) {
+            allCopies += `🎨 FORMATO VISUAL:\n${formatoVisual}\n\n`;
+        }
+        
+        allCopies += '---\n\n';
     });
     
     navigator.clipboard.writeText(allCopies.trim()).then(() => {
-        showNotification('Todos los copies copiados al portapapeles', 'success');
+        showNotification('📋 Todos los copywritings copiados al portapapeles', 'success');
     }).catch(err => {
         console.error('Error al copiar:', err);
-        showNotification('Error al copiar los copies', 'error');
+        showNotification('❌ Error al copiar los copywritings', 'error');
     });
 }
 
