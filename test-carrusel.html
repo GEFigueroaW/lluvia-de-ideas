@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎠 Test Carrusel de Redes Sociales</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- CSS del carrusel -->
+    <link rel="stylesheet" href="css/social-carousel.css">
+    
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-size: 1.1em;
+        }
+        
+        .instructions {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .instructions li {
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .instructions li:last-child {
+            border-bottom: none;
+        }
+        
+        .selected-info {
+            background: #e6fffa;
+            border: 2px solid #4fd1c7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #047857;
+        }
+        
+        .test-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .test-btn {
+            background: linear-gradient(135deg, var(--primary-color), #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .modern-field {
+            margin: 30px 0;
+        }
+        
+        .modern-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+        
+        .field-note {
+            margin-top: 10px;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎠 Carrusel de Redes Sociales</h1>
+        <p class="subtitle">Prueba el nuevo selector interactivo</p>
+        
+        <div class="modern-field">
+            <label class="modern-label">
+                <i class="fas fa-share-alt"></i>
+                Red Social (Desliza o usa las flechas)
+            </label>
+            <div class="social-network-selector" id="socialCarouselContainer">
+                <!-- El carrusel se generará aquí dinámicamente -->
+            </div>
+            <p class="field-note">
+                🎯 Obtendrás 3 ideas diferentes para la red social seleccionada
+            </p>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> Cómo usar el carrusel</h3>
+            <ul>
+                <li>🖱️ <strong>Click:</strong> Haz click en cualquier red social para seleccionarla</li>
+                <li>⬅️➡️ <strong>Flechas:</strong> Usa los botones de navegación</li>
+                <li>⌨️ <strong>Teclado:</strong> Usa las flechas del teclado (←→)</li>
+                <li>📱 <strong>Touch:</strong> Desliza hacia izquierda o derecha en móviles</li>
+                <li>🎯 <strong>Indicadores:</strong> Click en los puntos para ir directamente</li>
+            </ul>
+        </div>
+        
+        <div class="selected-info" id="selectedInfo" style="display: none;">
+            <span id="selectedNetwork">Ninguna red seleccionada</span>
+        </div>
+        
+        <div class="test-buttons">
+            <button class="test-btn" onclick="selectRandomNetwork()">
+                🎲 Red Aleatoria
+            </button>
+            <button class="test-btn" onclick="showSelectedNetwork()">
+                📋 Mostrar Selección
+            </button>
+            <button class="test-btn" onclick="goToInstagram()">
+                📸 Ir a Instagram
+            </button>
+        </div>
+    </div>
+
+    <!-- Script del carrusel -->
+    <script src="js/social-carousel.js"></script>
+    
+    <script>
+        // Esperar a que el carrusel esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('socialCarouselContainer');
+            const selectedInfo = document.getElementById('selectedInfo');
+            const selectedNetwork = document.getElementById('selectedNetwork');
+            
+            // Escuchar cambios de red social
+            container.addEventListener('socialNetworkChanged', function(e) {
+                selectedNetwork.textContent = `✅ ${e.detail.network} seleccionada`;
+                selectedInfo.style.display = 'block';
+                
+                console.log('Red social cambiada:', e.detail);
+            });
+        });
+        
+        // Funciones de prueba
+        function selectRandomNetwork() {
+            if (window.socialCarousel) {
+                const randomIndex = Math.floor(Math.random() * 9);
+                window.socialCarousel.selectNetwork(randomIndex);
+            }
+        }
+        
+        function showSelectedNetwork() {
+            if (window.socialCarousel) {
+                const selected = window.socialCarousel.getSelectedNetwork();
+                alert(`Red social seleccionada: ${selected.name} ${selected.icon}`);
+            }
+        }
+        
+        function goToInstagram() {
+            if (window.socialCarousel) {
+                window.socialCarousel.selectByName('Instagram');
+            }
+        }
+        
+        // Función helper para compatibilidad
+        function getSelectedSocialNetwork() {
+            if (window.socialCarousel) {
+                return window.socialCarousel.getSelectedNetwork().name;
+            }
+            return '';
+        }
+    </script>
+</body>
+</html>

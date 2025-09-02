@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="css/modern.css">
     <link rel="stylesheet" href="css/autocorrector.css">
     <link rel="stylesheet" href="css/new-structure.css">
+    <link rel="stylesheet" href="css/social-carousel.css">
     
     <!-- Meta tags para SEO -->
     <meta name="description" content="Generador de ideas inteligente impulsado por IA para potenciar tu creatividad">
@@ -234,24 +235,15 @@
                         </h2>
                         
                         <form id="copywritingForm">
-                            <!-- 1. Selección de red social única -->
+                            <!-- 1. Red Social (carrusel) -->
                             <div class="modern-field">
                                 <label class="modern-label">
                                     <i class="fas fa-share-alt mr-2"></i>
-                                    Red Social (Selecciona 1)
+                                    Red Social (Desliza o usa las flechas)
                                 </label>
-                                <select id="singleSocialNetwork" class="modern-select" required>
-                                    <option value="">Selecciona una red social...</option>
-                                    <option value="Facebook">📘 Facebook</option>
-                                    <option value="Instagram">📸 Instagram</option>
-                                    <option value="LinkedIn">💼 LinkedIn</option>
-                                    <option value="X / Twitter">🐦 X / Twitter</option>
-                                    <option value="TikTok">🎵 TikTok</option>
-                                    <option value="WhatsApp">💬 WhatsApp</option>
-                                    <option value="Telegram">📡 Telegram</option>
-                                    <option value="YouTube">📺 YouTube</option>
-                                    <option value="Reddit">🤓 Reddit</option>
-                                </select>
+                                <div class="social-network-selector" id="socialCarouselContainer">
+                                    <!-- El carrusel se generará aquí dinámicamente -->
+                                </div>
                                 <p class="field-note">
                                     🎯 Obtendrás 3 ideas diferentes para la red social seleccionada
                                 </p>
@@ -671,5 +663,8 @@
             }
         }
     </style>
+    
+    <!-- Scripts del carrusel -->
+    <script src="js/social-carousel.js"></script>
 </body>
 </html>

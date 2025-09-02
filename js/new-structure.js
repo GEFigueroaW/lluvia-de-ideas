@@ -49,7 +49,7 @@ async function generateCopywritingNew() {
     
     try {
         // Obtener datos del formulario
-        const platform = document.getElementById('singleSocialNetwork').value;
+        const platform = getSelectedSocialNetwork(); // Usar función del carrusel
         const keyword = document.getElementById('copyKeyword').value.trim();
         const copyTypes = Array.from(document.querySelectorAll('input[name="copyTypes"]:checked'))
             .map(cb => cb.value);

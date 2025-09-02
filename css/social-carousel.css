@@ -1,0 +1,290 @@
+/* ===============================
+   CARRUSEL DE REDES SOCIALES
+   =============================== */
+
+.social-carousel {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: 20px;
+    padding: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 120px;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    align-items: center;
+    justify-content: center;
+    width: 300%;
+    transform: translateX(-33.333%);
+}
+
+.social-item {
+    flex: 0 0 33.333%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 10px;
+    border-radius: 15px;
+    position: relative;
+}
+
+.social-item.active {
+    transform: scale(1.2);
+    z-index: 10;
+}
+
+.social-item.side {
+    transform: scale(0.8);
+    opacity: 0.6;
+    filter: grayscale(50%);
+}
+
+.social-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.social-item.active .social-icon {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.social-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.social-item.active .social-name {
+    opacity: 1;
+    transform: translateY(0);
+    font-size: 16px;
+}
+
+/* Colores específicos por red social */
+.social-item[data-network="Facebook"] .social-icon {
+    background: linear-gradient(135deg, #1877F2, #42a5f5);
+}
+
+.social-item[data-network="Instagram"] .social-icon {
+    background: linear-gradient(135deg, #E4405F, #833AB4, #F77737);
+}
+
+.social-item[data-network="LinkedIn"] .social-icon {
+    background: linear-gradient(135deg, #0A66C2, #2196F3);
+}
+
+.social-item[data-network="X / Twitter"] .social-icon {
+    background: linear-gradient(135deg, #1DA1F2, #14171A);
+}
+
+.social-item[data-network="TikTok"] .social-icon {
+    background: linear-gradient(135deg, #000000, #FF0050);
+}
+
+.social-item[data-network="WhatsApp"] .social-icon {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+}
+
+.social-item[data-network="Telegram"] .social-icon {
+    background: linear-gradient(135deg, #0088CC, #229ED9);
+}
+
+.social-item[data-network="YouTube"] .social-icon {
+    background: linear-gradient(135deg, #FF0000, #CC0000);
+}
+
+.social-item[data-network="Reddit"] .social-icon {
+    background: linear-gradient(135deg, #FF4500, #FF6314);
+}
+
+/* Botones de navegación */
+.carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: var(--primary-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 20;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-nav:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.carousel-nav.prev {
+    left: -20px;
+}
+
+.carousel-nav.next {
+    right: -20px;
+}
+
+/* Indicadores */
+.carousel-indicators {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.indicator.active {
+    background: var(--primary-color);
+    transform: scale(1.2);
+}
+
+/* Input oculto para el formulario */
+.social-carousel input[type="hidden"] {
+    display: none;
+}
+
+/* Información de la red seleccionada */
+.selected-network-info {
+    text-align: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.selected-network-info.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.selected-network-info.hide {
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.network-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Efectos de hover y animaciones */
+.social-item:hover:not(.active) {
+    transform: scale(0.9);
+}
+
+.social-item.active {
+    animation: pulseActive 2s infinite;
+}
+
+@keyframes pulseActive {
+    0%, 100% { transform: scale(1.2); }
+    50% { transform: scale(1.25); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .social-carousel {
+        max-width: 350px;
+        padding: 15px;
+    }
+    
+    .carousel-container {
+        height: 100px;
+    }
+    
+    .social-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+    
+    .social-item.active .social-icon {
+        width: 65px;
+        height: 65px;
+        font-size: 26px;
+    }
+    
+    .carousel-nav {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+    
+    .carousel-nav.prev {
+        left: -15px;
+    }
+    
+    .carousel-nav.next {
+        right: -15px;
+    }
+}
+
+/* Animación de entrada */
+.social-carousel {
+    animation: slideInFromBottom 0.6s ease-out;
+}
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
