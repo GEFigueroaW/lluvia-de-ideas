@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔄 Cache Busting - GitHub Pages</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #f5f5f5; 
+            text-align: center;
+        }
+        .container { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 12px; 
+            max-width: 600px; 
+            margin: 0 auto;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .btn { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 12px 24px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            margin: 10px;
+            font-size: 16px;
+        }
+        .btn:hover { background: #0056b3; }
+        .success { color: #28a745; font-weight: bold; }
+        .warning { color: #ffc107; font-weight: bold; }
+        .info { background: #e7f3ff; padding: 15px; border-radius: 6px; margin: 15px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔄 Solución de Cache</h1>
+        <h2>GitHub Pages vs Firebase</h2>
+        
+        <div class="info">
+            <p><strong>Problema:</strong> GitHub Pages puede tener cache del código anterior</p>
+            <p><strong>Solución:</strong> Limpiar cache del navegador</p>
+        </div>
+        
+        <h3>🛠️ Pasos para solucionarlo:</h3>
+        
+        <div style="text-align: left; max-width: 500px; margin: 0 auto;">
+            <p><strong>1. Presiona estas teclas juntas:</strong></p>
+            <div style="background: #f8f9fa; padding: 10px; border-radius: 4px; text-align: center; font-family: monospace; font-size: 18px; font-weight: bold;">
+                Ctrl + Shift + R
+            </div>
+            <p style="font-size: 14px; color: #666;">Esto fuerza la recarga sin cache</p>
+            
+            <p><strong>2. O usa estas opciones:</strong></p>
+            <ul>
+                <li><strong>Chrome/Edge:</strong> F12 → Network → Disable cache → F5</li>
+                <li><strong>Firefox:</strong> Ctrl + F5</li>
+                <li><strong>Safari:</strong> Cmd + Shift + R</li>
+            </ul>
+            
+            <p><strong>3. Verifica la hora de actualización:</strong></p>
+            <div style="background: #e7f3ff; padding: 10px; border-radius: 4px; text-align: center;">
+                <strong>Última actualización:</strong> <span id="timestamp"></span>
+            </div>
+        </div>
+        
+        <h3>🔗 Enlaces Directos:</h3>
+        <button class="btn" onclick="openFirebase()">🔥 Firebase (Siempre Actualizado)</button>
+        <button class="btn" onclick="openGitHub()">🐙 GitHub Pages (Limpiar Cache)</button>
+        
+        <h3>✅ Verificación:</h3>
+        <p>Después de limpiar cache, ambas plataformas deben mostrar:</p>
+        <div class="success">✅ Aviso de "Modo de Respaldo" en lugar de error bloqueante</div>
+        
+        <div class="info">
+            <h4>🤔 ¿Por qué pasa esto?</h4>
+            <p><strong>Firebase:</strong> Actualización instantánea</p>
+            <p><strong>GitHub Pages:</strong> Hasta 10 minutos de delay + cache del navegador</p>
+            <p><strong>Solución:</strong> Siempre limpiar cache en GitHub Pages</p>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar timestamp de la página
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        function openFirebase() {
+            window.open('https://brain-storm-8f0d8.web.app/', '_blank');
+        }
+        
+        function openGitHub() {
+            // Abrir con parámetro de cache busting
+            const url = 'https://gefigueroaw.github.io/lluvia-de-ideas/?' + Date.now();
+            window.open(url, '_blank');
+        }
+        
+        // Detectar si venimos de GitHub Pages y mostrar instrucciones
+        if (document.referrer.includes('github.io')) {
+            const div = document.createElement('div');
+            div.className = 'warning';
+            div.innerHTML = '⚠️ Detectado acceso desde GitHub Pages - Por favor limpia el cache';
+            document.querySelector('.container').insertBefore(div, document.querySelector('h1').nextSibling);
+        }
+    </script>
+</body>
+</html>
