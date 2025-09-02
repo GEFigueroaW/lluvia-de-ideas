@@ -9,15 +9,15 @@ class SocialCarousel {
         this.container = document.getElementById(containerId);
         this.currentIndex = 0;
         this.socialNetworks = [
-            { name: 'Facebook', icon: '📘', emoji: 'fab fa-facebook-f' },
-            { name: 'Instagram', icon: '📸', emoji: 'fab fa-instagram' },
-            { name: 'LinkedIn', icon: '💼', emoji: 'fab fa-linkedin-in' },
-            { name: 'X / Twitter', icon: '🐦', emoji: 'fab fa-x-twitter' },
-            { name: 'TikTok', icon: '🎵', emoji: 'fab fa-tiktok' },
-            { name: 'WhatsApp', icon: '💬', emoji: 'fab fa-whatsapp' },
-            { name: 'Telegram', icon: '📡', emoji: 'fab fa-telegram-plane' },
-            { name: 'YouTube', icon: '📺', emoji: 'fab fa-youtube' },
-            { name: 'Reddit', icon: '🤓', emoji: 'fab fa-reddit-alien' }
+            { name: 'Facebook', icon: 'fab fa-facebook-f', emoji: 'fab fa-facebook-f' },
+            { name: 'Instagram', icon: 'fab fa-instagram', emoji: 'fab fa-instagram' },
+            { name: 'LinkedIn', icon: 'fab fa-linkedin-in', emoji: 'fab fa-linkedin-in' },
+            { name: 'X / Twitter', icon: 'fab fa-x-twitter', emoji: 'fab fa-x-twitter' },
+            { name: 'TikTok', icon: 'fab fa-tiktok', emoji: 'fab fa-tiktok' },
+            { name: 'WhatsApp', icon: 'fab fa-whatsapp', emoji: 'fab fa-whatsapp' },
+            { name: 'Telegram', icon: 'fab fa-telegram-plane', emoji: 'fab fa-telegram-plane' },
+            { name: 'YouTube', icon: 'fab fa-youtube', emoji: 'fab fa-youtube' },
+            { name: 'Reddit', icon: 'fab fa-reddit-alien', emoji: 'fab fa-reddit-alien' }
         ];
         
         this.init();
@@ -44,7 +44,7 @@ class SocialCarousel {
                         ${this.socialNetworks.map((network, index) => `
                             <div class="social-item" data-network="${network.name}" data-index="${index}">
                                 <div class="social-icon">
-                                    ${network.icon}
+                                    <i class="${network.icon}"></i>
                                 </div>
                                 <div class="social-name">${network.name}</div>
                             </div>
@@ -62,15 +62,6 @@ class SocialCarousel {
                     `).join('')}
                 </div>
                 
-                <div class="selected-network-info hide">
-                    <div class="network-name"></div>
-                    <div class="network-stats">
-                        <span>📊 Algoritmo optimizado</span>
-                        <span>🎯 3 ideas únicas</span>
-                        <span>⚡ < 60 segundos</span>
-                    </div>
-                </div>
-                
                 <input type="hidden" id="singleSocialNetwork" name="socialNetwork" value="">
             </div>
         `;
@@ -84,8 +75,6 @@ class SocialCarousel {
         this.prevBtn = this.container.querySelector('.carousel-nav.prev');
         this.nextBtn = this.container.querySelector('.carousel-nav.next');
         this.hiddenInput = this.container.querySelector('#singleSocialNetwork');
-        this.networkInfo = this.container.querySelector('.selected-network-info');
-        this.networkName = this.container.querySelector('.network-name');
     }
 
     bindEvents() {
@@ -206,11 +195,6 @@ class SocialCarousel {
         // Actualizar input oculto
         const selectedNetwork = this.socialNetworks[this.currentIndex];
         this.hiddenInput.value = selectedNetwork.name;
-
-        // Actualizar información de red
-        this.networkName.textContent = `✅ ${selectedNetwork.name} seleccionada`;
-        this.networkInfo.classList.remove('hide');
-        this.networkInfo.classList.add('show');
 
         // Trigger custom event para notificar el cambio
         const changeEvent = new CustomEvent('socialNetworkChanged', {

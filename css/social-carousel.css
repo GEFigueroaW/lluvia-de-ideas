@@ -62,17 +62,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    font-size: 28px;
     color: white;
     margin-bottom: 8px;
     transition: all 0.3s ease;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+.social-icon i {
+    font-size: inherit;
+    color: inherit;
+}
+
 .social-item.active .social-icon {
     width: 80px;
     height: 80px;
-    font-size: 32px;
+    font-size: 36px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
 }
 
@@ -95,38 +100,47 @@
 /* Colores específicos por red social */
 .social-item[data-network="Facebook"] .social-icon {
     background: linear-gradient(135deg, #1877F2, #42a5f5);
+    color: white;
 }
 
 .social-item[data-network="Instagram"] .social-icon {
     background: linear-gradient(135deg, #E4405F, #833AB4, #F77737);
+    color: white;
 }
 
 .social-item[data-network="LinkedIn"] .social-icon {
     background: linear-gradient(135deg, #0A66C2, #2196F3);
+    color: white;
 }
 
 .social-item[data-network="X / Twitter"] .social-icon {
     background: linear-gradient(135deg, #1DA1F2, #14171A);
+    color: white;
 }
 
 .social-item[data-network="TikTok"] .social-icon {
     background: linear-gradient(135deg, #000000, #FF0050);
+    color: white;
 }
 
 .social-item[data-network="WhatsApp"] .social-icon {
     background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
 }
 
 .social-item[data-network="Telegram"] .social-icon {
     background: linear-gradient(135deg, #0088CC, #229ED9);
+    color: white;
 }
 
 .social-item[data-network="YouTube"] .social-icon {
     background: linear-gradient(135deg, #FF0000, #CC0000);
+    color: white;
 }
 
 .social-item[data-network="Reddit"] .social-icon {
     background: linear-gradient(135deg, #FF4500, #FF6314);
+    color: white;
 }
 
 /* Botones de navegación */
@@ -190,35 +204,6 @@
 /* Input oculto para el formulario */
 .social-carousel input[type="hidden"] {
     display: none;
-}
-
-/* Información de la red seleccionada */
-.selected-network-info {
-    text-align: center;
-    margin-top: 15px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-}
-
-.selected-network-info.show {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.selected-network-info.hide {
-    opacity: 0;
-    transform: translateY(10px);
-}
-
-.network-stats {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--text-secondary);
 }
 
 /* Efectos de hover y animaciones */
