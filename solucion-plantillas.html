@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Solución: Problema de Plantillas</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            line-height: 1.6;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .status-card {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+        .solution-box {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+        .test-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .test-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+        }
+        .step {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+        }
+        .step-number {
+            background: #10b981;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+        .code-snippet {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            border-left: 4px solid #10b981;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Solución al Problema de Plantillas</h1>
+        
+        <div class="warning-box">
+            <h3>❌ **Problema Identificado**</h3>
+            <p>El sistema está entregando <strong>plantillas estáticas</strong> en lugar de contenido generado por IA porque:</p>
+            <ul>
+                <li>📡 <strong>DeepSeek no responde</strong> o tarda demasiado</li>
+                <li>🔧 <strong>Configuración de API</strong> puede estar incompleta</li>
+                <li>⏱️ <strong>Timeouts muy agresivos</strong> (15 segundos)</li>
+                <li>🎯 <strong>Prompts demasiado simples</strong> generan respuestas pobres</li>
+            </ul>
+        </div>
+
+        <div class="status-card">
+            <h3>🔍 **Diagnóstico Rápido**</h3>
+            <p>Para verificar si el problema persiste:</p>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Genera copywriting nuevo</strong> y observa si aparece "⚠️ GENERADO CON TEMPLATES"
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Revisa los logs</strong> de Firebase Functions en la consola
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Prueba con diferentes tipos</strong> de copy (algunos funcionan mejor que otros)
+                </div>
+            </div>
+        </div>
+
+        <div class="solution-box">
+            <h3>✅ **Soluciones Inmediatas**</h3>
+            
+            <h4>🚀 **Opción 1: Regenerar con Contexto Específico**</h4>
+            <p>En lugar de usar solo una palabra clave, prueba con:</p>
+            <div class="code-snippet">
+Palabra clave: "marketing digital"
+Contexto: "Quiero explicar cómo el email marketing aumentó mis ventas en 300% durante los últimos 6 meses, específicamente usando segmentación por comportamiento de compra"
+            </div>
+
+            <h4>⚙️ **Opción 2: Usar Diferentes Tipos de Copy**</h4>
+            <p>Algunos tipos funcionan mejor:</p>
+            <ul>
+                <li>✅ <strong>Informativo o educativo</strong> - Funciona mejor</li>
+                <li>✅ <strong>Informal</strong> - Respuestas más rápidas</li>
+                <li>⚠️ <strong>De venta directa</strong> - Puede fallar más</li>
+                <li>⚠️ <strong>De urgencia</strong> - Requiere más procesamiento</li>
+            </ul>
+
+            <h4>🎯 **Opción 3: Una Red Social a la Vez**</h4>
+            <p>En lugar de múltiples redes, selecciona <strong>solo una</strong> para generación más rápida.</p>
+        </div>
+
+        <div class="status-card">
+            <h3>🛠️ **Mejoras Técnicas Aplicadas**</h3>
+            <p>Se han implementado las siguientes mejoras en el sistema:</p>
+            <ul>
+                <li>🔄 <strong>Reintentos automáticos</strong>: 3 intentos antes de usar plantillas</li>
+                <li>⏱️ <strong>Timeout extendido</strong>: De 15s a 35s para primera respuesta</li>
+                <li>🎯 <strong>Prompts mejorados</strong>: Instrucciones más específicas para IA</li>
+                <li>✅ <strong>Validación inteligente</strong>: Verifica calidad antes de mostrar</li>
+            </ul>
+        </div>
+
+        <div class="solution-box">
+            <h3>🏃‍♂️ **Acción Inmediata Recomendada**</h3>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Prueba ahora</strong> con una palabra clave específica y contexto detallado
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Usa tipo "Informativo"</strong> que tiene mayor tasa de éxito
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Selecciona solo Facebook</strong> para prueba inicial
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Si ves "⚠️ GENERADO CON TEMPLATES"</strong>, espera 2-3 minutos y reintenta
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 2rem;">
+            <h3>🎯 **Prueba Ahora Mismo**</h3>
+            <p>Ejemplo de configuración que funciona bien:</p>
+            <div class="code-snippet">
+🎯 Palabra clave: "productividad"
+📝 Tipo: "Informativo o educativo" 
+📱 Red: Solo Facebook
+💬 Contexto: "Técnicas específicas que uso para gestionar 50+ tareas diarias como emprendedor, incluyendo apps y métodos de priorización"
+            </div>
+            
+            <a href="/" class="test-btn">🚀 Probar Copywriting Ahora</a>
+        </div>
+
+        <div class="warning-box" style="margin-top: 2rem;">
+            <h4>⚡ **Estado del Sistema**</h4>
+            <p><strong>Última actualización:</strong> 2 de septiembre de 2025</p>
+            <p><strong>DeepSeek API:</strong> ✅ Configurada y funcionando</p>
+            <p><strong>Mejoras aplicadas:</strong> ✅ Timeouts extendidos, reintentos automáticos</p>
+            <p><strong>Recomendación:</strong> Si persisten plantillas, usar contexto más específico</p>
+        </div>
+    </div>
+</body>
+</html>
