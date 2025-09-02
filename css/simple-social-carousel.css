@@ -1,0 +1,274 @@
+/* ===============================
+   CARRUSEL SIMPLE DE REDES SOCIALES
+   =============================== */
+
+.simple-social-carousel {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.08) 0%, rgba(118, 75, 162, 0.08) 100%);
+    border-radius: 20px;
+    padding: 25px;
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.carousel-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.carousel-header h4 {
+    margin: 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* Selección actual grande */
+.current-selection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.current-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.current-icon svg {
+    width: 40px;
+    height: 40px;
+    fill: currentColor;
+}
+
+.current-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+    text-align: center;
+}
+
+/* Botones de navegación */
+.navigation-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.nav-btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.nav-btn:active {
+    transform: translateY(0);
+}
+
+/* Grid de redes sociales */
+.network-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.network-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 8px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.network-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.network-item.active {
+    border-color: #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.network-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+}
+
+.network-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+.network-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.network-item.active .network-name {
+    color: #333;
+    font-weight: 700;
+}
+
+/* Input oculto */
+.simple-social-carousel input[type="hidden"] {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .simple-social-carousel {
+        padding: 20px;
+        margin: 0 10px;
+    }
+    
+    .current-icon {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .current-icon svg {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .current-name {
+        font-size: 16px;
+    }
+    
+    .network-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    
+    .network-icon {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .network-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .network-name {
+        font-size: 10px;
+    }
+    
+    .nav-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .simple-social-carousel {
+        padding: 15px;
+    }
+    
+    .current-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .current-icon svg {
+        width: 30px;
+        height: 30px;
+    }
+    
+    .network-grid {
+        gap: 8px;
+    }
+    
+    .network-icon {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .network-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .network-name {
+        font-size: 9px;
+    }
+}
+
+/* Animación de entrada */
+.simple-social-carousel {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efecto de pulso para el elemento activo */
+.current-icon {
+    animation: gentlePulse 3s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+    0%, 100% { 
+        transform: scale(1); 
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    50% { 
+        transform: scale(1.02); 
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+}
