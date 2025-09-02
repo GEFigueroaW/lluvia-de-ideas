@@ -58,11 +58,10 @@ async function callDeepseekAPI(prompt, retries = 2) {
 
 // FUNCIÓN PRINCIPAL PARA GENERAR IDEAS - NUEVA ESTRUCTURA
 exports.generateIdeas = functions
-    .runWith({
+    .https.onRequest({
         timeoutSeconds: 60,
         memory: '512MB'
-    })
-    .https.onRequest(async (req, res) => {
+    }, async (req, res) => {
         return cors(req, res, async () => {
             const requestId = Math.random().toString(36).substring(7);
             console.log(`[API-${requestId}] 🚀 Nueva solicitud - Nueva estructura`);
@@ -193,7 +192,15 @@ function getCharacteristicsForCopyType(copyType) {
         'Informativo y educativo': 'Enfócate en enseñar algo valioso, compartir conocimiento útil, estadísticas interesantes, tips prácticos. Tono: profesional pero accesible.',
         'Venta directa y persuasivo': 'Enfócate en beneficios claros, urgencia, prueba social, llamadas a la acción directas. Tono: convincente y orientado a resultados.',
         'Posicionamiento y branding': 'Enfócate en valores de marca, diferenciación, storytelling, conexión emocional. Tono: aspiracional y auténtico.',
-        'Urgencia y escasez': 'Enfócate en tiempo limitado, pocas unidades, ofertas exclusivas, FOMO. Tono: urgente pero no agresivo.'
+        'Urgencia y escasez': 'Enfócate en tiempo limitado, pocas unidades, ofertas exclusivas, FOMO. Tono: urgente pero no agresivo.',
+        'De beneficio o solución': 'Enfócate en cómo el producto/servicio resuelve problemas específicos y mejora la vida del cliente. Tono: empático y solucionador.',
+        'De novedad o lanzamiento': 'Enfócate en lo nuevo, innovador, exclusivo. Genera expectativa y curiosidad. Tono: emocionante y anticipatorio.',
+        'De interacción o pregunta': 'Enfócate en generar engagement, hacer preguntas abiertas, encuestas, invitar a comentar. Tono: conversacional y participativo.',
+        'Llamada a la acción (CTA)': 'Enfócate en motivar acción inmediata: comprar, registrarse, descargar, contactar. Tono: directo y motivacional.',
+        'Narrativo o storytelling': 'Enfócate en contar historias emotivas, experiencias personales, casos de éxito. Tono: emotivo y narrativo.',
+        'Testimonio o prueba social': 'Enfócate en experiencias reales de clientes, reseñas, casos de éxito, reconocimientos. Tono: auténtico y creíble.',
+        'Técnico o profesional': 'Enfócate en datos, especificaciones, análisis detallados, información técnica. Tono: formal y especializado.',
+        'Informal': 'Enfócate en cercanía, humor sutil, lenguaje cotidiano, conversación amigable. Tono: relajado y cercano.'
     };
     
     return characteristics[copyType] || 'Crea contenido relevante y atractivo para la audiencia.';
@@ -201,11 +208,10 @@ function getCharacteristicsForCopyType(copyType) {
 
 // Función de test simplificada
 exports.testDeepseekConnection = functions
-    .runWith({
+    .https.onRequest({
         timeoutSeconds: 30,
         memory: '256MB'
-    })
-    .https.onRequest(async (req, res) => {
+    }, async (req, res) => {
         return cors(req, res, async () => {
             const requestId = Date.now().toString().slice(-6);
             console.log(`[TEST-${requestId}] Iniciando test de conexión...`);

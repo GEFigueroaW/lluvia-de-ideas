@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 TEST - Nueva Estructura | FeedFlow</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 30px;
+            font-size: 2.5em;
+        }
+        .platform-section {
+            margin-bottom: 40px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            background: #f9f9f9;
+        }
+        .platform-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #667eea;
+            text-align: center;
+        }
+        .test-form {
+            display: grid;
+            gap: 15px;
+        }
+        label { font-weight: bold; color: #555; }
+        select, input, textarea {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .copy-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .copy-type {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .copy-type:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        .copy-type input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        .test-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .test-btn:hover { transform: translateY(-2px); }
+        .test-btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+            transform: none;
+        }
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f8ff;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        .result-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+        .status { 
+            text-align: center; 
+            padding: 10px; 
+            margin: 10px 0;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .status.success { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+        .status.info { background: #d1ecf1; color: #0c5460; }
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .comparison { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 TEST: Nueva Estructura</h1>
+        <p style="text-align: center; margin-bottom: 30px; color: #666; font-size: 18px;">
+            <strong>1 Plataforma + 3 Ideas</strong> con tipos de copy seleccionables
+        </p>
+
+        <div class="comparison">
+            <!-- FIREBASE HOSTING -->
+            <div class="platform-section">
+                <div class="platform-title">🔥 Firebase Hosting</div>
+                <div class="platform-url" style="text-align: center; margin-bottom: 15px; font-family: monospace; background: #eee; padding: 8px; border-radius: 5px;">
+                    brain-storm-8f0d8.web.app
+                </div>
+                
+                <div class="test-form">
+                    <div>
+                        <label>Red Social:</label>
+                        <select id="platform1">
+                            <option value="Instagram">📸 Instagram</option>
+                            <option value="LinkedIn">💼 LinkedIn</option>
+                            <option value="Facebook">👥 Facebook</option>
+                            <option value="Twitter">🐦 Twitter</option>
+                            <option value="TikTok">🎵 TikTok</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>Palabra Clave:</label>
+                        <input type="text" id="keyword1" value="marketing digital" placeholder="Ej: marketing digital">
+                    </div>
+                    
+                    <div>
+                        <label>Tipos de Copy (máx. 3):</label>
+                        <div class="copy-types">
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_1" value="Informativo y educativo" checked>
+                                <label for="copy1_1">📚 Informativo y educativo</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_2" value="Venta directa y persuasivo">
+                                <label for="copy1_2">💰 Venta directa y persuasivo</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_3" value="Posicionamiento y branding">
+                                <label for="copy1_3">🎯 Posicionamiento y branding</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_4" value="Urgencia y escasez">
+                                <label for="copy1_4">⚡ Urgencia y escasez</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_5" value="De beneficio o solución">
+                                <label for="copy1_5">✨ De beneficio o solución</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_6" value="De novedad o lanzamiento">
+                                <label for="copy1_6">🚀 De novedad o lanzamiento</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_7" value="De interacción o pregunta">
+                                <label for="copy1_7">💬 De interacción o pregunta</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_8" value="Llamada a la acción (CTA)">
+                                <label for="copy1_8">👆 Llamada a la acción (CTA)</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_9" value="Narrativo o storytelling">
+                                <label for="copy1_9">📖 Narrativo o storytelling</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_10" value="Testimonio o prueba social">
+                                <label for="copy1_10">⭐ Testimonio o prueba social</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_11" value="Técnico o profesional">
+                                <label for="copy1_11">🔬 Técnico o profesional</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy1_12" value="Informal">
+                                <label for="copy1_12">😎 Informal</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Contexto Adicional:</label>
+                        <textarea id="context1" rows="2" placeholder="Audiencia, tono específico, etc.">Audiencia: emprendedores jóvenes</textarea>
+                    </div>
+                    
+                    <button class="test-btn" onclick="testPlatform(1)" id="btn1">
+                        🚀 PROBAR FIREBASE
+                    </button>
+                </div>
+                
+                <div id="status1" class="status" style="display: none;"></div>
+                <div id="results1" class="results" style="display: none;"></div>
+            </div>
+
+            <!-- GITHUB PAGES -->
+            <div class="platform-section">
+                <div class="platform-title">📄 GitHub Pages</div>
+                <div class="platform-url" style="text-align: center; margin-bottom: 15px; font-family: monospace; background: #eee; padding: 8px; border-radius: 5px;">
+                    gefigueroaw.github.io/lluvia-de-ideas
+                </div>
+                
+                <div class="test-form">
+                    <div>
+                        <label>Red Social:</label>
+                        <select id="platform2">
+                            <option value="Instagram">📸 Instagram</option>
+                            <option value="LinkedIn">💼 LinkedIn</option>
+                            <option value="Facebook">👥 Facebook</option>
+                            <option value="Twitter">🐦 Twitter</option>
+                            <option value="TikTok">🎵 TikTok</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label>Palabra Clave:</label>
+                        <input type="text" id="keyword2" value="marketing digital" placeholder="Ej: marketing digital">
+                    </div>
+                    
+                    <div>
+                        <label>Tipos de Copy (máx. 3):</label>
+                        <div class="copy-types">
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_1" value="Informativo y educativo" checked>
+                                <label for="copy2_1">📚 Informativo y educativo</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_2" value="Venta directa y persuasivo">
+                                <label for="copy2_2">💰 Venta directa y persuasivo</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_3" value="Posicionamiento y branding">
+                                <label for="copy2_3">🎯 Posicionamiento y branding</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_4" value="Urgencia y escasez">
+                                <label for="copy2_4">⚡ Urgencia y escasez</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_5" value="De beneficio o solución">
+                                <label for="copy2_5">✨ De beneficio o solución</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_6" value="De novedad o lanzamiento">
+                                <label for="copy2_6">🚀 De novedad o lanzamiento</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_7" value="De interacción o pregunta">
+                                <label for="copy2_7">💬 De interacción o pregunta</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_8" value="Llamada a la acción (CTA)">
+                                <label for="copy2_8">👆 Llamada a la acción (CTA)</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_9" value="Narrativo o storytelling">
+                                <label for="copy2_9">📖 Narrativo o storytelling</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_10" value="Testimonio o prueba social">
+                                <label for="copy2_10">⭐ Testimonio o prueba social</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_11" value="Técnico o profesional">
+                                <label for="copy2_11">🔬 Técnico o profesional</label>
+                            </div>
+                            <div class="copy-type">
+                                <input type="checkbox" id="copy2_12" value="Informal">
+                                <label for="copy2_12">😎 Informal</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label>Contexto Adicional:</label>
+                        <textarea id="context2" rows="2" placeholder="Audiencia, tono específico, etc.">Audiencia: emprendedores jóvenes</textarea>
+                    </div>
+                    
+                    <button class="test-btn" onclick="testPlatform(2)" id="btn2">
+                        🚀 PROBAR GITHUB PAGES
+                    </button>
+                </div>
+                
+                <div id="status2" class="status" style="display: none;"></div>
+                <div id="results2" class="results" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de endpoints
+        const endpoints = {
+            firebase: 'https://us-central1-brain-storm-8f0d8.cloudfunctions.net/generateIdeas',
+            github: 'https://us-central1-brain-storm-8f0d8.cloudfunctions.net/generateIdeas' // Ambos usan el mismo backend
+        };
+
+        // Manejar selección de checkboxes (máximo 3)
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const platformNum = this.id.includes('1') ? '1' : '2';
+                const checkboxes = document.querySelectorAll(`input[id*="copy${platformNum}_"]:checked`);
+                
+                if (checkboxes.length > 3) {
+                    this.checked = false;
+                    alert('⚠️ Máximo 3 tipos de copy permitidos');
+                }
+            });
+        });
+
+        async function testPlatform(platformNum) {
+            const platform = document.getElementById(`platform${platformNum}`).value;
+            const keyword = document.getElementById(`keyword${platformNum}`).value.trim();
+            const context = document.getElementById(`context${platformNum}`).value.trim();
+            
+            // Obtener tipos de copy seleccionados
+            const copyTypes = Array.from(document.querySelectorAll(`input[id*="copy${platformNum}_"]:checked`))
+                .map(cb => cb.value);
+            
+            if (!keyword) {
+                alert('⚠️ Por favor ingresa una palabra clave');
+                return;
+            }
+            
+            if (copyTypes.length === 0) {
+                alert('⚠️ Por favor selecciona al menos un tipo de copy');
+                return;
+            }
+
+            // UI
+            const btn = document.getElementById(`btn${platformNum}`);
+            const status = document.getElementById(`status${platformNum}`);
+            const results = document.getElementById(`results${platformNum}`);
+            
+            btn.disabled = true;
+            btn.textContent = '⏳ PROBANDO...';
+            status.style.display = 'block';
+            status.className = 'status info';
+            status.textContent = `🚀 Probando nueva estructura en ${platformNum === 1 ? 'Firebase' : 'GitHub Pages'}...`;
+            
+            const startTime = Date.now();
+
+            try {
+                const endpoint = platformNum === 1 ? endpoints.firebase : endpoints.github;
+                
+                status.textContent = `📡 Llamando a API: ${copyTypes.length} tipos de copy seleccionados`;
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        keyword: keyword,
+                        platform: platform,
+                        copyTypes: copyTypes,
+                        userContext: context,
+                        uid: `test-user-${platformNum}-${Date.now()}`
+                    })
+                });
+
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+
+                if (response.ok) {
+                    const result = await response.json();
+                    
+                    status.className = 'status success';
+                    status.textContent = `✅ ¡Éxito! Completado en ${totalTime} segundos`;
+                    
+                    displayResults(result.data, results, platformNum, totalTime);
+                } else {
+                    const errorData = await response.json();
+                    status.className = 'status error';
+                    status.textContent = `❌ Error ${response.status} en ${totalTime}s`;
+                    
+                    results.style.display = 'block';
+                    results.innerHTML = `
+                        <div class="result-item">
+                            <h3>❌ Error del Servidor</h3>
+                            <p><strong>Código:</strong> ${response.status}</p>
+                            <p><strong>Mensaje:</strong> ${errorData.error || 'Error desconocido'}</p>
+                            <p><strong>Detalles:</strong> ${errorData.details || 'No disponibles'}</p>
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                const totalTime = Math.floor((Date.now() - startTime) / 1000);
+                
+                status.className = 'status error';
+                status.textContent = `❌ Error de conexión en ${totalTime}s`;
+                
+                results.style.display = 'block';
+                results.innerHTML = `
+                    <div class="result-item">
+                        <h3>❌ Error de Conexión</h3>
+                        <p><strong>Mensaje:</strong> ${error.message}</p>
+                        <p><strong>Tipo:</strong> Problema de red o servidor no disponible</p>
+                    </div>
+                `;
+                
+                console.error('Error:', error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = `🚀 PROBAR ${platformNum === 1 ? 'FIREBASE' : 'GITHUB PAGES'}`;
+            }
+        }
+
+        function displayResults(data, resultsDiv, platformNum, totalTime) {
+            resultsDiv.style.display = 'block';
+            
+            let html = `
+                <h3>✅ Nueva Estructura - 3 Ideas Generadas</h3>
+                <div style="background: #e8f5e8; padding: 10px; border-radius: 8px; margin: 10px 0;">
+                    <strong>⏱️ Tiempo:</strong> ${totalTime} segundos<br>
+                    <strong>🎯 Plataforma:</strong> ${data.platform}<br>
+                    <strong>📝 Palabra clave:</strong> ${data.keyword}<br>
+                    <strong>🎨 Tipos seleccionados:</strong> ${data.copyTypes.join(', ')}<br>
+                    <strong>📊 Distribución:</strong> ${data.distribution.join(' → ')}
+                </div>
+            `;
+
+            if (data.ideas && data.ideas.length > 0) {
+                data.ideas.forEach((idea, index) => {
+                    html += `
+                        <div class="result-item">
+                            <h4>💡 Idea ${idea.ideaNumber} - ${idea.copyType}</h4>
+                            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                                ${idea.content.replace(/\n/g, '<br>')}
+                            </div>
+                            ${idea.error ? `<p style="color: red;"><strong>Error:</strong> ${idea.error}</p>` : ''}
+                            <small style="color: #666;">Timestamp: ${new Date(idea.timestamp).toLocaleTimeString()}</small>
+                        </div>
+                    `;
+                });
+            } else {
+                html += `
+                    <div class="result-item">
+                        <h4>⚠️ Sin Ideas</h4>
+                        <p>No se generaron ideas en esta respuesta.</p>
+                    </div>
+                `;
+            }
+
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
