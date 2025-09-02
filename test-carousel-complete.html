@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Completo - Carrusel Integrado</title>
+    
+    <!-- CSS del carrusel -->
+    <link rel="stylesheet" href="css/simple-social-carousel.css">
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 16px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .result-area {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .result-area h3 {
+            margin: 0 0 15px 0;
+            color: #333;
+        }
+        
+        .selected-network {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .debug-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #666;
+            white-space: pre-wrap;
+        }
+        
+        .status {
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="header">
+            <h1>🎯 Test Completo del Carrusel</h1>
+            <p>Prueba integral del sistema de selección de redes sociales</p>
+        </div>
+        
+        <div class="content">
+            <div id="statusArea"></div>
+            
+            <div class="form-section">
+                <label class="form-label">
+                    📱 Selecciona tu red social preferida:
+                </label>
+                
+                <!-- Aquí va el carrusel - EXACTAMENTE como en index.html -->
+                <div class="social-network-selector" id="socialCarouselContainer">
+                    <!-- El carrusel se generará aquí dinámicamente -->
+                </div>
+            </div>
+            
+            <div class="result-area">
+                <h3>📊 Estado del Carrusel:</h3>
+                <p><strong>Red social seleccionada:</strong> <span id="selectedNetwork" class="selected-network">Cargando...</span></p>
+                <p><strong>JavaScript cargado:</strong> <span id="jsStatus">Verificando...</span></p>
+                <p><strong>SVG encontrados:</strong> <span id="svgCount">Contando...</span></p>
+                <p><strong>Eventos registrados:</strong> <span id="eventsStatus">Verificando...</span></p>
+            </div>
+            
+            <div class="debug-info" id="debugInfo">
+                Iniciando verificación del carrusel...
+            </div>
+        </div>
+    </div>
+
+    <!-- Script del carrusel - EXACTAMENTE como en index.html -->
+    <script src="js/simple-social-carousel.js"></script>
+    
+    <!-- Script de prueba -->
+    <script>
+        let debugLog = '';
+        
+        function addDebug(message) {
+            debugLog += new Date().toLocaleTimeString() + ': ' + message + '\n';
+            document.getElementById('debugInfo').textContent = debugLog;
+        }
+        
+        function updateStatus(type, message) {
+            const statusArea = document.getElementById('statusArea');
+            statusArea.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+        
+        // Verificación al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            addDebug('DOM cargado - iniciando verificaciones...');
+            
+            // Verificar container
+            const container = document.querySelector('.social-network-selector');
+            if (container) {
+                addDebug('✅ Contenedor .social-network-selector encontrado');
+                addDebug('ID del contenedor: ' + (container.id || 'sin ID'));
+            } else {
+                addDebug('❌ Contenedor .social-network-selector NO encontrado');
+                updateStatus('error', '❌ Error: No se encontró el contenedor del carrusel');
+                return;
+            }
+            
+            // Verificar si se cargó SimpleSocialCarousel
+            if (typeof SimpleSocialCarousel !== 'undefined') {
+                addDebug('✅ Clase SimpleSocialCarousel disponible');
+                document.getElementById('jsStatus').textContent = '✅ Cargado correctamente';
+            } else {
+                addDebug('❌ Clase SimpleSocialCarousel NO disponible');
+                document.getElementById('jsStatus').textContent = '❌ Error de carga';
+                updateStatus('error', '❌ Error: JavaScript del carrusel no se cargó');
+                return;
+            }
+            
+            // Esperar a que se inicialice
+            setTimeout(() => {
+                // Verificar si se inicializó window.socialCarousel
+                if (window.socialCarousel) {
+                    addDebug('✅ Instancia window.socialCarousel disponible');
+                    document.getElementById('eventsStatus').textContent = '✅ Eventos activos';
+                    
+                    // Obtener red seleccionada
+                    const selected = window.socialCarousel.getSelectedNetwork();
+                    document.getElementById('selectedNetwork').textContent = selected.name;
+                    addDebug('Red seleccionada inicialmente: ' + selected.name);
+                    
+                    updateStatus('success', '✅ Carrusel inicializado correctamente');
+                } else {
+                    addDebug('❌ Instancia window.socialCarousel NO disponible');
+                    document.getElementById('eventsStatus').textContent = '❌ Sin eventos';
+                    updateStatus('error', '❌ Error: Carrusel no se inicializó');
+                }
+                
+                // Contar SVGs
+                const svgs = document.querySelectorAll('.simple-social-carousel svg');
+                document.getElementById('svgCount').textContent = svgs.length + ' iconos SVG';
+                addDebug('SVGs encontrados: ' + svgs.length);
+                
+                if (svgs.length > 0) {
+                    addDebug('✅ Los iconos SVG se cargaron correctamente');
+                } else {
+                    addDebug('❌ No se encontraron iconos SVG');
+                }
+            }, 1000);
+            
+            // Escuchar cambios
+            container.addEventListener('socialNetworkChanged', function(e) {
+                addDebug('🔄 Cambio detectado: ' + e.detail.network);
+                document.getElementById('selectedNetwork').textContent = e.detail.network;
+            });
+        });
+        
+        // Función de prueba manual
+        function testCarousel() {
+            if (window.socialCarousel) {
+                addDebug('🧪 Ejecutando prueba manual...');
+                
+                // Probar selección manual
+                window.socialCarousel.selectNetwork(2); // LinkedIn
+                addDebug('Selección manual: LinkedIn (índice 2)');
+                
+                setTimeout(() => {
+                    window.socialCarousel.next(); // Siguiente
+                    addDebug('Navegación: siguiente');
+                }, 1000);
+                
+                setTimeout(() => {
+                    window.socialCarousel.prev(); // Anterior
+                    addDebug('Navegación: anterior');
+                }, 2000);
+            } else {
+                addDebug('❌ No se puede probar: carrusel no disponible');
+            }
+        }
+        
+        // Auto-prueba después de 3 segundos
+        setTimeout(testCarousel, 3000);
+    </script>
+</body>
+</html>
