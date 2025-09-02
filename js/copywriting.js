@@ -686,8 +686,8 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Propuesta específica para imagen/video con detalles precisos para IA (idioma español latino, texto legible, sin errores)',
-                    examples: ['Imagen: persona sonriendo en paisaje natural, texto en español latino...', 'Video: demostración de 30 segundos, subtítulos en español...']
+                    description: 'Propuesta específica para imagen/video con detalles precisos para IA (ESPAÑOL LATINO PERFECTO, texto ultra-legible, sin errores, resultado perfecto al primer intento)',
+                    examples: ['Imagen: persona sonriendo en paisaje natural, texto en ESPAÑOL LATINO PERFECTO sin errores ortográficos, tipografía grande y legible, alto contraste...', 'Video: demostración de 30 segundos, subtítulos en ESPAÑOL LATINO IMPECABLE, fondo sólido para legibilidad...']
                 }
             ],
             baseTemplate: `🎯 Gancho Verbal Impactante: [FRASE_QUE_PARE_EL_SCROLL]
@@ -985,7 +985,7 @@ const SOCIAL_NETWORK_SPECS = {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
                     description: 'Imagen/video obligatorio de alta calidad, formato 1:1 o 4:5',
-                    examples: ['Imagen: persona en pose inspiradora, luz natural, colores cálidos, texto motivacional en español latino legible, sin errores ortográficos...', 'Reel: transformación de 15 seg, música inspiradora, subtítulos en español latino...']
+                    examples: ['Imagen: persona en pose inspiradora, luz natural, colores cálidos, texto motivacional en ESPAÑOL LATINO PERFECTO sin errores ortográficos, tipografía bold legible con alto contraste, resultado perfecto al primer intento...', 'Reel: transformación de 15 seg, música inspiradora, subtítulos en ESPAÑOL LATINO IMPECABLE, tipografía grande visible...']
                 }
             ],
             baseTemplate: `💥 Gancho Verbal Impactante: [PRIMERA_LINEA_PODEROSA]
@@ -1045,7 +1045,7 @@ const SOCIAL_NETWORK_SPECS = {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
                     description: 'Video vertical 9:16 obligatorio, 7-15 seg para viralidad',
-                    examples: ['Video vertical: demostración rápida, iluminación natural, subtítulos en español latino legibles, ritmo dinámico, elemento sorpresa final...', 'Transformation video: antes/después, música trending, efectos visuales...']
+                    examples: ['Video vertical: demostración rápida, iluminación natural, subtítulos en ESPAÑOL LATINO PERFECTO ultra-legibles, tipografía grande visible, alto contraste, resultado viral perfecto al primer intento...', 'Transformation video: antes/después, música trending, texto overlay en ESPAÑOL LATINO IMPECABLE...']
                 }
             ],
             baseTemplate: `🎯 Gancho Verbal Impactante: [PREGUNTA_O_RETO_VIRAL]
@@ -1163,7 +1163,7 @@ const SOCIAL_NETWORK_SPECS = {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
                     description: 'Video obligatorio horizontal 16:9 o Shorts 9:16, miniatura llamativa',
-                    examples: ['Video horizontal HD: inicio impactante en 3 seg, audio claro, iluminación profesional. Miniatura: texto en español latino legible, colores contrastantes, expresión emocional...', 'YouTube Short vertical: demostración rápida, subtítulos automáticos activados...']
+                    examples: ['Video horizontal HD: inicio impactante en 3 seg, audio claro, iluminación profesional. Miniatura: texto en ESPAÑOL LATINO PERFECTO ultra-legible, tipografía bold grande, colores contrastantes, expresión emocional, resultado clickeable perfecto al primer intento...', 'YouTube Short vertical: demostración rápida, subtítulos en ESPAÑOL LATINO IMPECABLE automáticos activados...']
                 }
             ],
             baseTemplate: `🎥 Gancho Verbal Impactante: [TITULO_CON_VALOR_ESPECIFICO]
@@ -1533,7 +1533,7 @@ ${context ? `CONTEXTO ESPECÍFICO: ${context}` : ''}
 • DEBE incluir acción específica del tema (motivación→actuar, venta→intentar, yoga→practicar)
 • DEBE respetar límites de palabras exactos
 • DEBE incluir formato visual detallado para IA
-• Texto en español latino, legible, sin errores
+• Texto en ESPAÑOL LATINO PERFECTO, ultra-legible, sin errores ortográficos, gramática impecable, resultado perfecto al primer intento
 
 📋 ESPECIFICACIONES POR PLATAFORMA:
 
@@ -1591,7 +1591,7 @@ ${networkSpec.template.structure.map(section =>
 • Generar CURIOSIDAD irresistible
 • Incluir ACCIÓN específica del tema (no genérica)
 • Respetar LÍMITES de palabras exactos
-• Describir VISUAL para IA (español latino, legible)
+• Describir VISUAL para IA (ESPAÑOL LATINO PERFECTO, ultra-legible, tipografía grande, alto contraste, resultado perfecto al primer intento)
 • Ser ÚNICO para su plataforma
 • Motivar RESULTADOS reales`;
 
