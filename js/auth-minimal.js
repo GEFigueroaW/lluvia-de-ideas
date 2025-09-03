@@ -33,35 +33,67 @@ function checkBypass() {
 function showMainApp() {
     console.log('✅ [AUTH-MINIMAL] Mostrando aplicación principal');
     
+    // Ocultar pantalla de carga específicamente
+    const loadingSection = document.getElementById('loadingSection');
+    if (loadingSection) {
+        loadingSection.style.display = 'none';
+        loadingSection.classList.add('is-hidden');
+        console.log('✅ [AUTH-MINIMAL] Pantalla de carga ocultada');
+    }
+    
     // Ocultar elementos de autenticación si existen
     const authElements = document.querySelectorAll('.auth-container, .login-container, #loginSection');
     authElements.forEach(el => {
-        if (el) el.style.display = 'none';
+        if (el) {
+            el.style.display = 'none';
+            el.classList.add('is-hidden');
+        }
     });
     
     // Mostrar elementos principales
     const mainElements = document.querySelectorAll('.main-container, .app-container, #mainApp, main, .copywriting-container');
     mainElements.forEach(el => {
-        if (el) el.style.display = 'block';
+        if (el) {
+            el.style.display = 'block';
+            el.classList.remove('is-hidden');
+        }
     });
     
     // Buscar específicamente el generador de copywriting
     const copywritingSection = document.querySelector('#copywriting-generator, .form-container, .modern-container');
     if (copywritingSection) {
         copywritingSection.style.display = 'block';
+        copywritingSection.classList.remove('is-hidden');
     }
     
     // Si hay un formulario, asegurarse de que esté visible
     const form = document.getElementById('copywritingForm');
     if (form) {
         form.style.display = 'block';
+        form.classList.remove('is-hidden');
         // Asegurarse de que el contenedor padre también esté visible
         let parent = form.parentElement;
         while (parent && parent !== document.body) {
             parent.style.display = 'block';
+            parent.classList.remove('is-hidden');
             parent = parent.parentElement;
         }
     }
+    
+    // Forzar visibilidad del contenedor principal
+    const mainContainer = document.querySelector('.container.main-container, #mainApp');
+    if (mainContainer) {
+        mainContainer.style.display = 'block';
+        mainContainer.style.visibility = 'visible';
+        mainContainer.style.opacity = '1';
+        mainContainer.classList.remove('is-hidden');
+        console.log('✅ [AUTH-MINIMAL] Contenedor principal forzado visible');
+    }
+    
+    // Mostrar body completo
+    document.body.style.overflow = 'auto';
+    
+    console.log('✅ [AUTH-MINIMAL] Aplicación principal mostrada');
 }
 
 // Función para verificar autenticación
@@ -101,6 +133,12 @@ window.forceAdminBypass = function() {
     }
 };
 
+// Función para forzar mostrar la aplicación (para debugging)
+window.forceShowApp = function() {
+    console.log('🔧 [AUTH-MINIMAL] Forzando mostrar aplicación...');
+    showMainApp();
+};
+
 // Funciones compatibles con sistema anterior
 window.isUserPremium = function() {
     return window.userProfile.isPremium || checkBypass();
@@ -114,10 +152,10 @@ window.getCurrentUser = function() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('🚀 [AUTH-MINIMAL] DOM cargado, inicializando autenticación...');
     
-    // Pequeño delay para asegurar que todos los elementos estén cargados
+    // Delay más largo para asegurar que todos los elementos estén cargados
     setTimeout(() => {
         checkAuth();
-    }, 100);
+    }, 500);
 });
 
 // También ejecutar inmediatamente si el DOM ya está cargado
@@ -127,7 +165,7 @@ if (document.readyState === 'loading') {
     // DOM ya está cargado
     setTimeout(() => {
         checkAuth();
-    }, 100);
+    }, 500);
 }
 
 console.log('✅ [AUTH-MINIMAL] Script de autenticación mínima cargado');
