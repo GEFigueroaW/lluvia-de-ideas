@@ -683,7 +683,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Propuesta específica para imagen/video con detalles precisos para IA (ESPAÑOL LATINO PERFECTO, texto ultra-legible, sin errores, resultado perfecto al primer intento)',
+                    description: 'Descripción SOLO de la imagen/video sin mencionar red social ni CTA. Enfoque únicamente en elementos visuales (ESPAÑOL LATINO PERFECTO, texto ultra-legible, sin errores, resultado perfecto al primer intento)',
                     examples: ['Imagen: persona sonriendo en paisaje natural, texto en ESPAÑOL LATINO PERFECTO sin errores ortográficos, tipografía grande y legible, alto contraste...', 'Video: demostración de 30 segundos, subtítulos en ESPAÑOL LATINO IMPECABLE, fondo sólido para legibilidad...']
                 }
             ],
@@ -743,7 +743,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Imagen simple, gráfico claro o meme ligero entendible en 2 segundos',
+                    description: 'Descripción SOLO de imagen/video sin mencionar red social. Enfoque visual simple entendible en 2 segundos',
                     examples: ['Gráfico simple: estadística en español latino, fondo contrastante, números grandes...', 'Imagen: quote destacado, tipografía limpia...']
                 }
             ],
@@ -803,7 +803,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Imagen profesional, limpia, con branding discreto',
+                    description: 'Descripción SOLO de imagen profesional sin mencionar red social ni branding específico',
                     examples: ['Infografía profesional: datos en español latino, colores corporativos, tipografía sans-serif...', 'Imagen: profesional en oficina moderna, iluminación natural...']
                 }
             ],
@@ -863,7 +863,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Imagen simple y clara, formato cuadrado o vertical',
+                    description: 'Descripción SOLO de imagen/video simple sin mencionar red social. Enfoque visual directo',
                     examples: ['Imagen cuadrada: mensaje clave en español latino, colores llamativos, texto grande y legible...', 'Captura simple: sin exceso de información...']
                 }
             ],
@@ -921,7 +921,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Infografía compacta o captura relevante',
+                    description: 'Descripción SOLO de infografía o captura visual sin mencionar red social. Enfoque únicamente en elementos visuales',
                     examples: ['Infografía: pasos numerados en español latino, iconos claros, colores contrastantes...', 'Captura: herramienta o resultado, texto legible...']
                 }
             ],
@@ -981,7 +981,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Imagen/video obligatorio de alta calidad, formato 1:1 o 4:5',
+                    description: 'Descripción SOLO de imagen/video de alta calidad sin mencionar red social. Enfoque únicamente en elementos visuales',
                     examples: ['Imagen: persona en pose inspiradora, luz natural, colores cálidos, texto motivacional en ESPAÑOL LATINO PERFECTO sin errores ortográficos, tipografía bold legible con alto contraste, resultado perfecto al primer intento...', 'Reel: transformación de 15 seg, música inspiradora, subtítulos en ESPAÑOL LATINO IMPECABLE, tipografía grande visible...']
                 }
             ],
@@ -1041,7 +1041,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Video vertical 9:16 obligatorio, 7-15 seg para viralidad',
+                    description: 'Descripción SOLO de video vertical sin mencionar red social. Enfoque únicamente en elementos visuales',
                     examples: ['Video vertical: demostración rápida, iluminación natural, subtítulos en ESPAÑOL LATINO PERFECTO ultra-legibles, tipografía grande visible, alto contraste, resultado viral perfecto al primer intento...', 'Transformation video: antes/después, música trending, texto overlay en ESPAÑOL LATINO IMPECABLE...']
                 }
             ],
@@ -1101,7 +1101,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Imagen opcional relevante y explicativa, sin branding excesivo',
+                    description: 'Descripción SOLO de imagen opcional sin mencionar red social ni branding. Enfoque únicamente en elementos visuales',
                     examples: ['Gráfico explicativo: datos en español, colores neutros, tipografía clara y legible...', 'Captura de pantalla: resultados reales, información verificable...']
                 }
             ],
@@ -1159,7 +1159,7 @@ const SOCIAL_NETWORK_SPECS = {
                 {
                     section: 'formato_visual',
                     label: '🎨 Formato Visual Sugerido',
-                    description: 'Video obligatorio horizontal 16:9 o Shorts 9:16, miniatura llamativa',
+                    description: 'Descripción SOLO de video y miniatura sin mencionar red social. Enfoque únicamente en elementos visuales',
                     examples: ['Video horizontal HD: inicio impactante en 3 seg, audio claro, iluminación profesional. Miniatura: texto en ESPAÑOL LATINO PERFECTO ultra-legible, tipografía bold grande, colores contrastantes, expresión emocional, resultado clickeable perfecto al primer intento...', 'YouTube Short vertical: demostración rápida, subtítulos en ESPAÑOL LATINO IMPECABLE automáticos activados...']
                 }
             ],
@@ -1948,11 +1948,11 @@ function copyCopywritingText(copyObject, networkName) {
  */
 function copyVisualFormat(formatoVisual, networkName) {
     console.log('[DEBUG] copyVisualFormat llamada con:', formatoVisual, networkName);
-    const visualText = `🎨 FORMATO VISUAL PARA ${networkName.toUpperCase()}:\n\n${formatoVisual}`;
+    const visualText = `🎨 FORMATO VISUAL:\n\n${formatoVisual}`;
     
     console.log('[DEBUG] Formato visual a copiar:', visualText);
     navigator.clipboard.writeText(visualText).then(() => {
-        showNotification(`🎨 Formato visual de ${networkName} copiado al portapapeles`, 'success');
+        showNotification(`🎨 Formato visual copiado al portapapeles`, 'success');
     }).catch(err => {
         console.error('Error al copiar formato visual:', err);
         showNotification('❌ Error al copiar el formato visual', 'error');
