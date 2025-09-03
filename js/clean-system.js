@@ -216,25 +216,39 @@ async function generateLocalIdea(platform, keyword, type, userContext, includeCT
     
     const templates = {
         'Informativo y educativo': [
-            `¿Sabías que ${keyword} puede transformar tu día a día? Descubre cómo aplicarlo paso a paso.`,
-            `5 datos fascinantes sobre ${keyword} que cambiarán tu perspectiva.`,
-            `La guía completa de ${keyword}: todo lo que necesitas saber en un solo lugar.`,
-            `Mitos vs. realidades sobre ${keyword}. ¡La #3 te sorprenderá!`,
-            `Todo lo que necesitas saber sobre ${keyword} explicado de forma simple y práctica.`
+            `🤔 ¿Te has preguntado alguna vez cómo ${keyword} podría estar transformando silenciosamente tu rutina diaria? La respuesta te sorprenderá: cada pequeña decisión relacionada con este tema es en realidad una puerta hacia nuevas posibilidades que quizás aún no has explorado.`,
+            
+            `💭 Reflexionemos juntos: ¿Qué pasaría si te dijera que todo lo que creías saber sobre ${keyword} es solo la punta del iceberg? Existe un universo de estrategias, enfoques y perspectivas que están esperando a ser descubiertos por mentes curiosas como la tuya.`,
+            
+            `🌟 Imagínate por un momento esto: cada experto en ${keyword} comenzó exactamente donde tú estás ahora, con dudas, preguntas y esa sensación de que hay algo más por aprender. La diferencia no está en el talento natural, sino en la disposición a cuestionar lo obvio y buscar respuestas más profundas.`,
+            
+            `🔍 ¿Sabías que las personas más exitosas en el ámbito de ${keyword} comparten un secreto que pocos conocen? No se trata de técnicas complejas o fórmulas mágicas, sino de una mentalidad específica que les permite ver oportunidades donde otros ven obstáculos.`,
+            
+            `💡 Aquí tienes algo en lo que pensar: si pudieras cambiar solo una cosa sobre tu enfoque hacia ${keyword}, ¿cuál sería? Esta simple pregunta ha llevado a miles de personas a descubrir estrategias revolucionarias que transformaron completamente sus resultados.`
         ],
+        
         'Venta directa y persuasivo': [
-            `🔥 ¡Últimas 24 horas! Aprovecha esta oportunidad única con ${keyword}.`,
-            `¿Cansado de buscar resultados? ${keyword} es la solución que estabas esperando.`,
-            `Más de 10,000 personas ya cambiaron su vida con ${keyword}. ¿Serás el próximo?`,
-            `No pierdas más tiempo. Comienza hoy mismo con ${keyword} y ve la diferencia.`,
-            `Oferta especial: Descubre cómo ${keyword} puede revolucionar tu negocio hoy mismo.`
+            `🎯 Déjame hacerte una pregunta directa: ¿Cuánto tiempo más vas a permitir que la incertidumbre sobre ${keyword} te mantenga alejado de los resultados que realmente deseas? Cada día que pasa sin tomar acción es una oportunidad perdida que jamás regresará.`,
+            
+            `⚡ Imagínate despertando mañana sabiendo que finalmente tienes el control total sobre ${keyword}. ¿Cómo se sentiría esa confianza? ¿Qué cambiaría en tu vida cuando ya no tengas que preocuparte por este tema nunca más?`,
+            
+            `🔥 Te voy a revelar algo que la mayoría de las personas no quiere admitir: el momento perfecto para dominar ${keyword} nunca va a llegar. La única diferencia entre quienes triunfan y quienes se quedan atrás es la decisión de actuar a pesar de las dudas.`,
+            
+            `💰 ¿Qué valor le das realmente a tu tiempo? Porque mientras sigues posponiendo tu decisión sobre ${keyword}, otros están aprovechando cada segundo para construir la vida que tú también podrías tener. La pregunta no es si puedes permitirte invertir en esto, sino si puedes permitirte no hacerlo.`,
+            
+            `🚀 Aquí está la verdad incómoda: las excusas sobre ${keyword} que te dices a ti mismo son las mismas que se dijeron miles de personas antes que tú. La diferencia es que algunos decidieron dejar de justificarse y empezar a actuar. ¿En qué grupo quieres estar?`
         ],
+        
         'Posicionamiento y branding': [
-            `En el mundo de ${keyword}, nosotros marcamos la diferencia.`,
-            `Cuando pienses en ${keyword}, piensa en calidad. Piensa en nosotros.`,
-            `15 años liderando el mercado de ${keyword}. La experiencia habla por sí sola.`,
-            `${keyword} + innovación = nuestra fórmula del éxito.`,
-            `Somos la referencia en ${keyword}. Nuestra reputación nos precede.`
+            `🏆 En un mundo donde todos hablan de ${keyword}, nosotros preferimos demostrar con hechos. Nuestra filosofía es simple: la excelencia no se proclama, se vive día a día en cada detalle, en cada decisión, en cada resultado que entregamos.`,
+            
+            `🎨 ¿Qué diferencia a una marca memorable de una olvidable? No es solo el logo o el mensaje, sino la capacidad de conectar emocionalmente con las aspiraciones más profundas de las personas. En el universo de ${keyword}, nosotros no vendemos productos, creamos experiencias transformadoras.`,
+            
+            `🌍 Reflexiona sobre esto: en una década, ¿cómo quieres que las personas recuerden su experiencia contigo en relación a ${keyword}? Nosotros hemos construido nuestra reputación pensando en ese legado, en ser recordados no por lo que vendimos, sino por las vidas que cambiamos.`,
+            
+            `💎 La verdadera autoridad en ${keyword} no se construye con promesas vacías, sino con una trayectoria sólida de resultados consistentes. Cada cliente que confía en nosotros se convierte en embajador de una filosofía que trasciende lo comercial: la búsqueda incansable de la excelencia.`,
+            
+            `🔮 Imagina por un momento el futuro de ${keyword}. Nosotros no solo lo imaginamos, lo estamos construyendo activamente. Cada innovación, cada mejora, cada nueva perspectiva que aportamos al mercado está diseñada pensando en las necesidades que aún no sabes que tienes.`
         ]
     };
     
@@ -263,11 +277,13 @@ async function generateLocalIdea(platform, keyword, type, userContext, includeCT
     // Agregar CTA si se solicita
     if (includeCTA) {
         const ctas = [
-            '¡Comparte tu experiencia en los comentarios!',
-            '¿Qué opinas? ¡Déjanos tu comentario!',
-            'Dale like si te gustó y comparte con tus amigos.',
-            '¡Síguenos para más contenido como este!',
-            '¿Te ha sido útil? ¡Compártelo!'
+            '¿Qué piensas sobre esto? Me encantaría conocer tu perspectiva en los comentarios.',
+            'Reflexiona: ¿cómo aplicarías esto en tu situación particular? Comparte tu enfoque.',
+            '¿Has experimentado algo similar? Tu experiencia podría inspirar a otros.',
+            'Pregunta para reflexionar: ¿qué sería diferente en tu vida si aplicaras esto consistentemente?',
+            '¿Cuál de estos puntos resuena más contigo? Me interesa saber por qué.',
+            'Desafío personal: ¿te atreves a implementar esto en los próximos 7 días?',
+            '¿Qué obstáculos ves para aplicar esto? Hablemos de soluciones juntos.'
         ];
         const selectedCTA = ctas[Math.floor(Math.random() * ctas.length)];
         content += ` ${selectedCTA}`;
@@ -341,14 +357,19 @@ async function generateFallbackIdea(platform, keyword, type, userContext, includ
     await new Promise(resolve => setTimeout(resolve, 500));
     
     const creativeIdeas = {
-        'Informativo y educativo': `💡 Todo lo que debes saber sobre ${keyword}: consejos prácticos, tendencias actuales y secretos que los expertos no te cuentan. ${userContext ? `Especialmente útil para ${userContext}.` : ''} ${includeCTA ? '¡Comparte si te sirvió!' : ''}`,
+        'Informativo y educativo': `� Aquí tienes una reflexión profunda sobre ${keyword}: cada pequeño paso que das hacia la comprensión de este tema es en realidad una inversión en tu crecimiento personal. ${userContext ? `Especialmente considerando tu contexto: ${userContext}.` : ''} ¿Te has preguntado cómo este conocimiento podría impactar no solo tu presente, sino también las decisiones que tomarás en el futuro?`,
         
-        'Venta directa y persuasivo': `🎯 ¿Buscas resultados reales con ${keyword}? Esta es tu oportunidad de dar el siguiente paso. ${userContext ? `Perfecto para ${userContext}.` : ''} ${includeCTA ? '¡Actúa ahora, las plazas son limitadas!' : ''}`,
+        'Venta directa y persuasivo': `🎯 Seamos honestos por un momento: la diferencia entre donde estás ahora y donde quieres estar con respecto a ${keyword} no es casualidad, es decisión. ${userContext ? `En tu situación específica: ${userContext}.` : ''} La pregunta real no es si necesitas actuar, sino si estás dispuesto a dar el primer paso hacia la transformación que buscas.`,
         
-        'Posicionamiento y branding': `🌟 En el competitivo mundo de ${keyword}, la diferencia está en los detalles. Nosotros lo sabemos. ${userContext ? `Con experiencia en ${userContext}.` : ''} ${includeCTA ? '¡Conoce más sobre nosotros!' : ''}`
+        'Posicionamiento y branding': `🌟 En el saturado universo de ${keyword}, nosotros elegimos un camino diferente: la autenticidad por encima de las promesas vacías. ${userContext ? `Entendemos particularmente situaciones como: ${userContext}.` : ''} Nuestra reputación no se construye con marketing, sino con resultados reales en la vida de personas reales.`
     };
     
-    const content = creativeIdeas[type] || creativeIdeas['Informativo y educativo'];
+    let content = creativeIdeas[type] || creativeIdeas['Informativo y educativo'];
+    
+    if (includeCTA) {
+        content += ` ¿Qué opinas? Me gustaría conocer tu perspectiva sobre este enfoque.`;
+    }
+    
     const hashtags = generateSmartHashtags(keyword, platform, type);
     
     return {
@@ -482,10 +503,12 @@ function displayResultsClean(ideas) {
         resultsContainer.id = 'results';
         resultsContainer.style.cssText = `
             margin-top: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            padding: 30px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
         `;
         
         // Insertar después del formulario
@@ -510,7 +533,7 @@ function displayResultsClean(ideas) {
         return;
     }
     
-    let html = '<h2 style="color: white; margin-bottom: 20px; text-align: center;">💡 Ideas Generadas por IA</h2>';
+    let html = '<h2 style="color: #333; margin-bottom: 20px; text-align: center;">💡 Ideas Generadas por IA</h2>';
     
     ideaKeys.forEach((key, index) => {
         const idea = ideas[key];
@@ -518,30 +541,33 @@ function displayResultsClean(ideas) {
         
         html += `
             <div style="
-                background: ${isError ? 'rgba(255,68,68,0.1)' : 'rgba(255,255,255,0.1)'};
-                padding: 20px;
-                margin: 15px 0;
-                border-radius: 10px;
-                border-left: 4px solid ${isError ? '#ff4444' : '#00ff88'};
-                transition: transform 0.2s ease;
-            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-                <h3 style="color: ${isError ? '#ff6666' : '#00ff88'}; margin: 0 0 10px 0; display: flex; align-items: center;">
+                background: ${isError ? 'rgba(255,68,68,0.1)' : 'rgba(255,255,255,0.9)'};
+                padding: 25px;
+                margin: 20px 0;
+                border-radius: 15px;
+                border-left: 4px solid ${isError ? '#ff4444' : '#007AFF'};
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
+                <h3 style="color: ${isError ? '#ff6666' : '#007AFF'}; margin: 0 0 15px 0; display: flex; align-items: center; font-size: 18px; font-weight: bold;">
                     ${isError ? '❌' : '✨'} ${idea.copyType}
                 </h3>
-                <p style="color: white; line-height: 1.6; margin: 0 0 15px 0; font-size: 16px;">${idea.content}</p>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
-                    <p style="color: #aaa; font-style: italic; margin: 0; font-size: 14px;">${idea.hashtags}</p>
+                <p style="color: #2c3e50; line-height: 1.8; margin: 0 0 20px 0; font-size: 16px; font-weight: 400;">${idea.content}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
+                    <p style="color: #7f8c8d; font-style: italic; margin: 0; font-size: 14px;">${idea.hashtags}</p>
                     ${!isError ? `<button onclick="copyToClipboard('${key}')" style="
-                        background: linear-gradient(45deg, #667eea, #764ba2);
+                        background: linear-gradient(45deg, #007AFF, #5856D6);
                         color: white;
                         border: none;
-                        padding: 8px 16px;
-                        border-radius: 6px;
+                        padding: 10px 20px;
+                        border-radius: 8px;
                         cursor: pointer;
-                        font-size: 12px;
-                        transition: transform 0.2s ease;
-                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        📋 Copiar
+                        font-size: 13px;
+                        font-weight: 600;
+                        transition: all 0.2s ease;
+                        box-shadow: 0 2px 8px rgba(0,122,255,0.3);
+                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(0,122,255,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(0,122,255,0.3)'">
+                        📋 Copiar Idea
                     </button>` : ''}
                 </div>
             </div>
