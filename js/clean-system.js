@@ -104,6 +104,89 @@ function hideGenerationProgress() {
     }
 }
 
+// Función para formatear el contenido del texto
+function formatContentText(content) {
+    return content
+        // Mejorar puntuación después de signos de interrogación y exclamación
+        .replace(/([¿¡])([A-Z])/g, '$1 $2')
+        .replace(/([?!])([A-Z])/g, '$1 $2')
+        
+        // Asegurar espacios después de puntos
+        .replace(/\.([A-Z])/g, '. $1')
+        
+        // Mejorar espacios alrededor de dos puntos
+        .replace(/:\s*([a-zA-Z])/g, ': $1')
+        
+        // Saltos de línea antes de emojis al inicio de oraciones
+        .replace(/([.!?])\s*([🤔💭🌟🔍💡⚡🔥💰🚀🎯🎨🌍💎🔮🏆])/g, '$1\n\n$2')
+        
+        // Asegurar salto de línea después de preguntas reflexivas
+        .replace(/(\?)\s*([A-ZÁÉÍÓÚÑ])/g, '$1\n\n$2')
+        
+        // Mejorar estructura de listas o puntos
+        .replace(/\.\s*([A-Z][^.]*:)/g, '.\n\n$1')
+        
+        // Limpiar espacios múltiples
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+// Función para generar prompts visuales según la plataforma
+function generateVisualPrompt(platform, keyword, type, content) {
+    const baseStyle = {
+        'Instagram': {
+            format: 'Imagen cuadrada (1080x1080)',
+            style: 'Estilo feed de Instagram, colores vibrantes, alta calidad',
+            elements: 'composición centrada, tipografía moderna'
+        },
+        'TikTok': {
+            format: 'Video vertical (9:16)',
+            style: 'Dinámico, trending, Gen Z appeal',
+            elements: 'movimiento, texto animado, colores llamativos'
+        },
+        'LinkedIn': {
+            format: 'Imagen horizontal (1200x627)',
+            style: 'Profesional, corporativo, limpio',
+            elements: 'gráficos de datos, colores sobrios, tipografía seria'
+        },
+        'Facebook': {
+            format: 'Imagen horizontal (1200x630)',
+            style: 'Familiar, accesible, colores cálidos',
+            elements: 'fácil de leer, imágenes relacionables'
+        },
+        'Twitter': {
+            format: 'Imagen horizontal (1200x675)',
+            style: 'Conciso, impactante, viral',
+            elements: 'mensaje claro, contraste alto'
+        }
+    };
+    
+    const visualStyle = baseStyle[platform] || baseStyle['Instagram'];
+    
+    const typePrompts = {
+        'Informativo y educativo': `Crea una imagen ${visualStyle.format} que muestre "${keyword}" de manera educativa. ${visualStyle.style}. Incluye ${visualStyle.elements}, iconos informativos, gráficos explicativos y un diseño que invite al aprendizaje. El concepto debe transmitir conocimiento y curiosidad.`,
+        
+        'Venta directa y persuasivo': `Diseña una imagen ${visualStyle.format} promocional para "${keyword}" con enfoque de ventas. ${visualStyle.style}. Incorpora ${visualStyle.elements}, call-to-action visual, elementos de urgencia, y diseño persuasivo. Debe generar deseo de compra inmediata.`,
+        
+        'Posicionamiento y branding': `Crea una imagen ${visualStyle.format} de marca premium para "${keyword}". ${visualStyle.style}. Incluye ${visualStyle.elements}, logo elegante, diseño sofisticado y elementos que transmitan autoridad y confianza en la marca.`
+    };
+    
+    let prompt = typePrompts[type] || typePrompts['Informativo y educativo'];
+    
+    // Agregar contexto específico de la plataforma
+    const platformContext = {
+        'Instagram': 'Optimizado para engagement y shares en stories.',
+        'TikTok': 'Debe captar atención en los primeros 3 segundos.',
+        'LinkedIn': 'Apropiado para audiencia profesional y networking.',
+        'Facebook': 'Diseñado para generar comentarios y discusión.',
+        'Twitter': 'Perfecto para retweets y conversaciones virales.'
+    };
+    
+    prompt += ` ${platformContext[platform] || ''} Colores que complementen el tema "${keyword}" y generen impacto visual.`;
+    
+    return prompt;
+}
+
 // Función para copiar al portapapeles
 function copyToClipboard(ideaKey) {
     try {
@@ -153,6 +236,30 @@ function fallbackCopyTextToClipboard(text) {
     }
     
     document.body.removeChild(textArea);
+}
+
+// Función para copiar prompt visual
+function copyVisualPrompt(ideaKey) {
+    try {
+        const idea = window.currentIdeas[ideaKey];
+        if (!idea || !idea.visualPrompt) return;
+        
+        const textToCopy = idea.visualPrompt;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showNotification('✅ Prompt visual copiado', 'success');
+            }).catch(err => {
+                console.error('Error copiando prompt:', err);
+                fallbackCopyTextToClipboard(textToCopy);
+            });
+        } else {
+            fallbackCopyTextToClipboard(textToCopy);
+        }
+    } catch (error) {
+        console.error('Error en copyVisualPrompt:', error);
+        showNotification('❌ Error al copiar prompt', 'error');
+    }
 }
 
 // Función para obtener red social seleccionada (con fallback robusto)
@@ -301,11 +408,19 @@ async function generateLocalIdea(platform, keyword, type, userContext, includeCT
     const hashtags = generateSmartHashtags(keyword, platform, type);
     console.log(`[LOCAL-AI] Hashtags generados: "${hashtags}"`);
     
+    // Generar prompt para imagen/video según la plataforma
+    const visualPrompt = generateVisualPrompt(platform, keyword, type, content);
+    console.log(`[LOCAL-AI] Prompt visual generado: "${visualPrompt}"`);
+    
+    // Mejorar formato del contenido
+    const formattedContent = formatContentText(content);
+    
     const result = {
         copyType: type,
-        content: content,
+        content: formattedContent,
         hashtags: hashtags,
-        platform: platform
+        platform: platform,
+        visualPrompt: visualPrompt
     };
     
     console.log(`[LOCAL-AI] Idea generada exitosamente:`, result);
@@ -371,12 +486,15 @@ async function generateFallbackIdea(platform, keyword, type, userContext, includ
     }
     
     const hashtags = generateSmartHashtags(keyword, platform, type);
+    const formattedContent = formatContentText(content);
+    const visualPrompt = generateVisualPrompt(platform, keyword, type, formattedContent);
     
     return {
         copyType: type,
-        content: content,
+        content: formattedContent,
         hashtags: hashtags,
-        platform: platform
+        platform: platform,
+        visualPrompt: visualPrompt
     };
 }
 
@@ -592,11 +710,38 @@ function displayResultsClean(ideas) {
                     text-align: left !important;
                     word-wrap: break-word !important;
                     overflow-wrap: break-word !important;
-                    white-space: normal !important;
+                    white-space: pre-line !important;
                     max-width: 100% !important;
                     overflow: visible !important;
                     hyphens: auto !important;
                 ">${idea.content}</p>
+                
+                ${idea.visualPrompt ? `
+                <div style="
+                    background: linear-gradient(135deg, #f8f9fa, #e9ecef) !important;
+                    padding: 15px !important;
+                    border-radius: 10px !important;
+                    border-left: 3px solid #28a745 !important;
+                    margin: 15px 0 !important;
+                ">
+                    <h4 style="
+                        color: #28a745 !important;
+                        margin: 0 0 10px 0 !important;
+                        font-size: 14px !important;
+                        font-weight: bold !important;
+                        font-family: Arial, sans-serif !important;
+                    ">🎨 Prompt para Imagen/Video (${idea.platform}):</h4>
+                    <p style="
+                        color: #495057 !important;
+                        font-size: 13px !important;
+                        line-height: 1.6 !important;
+                        margin: 0 !important;
+                        font-family: Arial, sans-serif !important;
+                        white-space: pre-line !important;
+                    ">${idea.visualPrompt}</p>
+                </div>
+                ` : ''}
+                
                 <div style="
                     display: flex !important; 
                     flex-wrap: wrap !important;
@@ -619,24 +764,42 @@ function displayResultsClean(ideas) {
                         flex: 1 !important;
                         min-width: 200px !important;
                     ">${idea.hashtags}</p>
-                    ${!isError ? `<button onclick="copyToClipboard('${key}')" style="
-                        background: linear-gradient(45deg, #2196F3, #1976D2) !important;
-                        color: white !important;
-                        border: none !important;
-                        padding: 12px 24px !important;
-                        border-radius: 8px !important;
-                        cursor: pointer !important;
-                        font-size: 13px !important;
-                        font-weight: 600 !important;
-                        transition: all 0.2s ease !important;
-                        box-shadow: 0 2px 8px rgba(33,150,243,0.3) !important;
-                        font-family: Arial, sans-serif !important;
-                        white-space: nowrap !important;
-                        flex-shrink: 0 !important;
-                        min-width: auto !important;
-                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(33,150,243,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(33,150,243,0.3)'">
-                        📋 Copiar Idea
-                    </button>` : ''}
+                    <div style="display: flex !important; gap: 10px !important; flex-wrap: wrap !important;">
+                        ${!isError ? `<button onclick="copyToClipboard('${key}')" style="
+                            background: linear-gradient(45deg, #2196F3, #1976D2) !important;
+                            color: white !important;
+                            border: none !important;
+                            padding: 10px 16px !important;
+                            border-radius: 8px !important;
+                            cursor: pointer !important;
+                            font-size: 12px !important;
+                            font-weight: 600 !important;
+                            transition: all 0.2s ease !important;
+                            box-shadow: 0 2px 8px rgba(33,150,243,0.3) !important;
+                            font-family: Arial, sans-serif !important;
+                            white-space: nowrap !important;
+                            flex-shrink: 0 !important;
+                        " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(33,150,243,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(33,150,243,0.3)'">
+                            📋 Copiar Copy
+                        </button>` : ''}
+                        ${!isError && idea.visualPrompt ? `<button onclick="copyVisualPrompt('${key}')" style="
+                            background: linear-gradient(45deg, #28a745, #20c997) !important;
+                            color: white !important;
+                            border: none !important;
+                            padding: 10px 16px !important;
+                            border-radius: 8px !important;
+                            cursor: pointer !important;
+                            font-size: 12px !important;
+                            font-weight: 600 !important;
+                            transition: all 0.2s ease !important;
+                            box-shadow: 0 2px 8px rgba(40,167,69,0.3) !important;
+                            font-family: Arial, sans-serif !important;
+                            white-space: nowrap !important;
+                            flex-shrink: 0 !important;
+                        " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(40,167,69,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(40,167,69,0.3)'">
+                            🎨 Copiar Prompt Visual
+                        </button>` : ''}
+                    </div>
                 </div>
             </div>
         `;
@@ -807,5 +970,6 @@ window.showNotification = showNotification;
 window.generateCopywritingClean = generateCopywritingClean;
 window.displayResultsClean = displayResultsClean;
 window.copyToClipboard = copyToClipboard;
+window.copyVisualPrompt = copyVisualPrompt;
 
 console.log('✅ [CLEAN-SYSTEM] Script cargado correctamente');
