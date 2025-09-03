@@ -290,9 +290,7 @@ function generateVisualPrompt(platform, keyword, type, content) {
     const contentSnippet = content.substring(0, 100).replace(/[^\w\s]/gi, '');
     
     if (isVideo) {
-        return `VIDEO PARA ${platform.toUpperCase()}:
-
-ESPECIFICACIONES TÉCNICAS:
+        return `ESPECIFICACIONES TÉCNICAS:
 - Formato: ${specs.format}
 - Relación de aspecto: ${specs.aspectRatio}
 - Orientación: ${specs.orientation}
@@ -324,9 +322,7 @@ ELEMENTOS DE ENGAGEMENT:
 - Elementos que inviten a la interacción (flechas, íconos)
 - Subtítulos completos en español latino con ortografía perfecta`;
     } else {
-        return `IMAGEN PARA ${platform.toUpperCase()}:
-
-ESPECIFICACIONES TÉCNICAS:
+        return `ESPECIFICACIONES TÉCNICAS:
 - Formato: ${specs.format}
 - Relación de aspecto: ${specs.aspectRatio}
 - Orientación: ${specs.orientation}
