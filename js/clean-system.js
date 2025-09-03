@@ -300,23 +300,197 @@ function getSelectedSocialNetworkSafe() {
     }
 }
 
-// Función para generar ideas con IA (múltiples alternativas)
-async function generateIdeaWithAI(platform, keyword, type, userContext, includeCTA) {
-    console.log(`[AI] Generando idea para ${type}...`);
+// Función para generar prompts visuales con IA real
+async function generateVisualPromptWithAI(platform, keyword, type, content) {
+    console.log(`[DEEPSEEK-VISUAL] 🎨 Generando prompt visual con IA real...`);
     
-    // Usar generación local inteligente directamente
+    const DEEPSEEK_API_KEY = 'sk-195d3e74fc904857a632ee7b22b174ff';
+    const API_URL = 'https://api.deepseek.com/v1/chat/completions';
+    
+    const systemPrompt = `Eres un experto en prompts para generación de imágenes y videos con IA. Creas prompts específicos y detallados para cada plataforma social.`;
+    
+    const userPrompt = `Basándote en este copywriting: "${content.substring(0, 200)}..."
+    
+    Genera un prompt específico para crear contenido visual en ${platform} sobre "${keyword}" de tipo "${type}".
+    
+    El prompt debe:
+    - Ser específico para ${platform} (formato, estilo, dimensiones)
+    - Describir elementos visuales que complementen el copy
+    - Incluir estilo fotográfico/artístico apropiado
+    - Ser claro y detallado para IA de imágenes/video
+    - Tener entre 100-150 palabras
+    
+    Responde SOLO con el prompt, sin explicaciones adicionales.`;
+    
+    const requestBody = {
+        model: "deepseek-chat",
+        messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+        ],
+        temperature: 0.7,
+        max_tokens: 300,
+        top_p: 0.8
+    };
+    
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify(requestBody)
+    });
+    
+    if (!response.ok) {
+        throw new Error(`DeepSeek Visual API Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error('Respuesta inválida de DeepSeek Visual API');
+    }
+    
+    console.log(`[DEEPSEEK-VISUAL] ✅ Prompt visual IA generado`);
+    return data.choices[0].message.content.trim();
+}
+
+// Función para generar contenido REAL con DeepSeek API
+async function generateWithDeepSeek(platform, keyword, type, userContext, includeCTA) {
+    console.log(`[DEEPSEEK] 🚀 Iniciando generación REAL con IA...`);
+    
+    const DEEPSEEK_API_KEY = 'sk-195d3e74fc904857a632ee7b22b174ff';
+    const API_URL = 'https://api.deepseek.com/v1/chat/completions';
+    
+    // Crear prompt específico según el tipo de contenido
+    let systemPrompt = '';
+    let userPrompt = '';
+    
+    switch(type) {
+        case 'Informativo y educativo':
+            systemPrompt = `Eres un experto en copywriting educativo para redes sociales. Generas contenido reflexivo, educativo y que invita a pensar profundamente sobre el tema.`;
+            userPrompt = `Crea un copywriting educativo para ${platform} sobre "${keyword}". 
+            ${userContext ? `Contexto adicional: ${userContext}` : ''}
+            El contenido debe:
+            - Ser profundamente reflexivo e invitar a la introspección
+            - Incluir preguntas que hagan pensar
+            - Tener un enfoque educativo y transformador
+            - Ser original y único (NO usar plantillas)
+            - Tener entre 150-250 palabras
+            ${includeCTA ? '- Incluir un call-to-action natural' : ''}`;
+            break;
+            
+        case 'Venta directa y persuasivo':
+            systemPrompt = `Eres un experto en copywriting persuasivo y ventas. Generas contenido que motiva a la acción de manera ética y efectiva.`;
+            userPrompt = `Crea un copywriting persuasivo para ${platform} sobre "${keyword}".
+            ${userContext ? `Contexto adicional: ${userContext}` : ''}
+            El contenido debe:
+            - Ser altamente persuasivo y motivador
+            - Crear urgencia y deseo
+            - Incluir beneficios claros y específicos
+            - Ser original y único (NO usar plantillas)
+            - Tener entre 120-200 palabras
+            ${includeCTA ? '- Incluir un call-to-action fuerte y directo' : ''}`;
+            break;
+            
+        case 'Posicionamiento y branding':
+            systemPrompt = `Eres un experto en branding y posicionamiento de marca. Generas contenido que construye autoridad y confianza.`;
+            userPrompt = `Crea un copywriting de branding para ${platform} sobre "${keyword}".
+            ${userContext ? `Contexto adicional: ${userContext}` : ''}
+            El contenido debe:
+            - Posicionar como líder y experto
+            - Transmitir autoridad y confianza
+            - Diferenciarse de la competencia
+            - Ser original y único (NO usar plantillas)
+            - Tener entre 130-220 palabras
+            ${includeCTA ? '- Incluir un call-to-action que refuerce el posicionamiento' : ''}`;
+            break;
+    }
+    
+    const requestBody = {
+        model: "deepseek-chat",
+        messages: [
+            {
+                role: "system",
+                content: systemPrompt
+            },
+            {
+                role: "user", 
+                content: userPrompt
+            }
+        ],
+        temperature: 0.8,
+        max_tokens: 500,
+        top_p: 0.9
+    };
+    
+    console.log(`[DEEPSEEK] 📤 Enviando request a API...`);
+    
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify(requestBody)
+    });
+    
+    if (!response.ok) {
+        throw new Error(`DeepSeek API Error: ${response.status} - ${response.statusText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`[DEEPSEEK] ✅ Respuesta recibida de IA real`);
+    
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+        throw new Error('Respuesta inválida de DeepSeek API');
+    }
+    
+    const content = data.choices[0].message.content.trim();
+    
+    // Formatear el contenido
+    const formattedContent = formatContentText(content);
+    
+    // Generar prompt para imagen/video según la plataforma con IA real
+    let visualPrompt;
     try {
-        return await generateLocalIdea(platform, keyword, type, userContext, includeCTA);
+        visualPrompt = await generateVisualPromptWithAI(platform, keyword, type, formattedContent);
     } catch (error) {
-        console.error(`[AI] Error en generación local:`, error);
+        console.log(`[DEEPSEEK] Error generando prompt visual, usando fallback`);
+        visualPrompt = generateVisualPrompt(platform, keyword, type, formattedContent);
+    }
+    
+    console.log(`[DEEPSEEK] 🎯 Contenido IA generado exitosamente`);
+    
+    return {
+        content: formattedContent,
+        platform: platform,
+        copyType: type,
+        generatedBy: '🤖 IA Real (DeepSeek)',
+        isRealAI: true,
+        visualPrompt: visualPrompt
+    };
+}
+
+// Función para generar ideas con IA REAL usando DeepSeek
+async function generateIdeaWithAI(platform, keyword, type, userContext, includeCTA) {
+    console.log(`[AI] 🤖 Generando idea REAL con IA para ${type}...`);
+    
+    // Intentar con DeepSeek API primero
+    try {
+        return await generateWithDeepSeek(platform, keyword, type, userContext, includeCTA);
+    } catch (error) {
+        console.error(`[AI] Error con DeepSeek API:`, error);
+        showNotification('Error con IA - usando sistema de respaldo', 'warning');
         return await generateFallbackIdea(platform, keyword, type, userContext, includeCTA);
     }
 }
 
-// Función para generar ideas localmente con lógica inteligente
-async function generateLocalIdea(platform, keyword, type, userContext, includeCTA) {
-    console.log(`[LOCAL-AI] Iniciando generación para ${type} en ${platform}`);
-    console.log(`[LOCAL-AI] Keyword: "${keyword}", Context: "${userContext}", CTA: ${includeCTA}`);
+// Función de respaldo con plantillas (solo cuando falla la IA real)
+async function generateFallbackIdea(platform, keyword, type, userContext, includeCTA) {
+    console.log(`[FALLBACK] ⚠️ Usando plantillas como respaldo...`);
+    showNotification('Usando plantillas de respaldo - IA no disponible', 'warning');
     
     // Simular delay de procesamiento
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
@@ -420,10 +594,12 @@ async function generateLocalIdea(platform, keyword, type, userContext, includeCT
         content: formattedContent,
         hashtags: hashtags,
         platform: platform,
-        visualPrompt: visualPrompt
+        visualPrompt: visualPrompt,
+        generatedBy: '📄 Plantilla de Respaldo',
+        isTemplate: true
     };
     
-    console.log(`[LOCAL-AI] Idea generada exitosamente:`, result);
+    console.log(`[FALLBACK] ⚠️ Plantilla generada como respaldo:`, result);
     return result;
 }
 
@@ -706,7 +882,7 @@ function displayResultsClean(ideas) {
                     overflow-wrap: break-word !important;
                     white-space: normal !important;
                 ">
-                    ${isError ? '❌' : '✨'} ${idea.copyType}
+                    ${isError ? '❌' : (idea.isRealAI ? '🤖' : (idea.isTemplate ? '📄' : '✨'))} ${idea.copyType}${idea.generatedBy ? ` - ${idea.generatedBy}` : ''}
                 </h3>
                 <p style="
                     color: #212121 !important; 
