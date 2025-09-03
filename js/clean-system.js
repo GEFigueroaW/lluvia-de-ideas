@@ -143,7 +143,6 @@ ${includeCTA ? 'CTA INTEGRADO: Llamada a la acción ES PARTE de la estructura so
 
 RESPONDE en español enfocado 100% en "${keyword}", MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
     } else if (type === 'Posicionamiento y branding') {
-    } else if (type === 'Posicionamiento y branding') {
         userPrompt = `Crea copy de autoridad ULTRA-CONCISO para ${platform} ESPECÍFICAMENTE sobre "${keyword}". ${userContext ? `Contexto adicional: ${userContext}` : ''}
 
 TEMA CENTRAL OBLIGATORIO: "${keyword}" - Debes posicionarte como experto en este tema exacto.
