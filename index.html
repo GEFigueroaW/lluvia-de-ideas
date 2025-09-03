@@ -543,6 +543,69 @@
     <script src="js/clean-system.js"></script>
     <script src="js/force-transition.js"></script>
     
+    <!-- Forzar transición con CSS y JavaScript inline -->
+    <style>
+        /* Forzar ocultación de pantalla de carga después de 2 segundos */
+        body.app-loaded #loadingSection {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+        
+        body.app-loaded #mainApp {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        /* Auto-transición después de carga */
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; display: none; }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        #loadingSection {
+            animation: fadeOut 0.5s ease-in-out 2s forwards;
+        }
+        
+        #mainApp {
+            animation: fadeIn 0.5s ease-in-out 2.5s forwards;
+        }
+    </style>
+    
+    <script>
+        // Forzar transición después de 2 segundos
+        setTimeout(() => {
+            document.body.classList.add('app-loaded');
+            console.log('🎯 [INLINE] Clase app-loaded agregada');
+        }, 2000);
+        
+        // Método de emergencia - forzar después de 3 segundos sin condiciones
+        setTimeout(() => {
+            const loading = document.getElementById('loadingSection');
+            const main = document.getElementById('mainApp');
+            
+            if (loading) {
+                loading.style.display = 'none';
+                loading.style.opacity = '0';
+                loading.style.visibility = 'hidden';
+            }
+            
+            if (main) {
+                main.style.display = 'block';
+                main.style.opacity = '1';
+                main.style.visibility = 'visible';
+            }
+            
+            console.log('🚨 [EMERGENCY] Transición forzada');
+        }, 3000);
+    </script>
+    
     <!-- Estilos específicos para ideas y animaciones -->
     <style>
         /* Animaciones adicionales */
