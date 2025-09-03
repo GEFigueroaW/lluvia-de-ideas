@@ -223,10 +223,8 @@ function setupSocialNetworks() {
     console.log('[COPYWRITING] setupSocialNetworks iniciado, isUserPremium:', isUserPremium);
     const container = document.getElementById('socialNetworksContainer');
     if (!container) {
-        console.warn('[COPYWRITING] ERROR: No se encontró socialNetworksContainer - reintentando en 500ms');
-        // Reintentar después de un momento
-        setTimeout(setupSocialNetworks, 500);
-        return;
+        console.log('[COPYWRITING] INFO: socialNetworksContainer no encontrado - usando nueva estructura con carrusel');
+        return; // No reintentar, es normal en la nueva estructura
     }
 
     // Limpiar solo si hay elementos básicos para actualizar con el estado premium real
@@ -277,10 +275,8 @@ function setupCopyTypes() {
     console.log('[COPYWRITING] setupCopyTypes iniciado');
     const select = document.getElementById('copyType');
     if (!select) {
-        console.warn('[COPYWRITING] ERROR: No se encontró copyType select - reintentando en 500ms');
-        // Reintentar después de un momento
-        setTimeout(setupCopyTypes, 500);
-        return;
+        console.log('[COPYWRITING] INFO: copyType select no encontrado - usando nueva estructura con checkboxes');
+        return; // No reintentar, es normal en la nueva estructura
     }
 
     // Limpiar solo si hay elementos básicos para actualizar con el estado premium real
@@ -476,7 +472,8 @@ async function handleCopywritingSubmit(e) {
     e.preventDefault();
     
     const keyword = document.getElementById('copyKeyword').value.trim();
-    const copyType = document.getElementById('copyType').value;
+    const copyTypeElement = document.getElementById('copyType');
+    const copyType = copyTypeElement ? copyTypeElement.value : '';
     const context = document.getElementById('copyContext').value.trim();
     const includeCTA = document.getElementById('includeCTA').checked;
     

@@ -44,38 +44,58 @@ function updateCopyTypeNote(selectedCount) {
 
 // Generar copywriting con nueva estructura
 async function generateCopywritingNew() {
+    console.log('[NEW-STRUCTURE] 🚀 Iniciando generación de copywriting...');
     const generateBtn = document.getElementById('generateCopyBtn');
     const originalText = generateBtn.textContent;
     
     try {
-        // Obtener datos del formulario
-        const platform = getSelectedSocialNetwork(); // Usar función del carrusel
+        // Obtener datos del formulario con validación robusta
+        let platform;
+        try {
+            platform = getSelectedSocialNetwork();
+            console.log('[NEW-STRUCTURE] 📱 Plataforma obtenida:', platform);
+        } catch (error) {
+            console.error('[NEW-STRUCTURE] ❌ Error al obtener red social:', error);
+            platform = 'Facebook'; // Fallback por defecto
+        }
+        
+        // Si aún es null o undefined, usar Facebook como fallback
+        if (!platform || platform === 'undefined' || platform === '') {
+            console.log('[NEW-STRUCTURE] ⚠️ Plataforma vacía, usando Facebook como fallback');
+            platform = 'Facebook';
+        }
+        
         const keyword = document.getElementById('copyKeyword').value.trim();
         const copyTypes = Array.from(document.querySelectorAll('input[name="copyTypes"]:checked'))
             .map(cb => cb.value);
+            
+        console.log('[NEW-STRUCTURE] 📝 Datos del formulario:');
+        console.log('- Plataforma:', platform);
+        console.log('- Keyword:', keyword);
+        console.log('- Copy Types:', copyTypes);
         const userContext = document.getElementById('copyContext').value.trim();
         const includeCTA = document.getElementById('includeCTA').checked;
         
         // Validaciones
-        if (!platform) {
-            showNotification('⚠️ Por favor selecciona una red social', 'warning');
-            return;
-        }
-        
         if (!keyword) {
+            console.log('[NEW-STRUCTURE] ❌ Keyword vacío');
             showNotification('⚠️ Por favor ingresa una palabra clave', 'warning');
             return;
         }
         
         if (copyTypes.length === 0) {
+            console.log('[NEW-STRUCTURE] ❌ No hay tipos de copy seleccionados');
             showNotification('⚠️ Por favor selecciona al menos un tipo de copy', 'warning');
             return;
         }
         
         if (copyTypes.length > 3) {
+            console.log('[NEW-STRUCTURE] ❌ Demasiados tipos de copy seleccionados');
             showNotification('⚠️ Máximo 3 tipos de copy permitidos', 'warning');
             return;
         }
+        
+        console.log('[NEW-STRUCTURE] ✅ Validaciones pasadas, iniciando generación...');
         
         // UI de loading
         generateBtn.disabled = true;

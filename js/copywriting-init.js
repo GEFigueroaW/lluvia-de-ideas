@@ -118,8 +118,8 @@ function initBasicCopyTypes() {
     
     const select = document.getElementById('copyType');
     if (!select) {
-        console.log('[COPYWRITING-INIT] ❌ Select no encontrado, elemento puede no existir aún');
-        return false;
+        console.log('[COPYWRITING-INIT] ✍️ Select copyType no encontrado - usando nueva estructura con checkboxes');
+        return true; // Retornar true porque no es un error en la nueva estructura
     }
 
     // Solo inicializar si no hay opciones o solo tiene la opción por defecto
