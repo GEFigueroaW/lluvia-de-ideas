@@ -558,13 +558,15 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
         visualPrompt = generateVisualPrompt(platform, keyword, type, formattedContent);
     }
     
-    // Generar CTA específico con IA real
-    let ctaContent;
-    try {
-        ctaContent = await generateCTAWithAI(platform, keyword, type, formattedContent);
-    } catch (error) {
-        console.log(`[DEEPSEEK] Error generando CTA, usando fallback`);
-        ctaContent = generateFallbackCTA(platform, type);
+    // Generar CTA específico con IA real SOLO si se solicita
+    let ctaContent = null;
+    if (includeCTA) {
+        try {
+            ctaContent = await generateCTAWithAI(platform, keyword, type, formattedContent);
+        } catch (error) {
+            console.log(`[DEEPSEEK] Error generando CTA, usando fallback`);
+            ctaContent = generateFallbackCTA(platform, type);
+        }
     }
     
     console.log(`[DEEPSEEK] 🎯 Contenido IA generado exitosamente`);
@@ -576,7 +578,8 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
         generatedBy: '🤖 IA Real (DeepSeek)',
         isRealAI: true,
         visualPrompt: visualPrompt,
-        cta: ctaContent
+        cta: ctaContent,
+        includeCTA: includeCTA
     };
 }
 
@@ -812,7 +815,9 @@ async function generateFallbackIdea(platform, keyword, type, userContext, includ
         platform: platform,
         visualPrompt: visualPrompt,
         generatedBy: '📄 Plantilla de Respaldo',
-        isTemplate: true
+        isTemplate: true,
+        includeCTA: includeCTA,
+        cta: null // Las plantillas incluyen el CTA directamente en el contenido
     };
     
     console.log(`[FALLBACK] ⚠️ Plantilla generada como respaldo:`, result);
@@ -1118,7 +1123,9 @@ function displayResultsClean(ideas) {
                     hyphens: auto !important;
                     flex-grow: 1 !important;
                     display: block !important;
-                ">${idea.content}</p>
+                ">${idea.content}${idea.cta && idea.includeCTA ? `
+
+🚀 ${idea.cta}` : ''}</p>
                 
                 ${idea.visualPrompt ? `
                 <div style="
@@ -1143,33 +1150,6 @@ function displayResultsClean(ideas) {
                         font-family: Arial, sans-serif !important;
                         white-space: pre-line !important;
                     ">${idea.visualPrompt}</p>
-                </div>
-                ` : ''}
-                
-                ${idea.cta ? `
-                <div style="
-                    background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
-                    padding: 15px !important;
-                    border-radius: 10px !important;
-                    border-left: 3px solid #ff6348 !important;
-                    margin: 15px 0 !important;
-                ">
-                    <h4 style="
-                        color: #ff6348 !important;
-                        margin: 0 0 10px 0 !important;
-                        font-size: 14px !important;
-                        font-weight: bold !important;
-                        font-family: Arial, sans-serif !important;
-                    ">🚀 Llamada a la Acción (CTA):</h4>
-                    <p style="
-                        color: #d63031 !important;
-                        font-size: 14px !important;
-                        font-weight: 500 !important;
-                        line-height: 1.6 !important;
-                        margin: 0 !important;
-                        font-family: Arial, sans-serif !important;
-                        white-space: pre-line !important;
-                    ">${idea.cta}</p>
                 </div>
                 ` : ''}
                 
