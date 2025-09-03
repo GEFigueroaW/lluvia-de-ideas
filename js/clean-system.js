@@ -11,34 +11,42 @@ window.currentIdeas = {};
 function showNotification(message, type = 'info') {
     console.log(`[NOTIFICATION] ${type.toUpperCase()}: ${message}`);
     
-    // Crear elemento de notificación visual
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 15px 20px;
-        border-radius: 8px;
-        color: white;
-        font-weight: bold;
-        z-index: 10000;
-        max-width: 300px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        ${type === 'error' ? 'background: #ff4444;' : ''}
-        ${type === 'warning' ? 'background: #ffaa00;' : ''}
-        ${type === 'success' ? 'background: #00ff88; color: #003311;' : ''}
-        ${type === 'info' ? 'background: #007AFF;' : ''}
-    `;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // Remover después de 3 segundos
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.parentNode.removeChild(notification);
-        }
-    }, 3000);
+    try {
+        // Crear elemento de notificación visual
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            ${type === 'error' ? 'background: #ff4444;' : ''}
+            ${type === 'warning' ? 'background: #ffaa00;' : ''}
+            ${type === 'success' ? 'background: #00ff88; color: #003311;' : ''}
+            ${type === 'info' ? 'background: #007AFF;' : ''}
+        `;
+        notification.textContent = message;
+        
+        document.body.appendChild(notification);
+        
+        // Remover después de 3 segundos
+        setTimeout(() => {
+            try {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            } catch (e) {
+                console.log('[NOTIFICATION] Error al remover notificación:', e);
+            }
+        }, 3000);
+    } catch (error) {
+        console.error('[NOTIFICATION] Error al crear notificación:', error);
+    }
 }
 
 // Función para mostrar progreso de generación
@@ -317,37 +325,62 @@ function updateCopyTypeNoteClean(selectedCount) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✅ [CLEAN-SYSTEM] DOM cargado, inicializando...');
     
-    // Manejar selección de tipos de copy
-    handleCopyTypeSelectionClean();
-    
-    // Manejar envío del formulario
-    const form = document.getElementById('copywritingForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            generateCopywritingClean();
-        });
-        console.log('✅ [CLEAN-SYSTEM] Formulario configurado');
-    } else {
-        console.warn('[CLEAN-SYSTEM] ⚠️ Formulario no encontrado');
+    try {
+        // Manejar selección de tipos de copy
+        handleCopyTypeSelectionClean();
+        
+        // Manejar envío del formulario
+        const form = document.getElementById('copywritingForm');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                generateCopywritingClean();
+            });
+            console.log('✅ [CLEAN-SYSTEM] Formulario configurado');
+        } else {
+            console.warn('[CLEAN-SYSTEM] ⚠️ Formulario no encontrado');
+            
+            // Buscar formulario con otros selectores
+            const alternativeForm = document.querySelector('form');
+            if (alternativeForm) {
+                alternativeForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    generateCopywritingClean();
+                });
+                console.log('✅ [CLEAN-SYSTEM] Formulario alternativo configurado');
+            }
+        }
+        
+        // Configurar botón de generar directamente
+        const generateBtn = document.getElementById('generateCopyBtn');
+        if (generateBtn) {
+            generateBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                generateCopywritingClean();
+            });
+            console.log('✅ [CLEAN-SYSTEM] Botón generar configurado');
+        } else {
+            console.warn('[CLEAN-SYSTEM] ⚠️ Botón generar no encontrado');
+            
+            // Buscar botón con otros selectores
+            const alternativeBtn = document.querySelector('button[type="submit"], .btn-generate, .generate-btn');
+            if (alternativeBtn) {
+                alternativeBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    generateCopywritingClean();
+                });
+                console.log('✅ [CLEAN-SYSTEM] Botón alternativo configurado');
+            }
+        }
+        
+        // Inicializar nota
+        updateCopyTypeNoteClean(1);
+        
+        console.log('🎉 [CLEAN-SYSTEM] Sistema limpio inicializado correctamente');
+        
+    } catch (error) {
+        console.error('[CLEAN-SYSTEM] Error en inicialización:', error);
     }
-    
-    // Configurar botón de generar directamente
-    const generateBtn = document.getElementById('generateCopyBtn');
-    if (generateBtn) {
-        generateBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            generateCopywritingClean();
-        });
-        console.log('✅ [CLEAN-SYSTEM] Botón generar configurado');
-    } else {
-        console.warn('[CLEAN-SYSTEM] ⚠️ Botón generar no encontrado');
-    }
-    
-    // Inicializar nota
-    updateCopyTypeNoteClean(1);
-    
-    console.log('🎉 [CLEAN-SYSTEM] Sistema limpio inicializado correctamente');
 });
 
 // Exponer funciones globalmente para compatibilidad
