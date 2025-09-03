@@ -609,15 +609,18 @@ async function generateThreeIdeas() {
         </div>
     `;
     
-    const types = [
+    // Obtener tipos seleccionados del carousel
+    const selectedTypes = getSelectedCopyTypes ? getSelectedCopyTypes() : [
         'Informativo y educativo',
         'Venta directa y persuasivo', 
         'Posicionamiento y branding'
     ];
     
+    console.log('[GENERATE] 🎯 Tipos a generar:', selectedTypes);
+    
     try {
         const ideas = await Promise.all(
-            types.map(type => generateIdeaWithAI(platform, keyword, type, context, includeCTA))
+            selectedTypes.map(type => generateIdeaWithAI(platform, keyword, type, context, includeCTA))
         );
         
         window.currentIdeas = {
@@ -634,8 +637,7 @@ async function generateThreeIdeas() {
         // Guardar en historial
         if (typeof window.historyManager !== 'undefined') {
             try {
-                const copyTypes = getSelectedCopyTypes ? getSelectedCopyTypes() : types;
-                window.historyManager.saveToHistory(platform, keyword, context, ideas, copyTypes);
+                window.historyManager.saveToHistory(platform, keyword, context, ideas, selectedTypes);
                 console.log('[HISTORY] ✅ Sesión guardada en historial');
             } catch (error) {
                 console.error('[HISTORY] Error al guardar en historial:', error);

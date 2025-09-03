@@ -16,6 +16,7 @@ class CopyCarousel {
         this.items = Array.from(this.carousel.querySelectorAll('.copy-carousel-item'));
         this.setupEventListeners();
         this.updatePositions();
+        this.selectDefaultTypes(); // Seleccionar tipos predeterminados
         this.updateSelections();
         
         console.log('🎠 Copy Carousel inicializado con', this.items.length, 'elementos');
@@ -157,6 +158,25 @@ class CopyCarousel {
         console.log('🗑️ Eliminado:', copyType);
     }
     
+    selectDefaultTypes() {
+        // Seleccionar automáticamente los primeros 3 tipos como predeterminados
+        const defaultTypes = [
+            'Informativo y educativo',
+            'Venta directa y persuasivo', 
+            'Posicionamiento y branding'
+        ];
+        
+        defaultTypes.forEach(type => {
+            const item = this.items.find(item => item.getAttribute('data-copy') === type);
+            if (item && !this.selectedTypes.includes(type)) {
+                this.selectedTypes.push(type);
+                item.classList.add('selected');
+            }
+        });
+        
+        console.log('🎯 Tipos predeterminados seleccionados:', this.selectedTypes);
+    }
+    
     updateSelections() {
         const countElement = document.getElementById('selectionsCount');
         const listElement = document.getElementById('selectionsList');
@@ -255,6 +275,24 @@ function rotateCopyCarousel(direction) {
     if (window.copyCarousel) {
         window.copyCarousel.rotate(direction);
     }
+}
+
+// Función global para obtener tipos seleccionados
+function getSelectedCopyTypes() {
+    if (window.copyCarousel && window.copyCarousel.selectedTypes.length > 0) {
+        console.log('🎯 [COPY-TYPES] Tipos seleccionados:', window.copyCarousel.selectedTypes);
+        return window.copyCarousel.selectedTypes;
+    }
+    
+    // Fallback a tipos predeterminados si no hay selección
+    const defaultTypes = [
+        'Informativo y educativo',
+        'Venta directa y persuasivo', 
+        'Posicionamiento y branding'
+    ];
+    
+    console.log('⚠️ [COPY-TYPES] No hay selección, usando tipos predeterminados:', defaultTypes);
+    return defaultTypes;
 }
 
 // Inicializar cuando el DOM esté listo
