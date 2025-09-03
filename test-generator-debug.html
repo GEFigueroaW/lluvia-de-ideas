@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST GENERADOR - Debug Completo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin: 0;
+        }
+        .debug-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            border-left: 4px solid #00ff88;
+        }
+        .error {
+            border-left-color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+        }
+        .success {
+            border-left-color: #00ff88;
+            background: rgba(0, 255, 136, 0.1);
+        }
+        .warning {
+            border-left-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.1);
+        }
+        pre {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+        }
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #003311;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            transform: scale(1.05);
+        }
+        .logo-test {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <h1>🔍 TEST GENERADOR - Debug Completo</h1>
+        
+        <div class="test-section" id="scripts-test">
+            <h3>📋 Test de Scripts</h3>
+            <div id="scripts-results"></div>
+        </div>
+        
+        <div class="test-section" id="carousel-test">
+            <h3>🎠 Test del Carrusel</h3>
+            <div id="carousel-results"></div>
+            <div id="carousel-live"></div>
+        </div>
+        
+        <div class="test-section" id="form-test">
+            <h3>📝 Test del Formulario</h3>
+            <div id="form-results"></div>
+        </div>
+        
+        <div class="test-section" id="generation-test">
+            <h3>🚀 Test de Generación</h3>
+            <button class="btn" onclick="testGeneration()">🧪 Probar Generación</button>
+            <div id="generation-results"></div>
+        </div>
+        
+        <div class="test-section" id="console-logs">
+            <h3>📊 Logs de Consola</h3>
+            <button class="btn" onclick="clearLogs()">🧹 Limpiar Logs</button>
+            <pre id="console-output"></pre>
+        </div>
+    </div>
+
+    <!-- Cargar scripts en el mismo orden que index.html -->
+    <script src="simple-bypass.js"></script>
+    <script src="js/copywriting-init.js"></script>
+    <script src="js/simple-social-carousel.js"></script>
+    <script src="js/new-structure.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script src="js/autocorrector.js"></script>
+    <script src="debug-helpers.js"></script>
+
+    <script>
+        let consoleLogs = [];
+        
+        // Interceptar console.log para capturar mensajes
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleLogs.push(`[LOG] ${args.join(' ')}`);
+            updateConsoleLogs();
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            consoleLogs.push(`[WARN] ${args.join(' ')}`);
+            updateConsoleLogs();
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            consoleLogs.push(`[ERROR] ${args.join(' ')}`);
+            updateConsoleLogs();
+        };
+        
+        function updateConsoleLogs() {
+            const output = document.getElementById('console-output');
+            if (output) {
+                output.textContent = consoleLogs.slice(-50).join('\n'); // Últimos 50 logs
+            }
+        }
+        
+        function clearLogs() {
+            consoleLogs = [];
+            updateConsoleLogs();
+        }
+        
+        function setTestResult(sectionId, status, content) {
+            const section = document.getElementById(sectionId);
+            const resultsDiv = section.querySelector('[id$="-results"]');
+            
+            section.className = `test-section ${status}`;
+            resultsDiv.innerHTML = content;
+        }
+        
+        function testScripts() {
+            console.log('🧪 [TEST] Iniciando test de scripts...');
+            
+            const requiredFunctions = [
+                'SimpleSocialCarousel',
+                'getSelectedSocialNetwork',
+                'generateCopywritingNew'
+            ];
+            
+            let results = '<h4>Funciones Requeridas:</h4>';
+            let allOk = true;
+            
+            requiredFunctions.forEach(func => {
+                const exists = typeof window[func] !== 'undefined';
+                results += `<div class="logo-test">
+                    ${exists ? '✅' : '❌'} ${func}: ${exists ? 'Disponible' : 'NO DISPONIBLE'}
+                </div>`;
+                if (!exists) allOk = false;
+            });
+            
+            setTestResult('scripts-test', allOk ? 'success' : 'error', results);
+            return allOk;
+        }
+        
+        function testCarousel() {
+            console.log('🧪 [TEST] Iniciando test del carrusel...');
+            
+            try {
+                // Crear contenedor para el carrusel
+                const liveDiv = document.getElementById('carousel-live');
+                liveDiv.innerHTML = '<div id="socialCarouselContainer"></div>';
+                
+                // Inicializar carrusel
+                if (typeof SimpleSocialCarousel !== 'undefined') {
+                    const carousel = new SimpleSocialCarousel();
+                    carousel.init();
+                    
+                    // Verificar elementos
+                    setTimeout(() => {
+                        const svgs = document.querySelectorAll('#socialCarouselContainer svg');
+                        const currentIcon = document.querySelector('#socialCarouselContainer #currentIcon');
+                        const currentName = document.querySelector('#socialCarouselContainer #currentName');
+                        
+                        let results = `<h4>Estado del Carrusel:</h4>
+                            <div class="logo-test">✅ SimpleSocialCarousel inicializado</div>
+                            <div class="logo-test">${currentIcon ? '✅' : '❌'} Icono actual: ${currentIcon ? 'Presente' : 'Ausente'}</div>
+                            <div class="logo-test">${currentName ? '✅' : '❌'} Nombre actual: ${currentName ? currentName.textContent : 'Ausente'}</div>
+                            <div class="logo-test">${svgs.length > 0 ? '✅' : '❌'} SVGs encontrados: ${svgs.length}</div>`;
+                        
+                        // Test de getSelectedSocialNetwork
+                        try {
+                            const selectedNetwork = getSelectedSocialNetwork();
+                            results += `<div class="logo-test">✅ getSelectedSocialNetwork(): ${selectedNetwork}</div>`;
+                            setTestResult('carousel-test', 'success', results);
+                        } catch (error) {
+                            results += `<div class="logo-test">❌ getSelectedSocialNetwork() falló: ${error.message}</div>`;
+                            setTestResult('carousel-test', 'error', results);
+                        }
+                    }, 1000);
+                    
+                } else {
+                    setTestResult('carousel-test', 'error', '<div class="logo-test">❌ SimpleSocialCarousel no disponible</div>');
+                }
+                
+            } catch (error) {
+                setTestResult('carousel-test', 'error', `<div class="logo-test">❌ Error: ${error.message}</div>`);
+            }
+        }
+        
+        function testForm() {
+            console.log('🧪 [TEST] Iniciando test del formulario...');
+            
+            const formElements = [
+                { id: 'copyKeyword', name: 'Campo de palabra clave' },
+                { id: 'copyContext', name: 'Campo de contexto' },
+                { id: 'includeCTA', name: 'Toggle CTA' }
+            ];
+            
+            let results = '<h4>Elementos del Formulario:</h4>';
+            let allOk = true;
+            
+            formElements.forEach(element => {
+                const exists = !!document.getElementById(element.id);
+                results += `<div class="logo-test">
+                    ${exists ? '✅' : '❌'} ${element.name}: ${exists ? 'Presente' : 'Ausente'}
+                </div>`;
+                if (!exists) allOk = false;
+            });
+            
+            // Test de checkboxes
+            const checkboxes = document.querySelectorAll('input[name="copyTypes"]');
+            const checkedBoxes = document.querySelectorAll('input[name="copyTypes"]:checked');
+            
+            results += `<div class="logo-test">
+                ${checkboxes.length > 0 ? '✅' : '❌'} Checkboxes de copyTypes: ${checkboxes.length} encontrados
+            </div>`;
+            results += `<div class="logo-test">
+                ${checkedBoxes.length > 0 ? '✅' : '❌'} Checkboxes marcados: ${checkedBoxes.length}
+            </div>`;
+            
+            if (checkboxes.length === 0 || checkedBoxes.length === 0) allOk = false;
+            
+            setTestResult('form-test', allOk ? 'success' : 'error', results);
+            return allOk;
+        }
+        
+        async function testGeneration() {
+            console.log('🧪 [TEST] Iniciando test de generación...');
+            
+            // Limpiar logs anteriores
+            clearLogs();
+            
+            try {
+                // Simular datos del formulario
+                const keywordField = document.getElementById('copyKeyword');
+                const ctaField = document.getElementById('includeCTA');
+                
+                if (keywordField) keywordField.value = 'iPhone 15 Pro';
+                if (ctaField) ctaField.checked = true;
+                
+                // Marcar al menos un checkbox si no hay ninguno marcado
+                const checkedBoxes = document.querySelectorAll('input[name="copyTypes"]:checked');
+                if (checkedBoxes.length === 0) {
+                    const firstCheckbox = document.querySelector('input[name="copyTypes"]');
+                    if (firstCheckbox) firstCheckbox.checked = true;
+                }
+                
+                // Llamar a la función de generación
+                if (typeof generateCopywritingNew === 'function') {
+                    setTestResult('generation-test', 'warning', '<div class="logo-test">⏳ Iniciando generación...</div>');
+                    
+                    await generateCopywritingNew();
+                    
+                    setTimeout(() => {
+                        setTestResult('generation-test', 'success', '<div class="logo-test">✅ Generación completada (revisar logs)</div>');
+                    }, 2000);
+                    
+                } else {
+                    setTestResult('generation-test', 'error', '<div class="logo-test">❌ generateCopywritingNew no disponible</div>');
+                }
+                
+            } catch (error) {
+                console.error('Error en test de generación:', error);
+                setTestResult('generation-test', 'error', `<div class="logo-test">❌ Error: ${error.message}</div>`);
+            }
+        }
+        
+        function runAllTests() {
+            console.log('🚀 [TEST] Iniciando batería completa de tests...');
+            
+            setTimeout(() => testScripts(), 500);
+            setTimeout(() => testCarousel(), 1000);
+            setTimeout(() => testForm(), 1500);
+        }
+        
+        // Ejecutar tests cuando esté listo
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ [TEST] DOM cargado, iniciando tests...');
+            runAllTests();
+        });
+        
+        window.addEventListener('load', () => {
+            console.log('✅ [TEST] Página completamente cargada');
+        });
+    </script>
+</body>
+</html>
