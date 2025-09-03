@@ -510,6 +510,12 @@ function displayResultsClean(ideas) {
             box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;
             max-width: 100% !important;
             width: 100% !important;
+            min-height: auto !important;
+            height: auto !important;
+            overflow: visible !important;
+            box-sizing: border-box !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
         `;
         
         // Insertar después del formulario
@@ -554,15 +560,25 @@ function displayResultsClean(ideas) {
                 transition: all 0.3s ease !important;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
                 border: 1px solid #e0e0e0 !important;
+                width: 100% !important;
+                min-height: auto !important;
+                height: auto !important;
+                overflow: visible !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                box-sizing: border-box !important;
             " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'">
                 <h3 style="
                     color: ${isError ? '#f44336' : '#1976D2'} !important; 
                     margin: 0 0 15px 0 !important; 
-                    display: flex !important; 
-                    align-items: center !important; 
+                    display: block !important; 
                     font-size: 18px !important; 
                     font-weight: bold !important;
                     font-family: Arial, sans-serif !important;
+                    line-height: 1.4 !important;
+                    word-wrap: break-word !important;
+                    overflow-wrap: break-word !important;
+                    white-space: normal !important;
                 ">
                     ${isError ? '❌' : '✨'} ${idea.copyType}
                 </h3>
@@ -574,20 +590,40 @@ function displayResultsClean(ideas) {
                     font-weight: 400 !important;
                     font-family: Arial, sans-serif !important;
                     text-align: left !important;
+                    word-wrap: break-word !important;
+                    overflow-wrap: break-word !important;
+                    white-space: normal !important;
+                    max-width: 100% !important;
+                    overflow: visible !important;
+                    hyphens: auto !important;
                 ">${idea.content}</p>
-                <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-top: 20px !important; padding-top: 15px !important; border-top: 1px solid #e0e0e0 !important;">
+                <div style="
+                    display: flex !important; 
+                    flex-wrap: wrap !important;
+                    justify-content: space-between !important; 
+                    align-items: flex-start !important; 
+                    margin-top: 20px !important; 
+                    padding-top: 15px !important; 
+                    border-top: 1px solid #e0e0e0 !important;
+                    gap: 10px !important;
+                ">
                     <p style="
                         color: #666666 !important; 
                         font-style: italic !important; 
                         margin: 0 !important; 
                         font-size: 14px !important;
                         font-family: Arial, sans-serif !important;
+                        word-wrap: break-word !important;
+                        overflow-wrap: break-word !important;
+                        white-space: normal !important;
+                        flex: 1 !important;
+                        min-width: 200px !important;
                     ">${idea.hashtags}</p>
                     ${!isError ? `<button onclick="copyToClipboard('${key}')" style="
                         background: linear-gradient(45deg, #2196F3, #1976D2) !important;
                         color: white !important;
                         border: none !important;
-                        padding: 10px 20px !important;
+                        padding: 12px 24px !important;
                         border-radius: 8px !important;
                         cursor: pointer !important;
                         font-size: 13px !important;
@@ -595,6 +631,9 @@ function displayResultsClean(ideas) {
                         transition: all 0.2s ease !important;
                         box-shadow: 0 2px 8px rgba(33,150,243,0.3) !important;
                         font-family: Arial, sans-serif !important;
+                        white-space: nowrap !important;
+                        flex-shrink: 0 !important;
+                        min-width: auto !important;
                     " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(33,150,243,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(33,150,243,0.3)'">
                         📋 Copiar Idea
                     </button>` : ''}
@@ -604,6 +643,48 @@ function displayResultsClean(ideas) {
     });
 
     console.log('[CLEAN-SYSTEM] HTML generado:', html.substring(0, 200) + '...');
+    
+    // Agregar estilos responsivos y de ajuste automático
+    const responsiveStyle = document.createElement('style');
+    responsiveStyle.innerHTML = `
+        #results * {
+            box-sizing: border-box !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
+        }
+        
+        #results {
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow: visible !important;
+        }
+        
+        #results > div {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-height: auto !important;
+            height: auto !important;
+        }
+        
+        @media (max-width: 768px) {
+            #results > div > div:last-child {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 15px !important;
+            }
+            
+            #results button {
+                width: 100% !important;
+                max-width: 200px !important;
+            }
+        }
+    `;
+    
+    if (!document.getElementById('responsive-results-style')) {
+        responsiveStyle.id = 'responsive-results-style';
+        document.head.appendChild(responsiveStyle);
+    }
+    
     resultsContainer.innerHTML = html;
     
     // Asegurar que el contenedor sea visible
