@@ -1,8 +1,5 @@
 // =========================================
-// SISTEMA LIMPIO - COPYWRITING CO    console.log(`[DEEPSEEK] 📏 OPTIMIZADO 2025: ${maxTokens} tokens para ${platform} (≈${Math.round(maxTokens * 0.7)} palabras máximo)`);
-    
-    // Mostrar límite actualizado en la interfaz
-    showPlatformWordLimit(platform, Math.round(maxTokens * 0.7)); IA REAL
+// SISTEMA LIMPIO - COPYWRITING CON IA REAL
 // =========================================
 
 console.log('🚀 [CLEAN-SYSTEM] Iniciando sistema limpio...');
