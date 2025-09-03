@@ -88,98 +88,81 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
     // System prompt optimizado para máximo impacto en mínimas palabras
     const systemPrompt = `Eres un copywriter experto en capturar atención ultra-rápida especializado en ${platform}. 
 
-REGLAS CRÍTICAS: 
+REGLAS CRÍTICAS OBLIGATORIAS: 
 - Responde SIEMPRE en español
 - MÁXIMO ${Math.round(maxTokens * 0.7)} palabras para ${platform}
-- Cada palabra debe ser IMPRESCINDIBLE
+- NUNCA te alejes del tema específico que se te solicita
+- Cada palabra debe ser IMPRESCINDIBLE y RELEVANTE al tema
 - Estructura: Hook (1 línea) + Insight (2 líneas) + CTA (1 línea)
 - Elimina TODAS las palabras de relleno
 - Usa números específicos, no generalidades
-- Provoca reacción emocional inmediata en primeras 5 palabras`;
+- Provoca reacción emocional inmediata en primeras 5 palabras
+- MANTÉN COHERENCIA TOTAL con el tema solicitado en todo momento`;
     
     // User prompts específicos con instrucciones de longitud
     let userPrompt = '';
     
     if (type === 'Informativo y educativo') {
-        userPrompt = `Crea copy educativo ULTRA-CONCISO para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+        userPrompt = `Crea copy educativo ULTRA-CONCISO para ${platform} ESPECÍFICAMENTE sobre el tema "${keyword}". ${userContext ? `Contexto adicional: ${userContext}` : ''}
+
+TEMA OBLIGATORIO: "${keyword}" - DEBES mantenerte 100% enfocado en este tema exacto.
 
 LÍMITE ESTRICTO: MÁXIMO ${Math.round(maxTokens * 0.7)} palabras para ${platform}.
 
-ESTRUCTURA OBLIGATORIA:
-❌ [Creencia/error común en 5-7 palabras]
-✅ [Insight contraintuitivo específico en 15-20 palabras]
-💡 [Acción concreta implementable HOY en 8-12 palabras]
+ESTRUCTURA OBLIGATORIA sobre "${keyword}":
+❌ [Error común sobre "${keyword}" en 5-7 palabras]
+✅ [Insight específico sobre "${keyword}" en 15-20 palabras]
+💡 [Acción práctica sobre "${keyword}" implementable HOY en 8-12 palabras]
 
-PROHIBIDO: 
-- Palabras de relleno ("realmente", "básicamente", "en general")
-- Explicaciones largas
-- Teoría sin acción
-- Frases cliché
+VALIDACIÓN CRÍTICA:
+- Cada oración DEBE mencionar o relacionarse directamente con "${keyword}"
+- NO cambies de tema ni uses ejemplos externos
+- Mantén TOTAL coherencia con "${keyword}"
 
-${includeCTA ? 'CTA INTEGRADO: Incluye llamada a la acción EN LA ESTRUCTURA, no como anexo.' : 'SIN CTA final.'}
+${includeCTA ? 'CTA INTEGRADO: Llamada a la acción relacionada con "${keyword}".' : 'SIN CTA final.'}
 
-EJEMPLO DE CONCISIÓN:
-❌ NO: "Muchas personas piensan que para ser exitoso necesitan trabajar muchísimas horas"
-✅ SÍ: "Trabajar 12+ horas = menos productividad"
-
-RESPONDE en español, MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
+RESPONDE en español sobre "${keyword}" únicamente, MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
     } else if (type === 'Venta directa y persuasivo') {
-        userPrompt = `Crea copy de venta ULTRA-PERSUASIVO para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+        userPrompt = `Crea copy de venta ULTRA-PERSUASIVO para ${platform} ESPECÍFICAMENTE sobre "${keyword}". ${userContext ? `Contexto adicional: ${userContext}` : ''}
+
+TEMA CENTRAL OBLIGATORIO: "${keyword}" - Todo el copy debe girar en torno a este tema.
 
 LÍMITE ESTRICTO: MÁXIMO ${Math.round(maxTokens * 0.7)} palabras para ${platform}.
 
-ESTRUCTURA DE CONVERSIÓN:
-🔥 [Frustración específica en 5-8 palabras]
-⚡ [Solución + beneficio cuantificado en 15-20 palabras]
-🎯 [CTA directo + urgencia real en 8-12 palabras]
+ESTRUCTURA DE CONVERSIÓN sobre "${keyword}":
+🔥 [Frustración específica relacionada con "${keyword}" en 5-8 palabras]
+⚡ [Solución para "${keyword}" + beneficio cuantificado en 15-20 palabras]
+🎯 [CTA directo relacionado con "${keyword}" + urgencia real en 8-12 palabras]
 
-REGLAS DE PERSUASIÓN:
-- Usa números específicos, no "muchos" o "varios"
-- Menciona consecuencia CALCULABLE de no actuar
-- Incluye prueba social concreta (no genérica)
-- Crea urgencia auténtica (fecha, cantidad, tiempo)
+VALIDACIÓN CRÍTICA:
+- Cada línea DEBE estar directamente relacionada con "${keyword}"
+- NO uses ejemplos genéricos sin conexión con "${keyword}"
+- Mantén coherencia total con el tema "${keyword}"
 
-PROHIBIDO:
-- Promesas vagas ("cambiar tu vida")
-- Urgencia falsa ("solo por hoy")
-- Superlativos sin prueba ("el mejor", "único")
+${includeCTA ? 'CTA INTEGRADO: Llamada a la acción ES PARTE de la estructura sobre "${keyword}".' : 'SIN CTA adicional.'}
 
-${includeCTA ? 'CTA INTEGRADO: La llamada a la acción es PARTE de la estructura, no extra.' : 'SIN CTA adicional.'}
-
-EJEMPLO:
-🔥 NO: "¿Te cuesta conseguir clientes?" 
-🔥 SÍ: "3 meses sin clientes nuevos"
-
-RESPONDE en español, MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
+RESPONDE en español enfocado 100% en "${keyword}", MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
     } else if (type === 'Posicionamiento y branding') {
-        userPrompt = `Crea copy de autoridad ULTRA-CONCISO para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+    } else if (type === 'Posicionamiento y branding') {
+        userPrompt = `Crea copy de autoridad ULTRA-CONCISO para ${platform} ESPECÍFICAMENTE sobre "${keyword}". ${userContext ? `Contexto adicional: ${userContext}` : ''}
+
+TEMA CENTRAL OBLIGATORIO: "${keyword}" - Debes posicionarte como experto en este tema exacto.
 
 LÍMITE ESTRICTO: MÁXIMO ${Math.round(maxTokens * 0.7)} palabras para ${platform}.
 
-ESTRUCTURA DE AUTORIDAD:
-💭 [Creencia común que desafías en 5-8 palabras]
-🎪 [Tu filosofía única + ejemplo específico en 15-20 palabras]
-🚀 [Para quién eres + resultado en 8-12 palabras]
+ESTRUCTURA DE AUTORIDAD sobre "${keyword}":
+💭 [Creencia común sobre "${keyword}" que desafías en 5-8 palabras]
+🎪 [Tu filosofía única sobre "${keyword}" + ejemplo específico en 15-20 palabras]
+🚀 [Para quién eres en "${keyword}" + resultado en 8-12 palabras]
 
-CRITERIOS DE POSICIONAMIENTO:
-- Demuestra experiencia con caso específico, no genérico
-- Define claramente para quién NO eres (exclusividad)
-- Presenta metodología/framework propio
-- Usa datos concretos de tu experiencia
+VALIDACIÓN CRÍTICA:
+- Todo debe demostrar tu expertise ESPECÍFICA en "${keyword}"
+- NO uses ejemplos generales sin relación con "${keyword}"
+- Posiciónate como autoridad EN "${keyword}" únicamente
 
-PROHIBIDO:
-- Lenguaje corporativo vacío
-- Afirmaciones sin respaldo específico
-- "Ayudo a empresas" (muy genérico)
-- "Años de experiencia" sin especificar
+${includeCTA ? 'CTA INTEGRADO: Llamada a la acción relacionada con tu expertise en "${keyword}".' : 'SIN CTA adicional.'}
 
-${includeCTA ? 'CTA INTEGRADO: Llamada a la acción ES PARTE de la estructura de autoridad.' : 'SIN CTA adicional.'}
-
-EJEMPLO:
-💭 NO: "El networking es clave para el éxito"
-💭 SÍ: "Eventos networking = pérdida de tiempo"
-
-RESPONDE en español, MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
+RESPONDE en español como experto en "${keyword}", MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
     }
     
     const requestBody = {
