@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrusel de Tipos de Copy</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .carousel-container {
+            perspective: 1000px;
+            height: 200px;
+            overflow: hidden;
+            width: 300px;
+        }
+
+        .carousel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-item {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 5px 0;
+            width: 80%;
+            text-align: center;
+            font-size: 1.2em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .selected-container {
+            margin-top: 20px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .selected-container span {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background: #007bff;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="carousel-container">
+        <div class="carousel" id="carousel">
+            <div class="carousel-item" data-copy="Copy 1">✍️ Copy 1</div>
+            <div class="carousel-item" data-copy="Copy 2">💡 Copy 2</div>
+            <div class="carousel-item" data-copy="Copy 3">📢 Copy 3</div>
+            <div class="carousel-item" data-copy="Copy 4">🎯 Copy 4</div>
+            <div class="carousel-item" data-copy="Copy 5">🔥 Copy 5</div>
+        </div>
+    </div>
+
+    <div class="selected-container" id="selected">
+        <strong>Seleccionados:</strong>
+    </div>
+
+    <button id="confirm" disabled>Confirmar Selección</button>
+
+    <script>
+        const carousel = document.getElementById('carousel');
+        const selectedContainer = document.getElementById('selected');
+        const confirmButton = document.getElementById('confirm');
+        const items = document.querySelectorAll('.carousel-item');
+        let selected = [];
+        let angle = 0;
+
+        // Rotate carousel
+        function rotateCarousel(direction) {
+            angle += direction * 60; // Adjust rotation angle
+            carousel.style.transform = `rotateX(${angle}deg)`;
+        }
+
+        // Handle item selection
+        items.forEach(item => {
+            item.addEventListener('click', () => {
+                const copy = item.getAttribute('data-copy');
+
+                if (selected.includes(copy)) {
+                    selected = selected.filter(c => c !== copy);
+                    item.style.background = '#fff';
+                } else if (selected.length < 3) {
+                    selected.push(copy);
+                    item.style.background = '#007bff';
+                    item.style.color = '#fff';
+                }
+
+                updateSelected();
+            });
+        });
+
+        // Update selected container
+        function updateSelected() {
+            selectedContainer.innerHTML = '<strong>Seleccionados:</strong> ' +
+                selected.map(copy => `<span>${copy}</span>`).join('');
+
+            confirmButton.disabled = selected.length === 0;
+        }
+
+        // Confirm selection
+        confirmButton.addEventListener('click', () => {
+            alert(`Has seleccionado: ${selected.join(', ')}`);
+        });
+
+        // Optional: Add rotation buttons
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowUp') rotateCarousel(1);
+            if (e.key === 'ArrowDown') rotateCarousel(-1);
+        });
+    </script>
+</body>
+</html>
