@@ -276,7 +276,7 @@ function generateVisualPrompt(platform, keyword, type, content) {
 - Formato: ${specs.format}
 - Relación de aspecto: ${specs.aspectRatio}
 - Orientación: ${specs.orientation}
-- Duración: 15-30 segundos para TikTok, 60-90 segundos para YouTube
+- Duración: 15-60 segundos según necesidad
 - Calidad: HD mínimo, 4K preferible
 
 CONTENIDO VISUAL:
@@ -298,10 +298,6 @@ ESTILO VISUAL:
 - Paleta de colores: Profesional y moderna (azules, verdes, o colores corporativos)
 - Estética: Limpia, minimalista, enfocada en el mensaje
 - Marca de agua sutil (opcional)
-
-ELEMENTOS DE ENGAGEMENT:
-- Call-to-action visual al final
-- Elementos que inviten a la interacción (flechas, íconos)
 - Subtítulos completos en español latino con ortografía perfecta`;
     } else {
         return `ESPECIFICACIONES TÉCNICAS:
@@ -328,7 +324,6 @@ ELEMENTOS DE TEXTO:
 CONTENIDO TEXTUAL SUGERIDO:
 - Título principal: Frase impactante sobre "${mainTheme}"
 - Elementos clave: 2-3 puntos principales del mensaje
-- Call-to-action: Invitación clara a la acción
 - Toda la información debe ser comprensible instantáneamente
 
 PALETA DE COLORES:
@@ -343,11 +338,10 @@ ELEMENTOS VISUALES:
 - Imágenes complementarias: Si se incluyen, que sean de alta calidad y relevantes
 - Efectos: Sutiles sombras o gradientes para profundidad
 
-OPTIMIZACIÓN PARA ${platform}:
+OPTIMIZACIÓN:
 - Legibilidad en dispositivos móviles garantizada
 - Elementos importantes alejados de los bordes (margen de seguridad)
-- Diseño que funcione tanto en feed como en vista completa
-- Consistencia con la estética de la plataforma`;
+- Diseño que funcione en diferentes tamaños y formatos`;
     }
 }
 
