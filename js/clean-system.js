@@ -595,6 +595,17 @@ async function generateThreeIdeas() {
         displayResults(ideas);
         showNotification('¡3 ideas generadas con IA real!', 'success');
         
+        // Guardar en historial
+        if (typeof window.historyManager !== 'undefined') {
+            try {
+                const copyTypes = getSelectedCopyTypes ? getSelectedCopyTypes() : types;
+                window.historyManager.saveToHistory(platform, keyword, context, ideas, copyTypes);
+                console.log('[HISTORY] ✅ Sesión guardada en historial');
+            } catch (error) {
+                console.error('[HISTORY] Error al guardar en historial:', error);
+            }
+        }
+        
     } catch (error) {
         console.error('[GENERATE] Error:', error);
         showNotification('Error al generar ideas', 'error');
@@ -773,6 +784,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     showNotification('¡Sistema IA listo para generar contenido!', 'success');
+    
+    // Inicializar el sistema de historial
+    if (typeof window.historyManager !== 'undefined') {
+        console.log('[INIT] ✅ Inicializando sistema de historial...');
+        window.historyManager.loadHistory();
+    } else {
+        console.warn('[INIT] ⚠️ Sistema de historial no disponible');
+    }
 });
 
 console.log('✅ [CLEAN-SYSTEM] Sistema cargado completamente');
