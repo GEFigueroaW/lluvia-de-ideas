@@ -64,14 +64,39 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
     const DEEPSEEK_API_KEY = 'sk-195d3e74fc904857a632ee7b22b174ff';
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
     
-    // System prompt base
-    const systemPrompt = `Eres un copywriter experto y filósofo del comportamiento humano especializado en ${platform}. IMPORTANTE: Responde SIEMPRE en español. Tu especialidad es crear contenido que provoca reflexión profunda, desafía creencias limitantes y genera insights transformadores.`;
+    // Configuración de tokens específica por plataforma
+    const platformTokens = {
+        'X / Twitter': 150,      // ~100 palabras - Tweets largos pero concisos
+        'TikTok': 250,          // ~180 palabras - Para videos cortos
+        'Instagram': 450,       // ~320 palabras - Posts engagement óptimo
+        'WhatsApp': 300,        // ~220 palabras - Mensajes directos
+        'Facebook': 550,        // ~400 palabras - Posts con buen alcance
+        'LinkedIn': 700,        // ~500 palabras - Contenido profesional
+        'YouTube': 900,         // ~650 palabras - Descripciones completas
+        'Telegram': 400         // ~280 palabras - Canales y grupos
+    };
     
-    // User prompts específicos
+    const maxTokens = platformTokens[platform] || 450; // Instagram como default
+    
+    console.log(`[DEEPSEEK] 📏 Configurando ${maxTokens} tokens para ${platform} (≈${Math.round(maxTokens * 0.7)} palabras)`);
+    
+    // System prompt base con instrucciones de longitud
+    const systemPrompt = `Eres un copywriter experto y filósofo del comportamiento humano especializado en ${platform}. 
+
+IMPORTANTE: 
+- Responde SIEMPRE en español
+- Ajusta la longitud específicamente para ${platform}
+- Máximo ${Math.round(maxTokens * 0.7)} palabras aproximadamente
+- Tu especialidad es crear contenido que provoca reflexión profunda, desafía creencias limitantes y genera insights transformadores
+- El contenido debe ser PERFECTO para ${platform} en longitud y formato`;
+    
+    // User prompts específicos con instrucciones de longitud
     let userPrompt = '';
     
     if (type === 'Informativo y educativo') {
         userPrompt = `Crea un copy educativo profundo para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+
+LONGITUD ESPECÍFICA PARA ${platform}: Máximo ${Math.round(maxTokens * 0.7)} palabras.
 
 CRITERIOS OBLIGATORIOS:
 - Ofrece insights específicos y contradictorios a lo que normalmente se piensa
@@ -84,9 +109,11 @@ ${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a
 
 PROHIBIDO: Frases cliché, consejos obvios, información genérica
 
-RESPONDE EN ESPAÑOL con contenido genuinamente valioso.`;
+RESPONDE EN ESPAÑOL con contenido genuinamente valioso, AJUSTADO PERFECTAMENTE a la longitud de ${platform}.`;
     } else if (type === 'Venta directa y persuasivo') {
         userPrompt = `Crea un copy persuasivo poderoso para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+
+LONGITUD ESPECÍFICA PARA ${platform}: Máximo ${Math.round(maxTokens * 0.7)} palabras.
 
 CRITERIOS OBLIGATORIOS:
 - Describe una frustración específica y visceral
@@ -99,9 +126,11 @@ ${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a
 
 PROHIBIDO: Promesas vagas, urgencia falsa
 
-RESPONDE EN ESPAÑOL siendo persuasivo pero ético.`;
+RESPONDE EN ESPAÑOL siendo persuasivo pero ético, AJUSTADO PERFECTAMENTE a la longitud de ${platform}.`;
     } else if (type === 'Posicionamiento y branding') {
         userPrompt = `Crea un copy de branding y autoridad para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+
+LONGITUD ESPECÍFICA PARA ${platform}: Máximo ${Math.round(maxTokens * 0.7)} palabras.
 
 CRITERIOS OBLIGATORIOS:
 - Demuestra experiencia real con ejemplo concreto
@@ -114,7 +143,7 @@ ${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a
 
 PROHIBIDO: Lenguaje corporativo vacío, afirmaciones sin respaldo
 
-RESPONDE EN ESPAÑOL posicionando como verdadero experto.`;
+RESPONDE EN ESPAÑOL posicionando como verdadero experto, AJUSTADO PERFECTAMENTE a la longitud de ${platform}.`;
     }
     
     const requestBody = {
@@ -124,7 +153,7 @@ RESPONDE EN ESPAÑOL posicionando como verdadero experto.`;
             { role: "user", content: userPrompt }
         ],
         temperature: 0.9,
-        max_tokens: 800,
+        max_tokens: maxTokens,
         top_p: 0.9
     };
     
@@ -340,10 +369,56 @@ async function generateIdeaWithAI(platform, keyword, type, userContext, includeC
 async function generateFallbackIdea(platform, keyword, type, userContext, includeCTA) {
     console.log(`[FALLBACK] Usando sistema de respaldo para ${type}...`);
     
+    // Usar las mismas configuraciones de longitud que la IA principal
+    const platformWords = {
+        'X / Twitter': 100,      // Tweets concisos
+        'TikTok': 180,          // Videos cortos
+        'Instagram': 320,       // Posts engagement óptimo
+        'WhatsApp': 220,        // Mensajes directos
+        'Facebook': 400,        // Posts con buen alcance
+        'LinkedIn': 500,        // Contenido profesional
+        'YouTube': 650,         // Descripciones completas
+        'Telegram': 280         // Canales y grupos
+    };
+    
+    const targetWords = platformWords[platform] || 320; // Instagram como default
+    console.log(`[FALLBACK] 📏 Generando ≈${targetWords} palabras para ${platform}`);
+    
     let content = '';
     
     if (type === 'Informativo y educativo') {
-        content = `🎯 Lo que nadie te dice sobre ${keyword}
+        if (platform === 'X / Twitter') {
+            content = `🎯 La verdad sobre ${keyword} que nadie menciona:
+
+El 80% comete este error básico ↓
+
+${keyword} no es lo que piensas. Requiere un enfoque contraintuitivo que el 95% ignora.
+
+3 insights clave:
+→ Los resultados dependen de factores ocultos
+→ La implementación correcta está en los detalles
+→ El timing es más importante que la técnica
+
+${userContext ? `Para tu caso: ${userContext.substring(0, 50)}...` : ''}
+
+¿Estás dispuesto a cuestionar lo que creías saber?${includeCTA ? '\n\n💬 Cuéntame: ¿cuál insight te sorprendió?' : ''}`;
+        } else if (platform === 'TikTok') {
+            content = `🎯 Lo que NADIE te dice sobre ${keyword}
+
+La mayoría cree que es simple, pero...
+
+¿Sabías que el 80% comete este error fundamental?
+
+3 insights que cambiarán todo:
+1. ${keyword} requiere un enfoque contraintuitivo
+2. Los resultados dependen de factores que nadie menciona  
+3. La implementación correcta está en los detalles
+
+${userContext ? `En tu contexto: ${userContext.substring(0, 80)}` : ''}
+
+La pregunta real: ¿estás dispuesto a cuestionar lo que creías saber?${includeCTA ? '\n\n💭 Comenta cuál insight te impactó más' : ''}`;
+        } else {
+            content = `🎯 Lo que nadie te dice sobre ${keyword}
 
 La mayoría cree que ${keyword} es simple, pero hay aspectos ocultos que marcan la diferencia.
 
@@ -358,8 +433,38 @@ Aquí tienes 3 insights que cambiarán tu perspectiva:
 ${userContext ? `Aplicado a tu contexto: ${userContext}` : ''}
 
 La pregunta real es: ¿estás dispuesto a cuestionar lo que creías saber?${includeCTA ? '\n\n💬 Cuéntame en los comentarios: ¿cuál de estos insights te sorprendió más?' : ''}`;
+        }
     } else if (type === 'Venta directa y persuasivo') {
-        content = `🚨 REALIDAD BRUTAL sobre ${keyword}
+        if (platform === 'X / Twitter') {
+            content = `🚨 REALIDAD BRUTAL sobre ${keyword}
+
+El 95% falla porque ignora ESTO ↓
+
+${keyword} no es lo que te vendieron. Es más complejo, pero más poderoso cuando se hace bien.
+
+✅ Los que triunfan: conocen estos secretos
+❌ Los que fallan: siguen consejos obsoletos
+
+${userContext ? `Tu caso: ${userContext.substring(0, 60)}...` : ''}
+
+La diferencia está en los próximos 30 días.${includeCTA ? '\n\n🔥 ¿Listo? Escríbeme "SÍ"' : ''}`;
+        } else if (platform === 'TikTok') {
+            content = `🚨 REALIDAD BRUTAL sobre ${keyword}
+
+Mientras otros prometen resultados mágicos, te digo la verdad:
+
+El 95% falla porque ignora ESTO ↓
+
+${keyword} no es lo que te han vendido. Es más complejo, pero también más poderoso cuando lo haces bien.
+
+✅ Los que triunfan saben estos secretos
+❌ Los que fallan siguen consejos obsoletos
+
+${userContext ? `En tu caso específico: ${userContext.substring(0, 100)}` : ''}
+
+La diferencia entre éxito y fracaso está en los próximos 30 días.${includeCTA ? '\n\n🔥 ¿Listo para cambiar tu enfoque? Comenta "SÍ"' : ''}`;
+        } else {
+            content = `🚨 REALIDAD BRUTAL sobre ${keyword}
 
 Mientras otros prometen resultados mágicos, te digo la verdad:
 
@@ -373,8 +478,40 @@ ${keyword} no es lo que te han vendido. Es más complejo, pero también más pod
 ${userContext ? `En tu caso específico: ${userContext}` : ''}
 
 La diferencia entre éxito y fracaso está en los próximos 30 días.${includeCTA ? '\n\n🔥 ¿Listo para cambiar tu enfoque? Escríbeme "SÍ" en los comentarios.' : ''}`;
+        }
     } else {
-        content = `💡 Mi enfoque contrario sobre ${keyword}
+        if (platform === 'X / Twitter') {
+            content = `💡 Mi enfoque contrario sobre ${keyword}
+
+Después de años: todos se equivocan.
+
+La industria vende una mentira sobre ${keyword}.
+
+Mi metodología:
+→ Analizo lo que funciona REALMENTE  
+→ Elimino modas que no sirven
+→ Me enfoco en resultados, no teorías
+
+${userContext ? `Tu contexto: ${userContext.substring(0, 50)}...` : ''}
+
+No sigo tendencias. Creo estrategias que funcionan.${includeCTA ? '\n\n👑 Sígueme para más insights' : ''}`;
+        } else if (platform === 'TikTok') {
+            content = `💡 Mi enfoque contrario sobre ${keyword}
+
+Después de años en esto, he descubierto que todos se equivocan.
+
+La industria te vende una mentira sobre ${keyword}.
+
+Mi metodología es diferente:
+→ Analizo lo que funciona REALMENTE
+→ Elimino lo que está de moda pero no sirve  
+→ Me enfoco en resultados, no en teorías
+
+${userContext ? `Para tu contexto: ${userContext.substring(0, 100)}` : ''}
+
+No sigo tendencias. Creo estrategias que funcionan cuando otros fallan.${includeCTA ? '\n\n👑 Sígueme para más insights contraintuitivos' : ''}`;
+        } else {
+            content = `💡 Mi enfoque contrario sobre ${keyword}
 
 Después de años en esto, he descubierto que todos se equivocan.
 
@@ -388,6 +525,7 @@ Mi metodología es diferente:
 ${userContext ? `Para tu contexto: ${userContext}` : ''}
 
 No sigo tendencias. Creo estrategias que funcionan cuando otros fallan.${includeCTA ? '\n\n👑 Sígueme para más insights contraintuitivos que realmente funcionan.' : ''}`;
+        }
     }
     
     return {
