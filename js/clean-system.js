@@ -628,12 +628,16 @@ function displayResultsClean(ideas) {
             box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;
             max-width: 100% !important;
             width: 100% !important;
-            min-height: auto !important;
+            min-height: fit-content !important;
             height: auto !important;
+            max-height: none !important;
             overflow: visible !important;
             box-sizing: border-box !important;
             word-wrap: break-word !important;
             overflow-wrap: break-word !important;
+            display: flex !important;
+            flex-direction: column !important;
+            flex-grow: 1 !important;
         `;
         
         // Insertar después del formulario
@@ -679,12 +683,16 @@ function displayResultsClean(ideas) {
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
                 border: 1px solid #e0e0e0 !important;
                 width: 100% !important;
-                min-height: auto !important;
+                min-height: fit-content !important;
                 height: auto !important;
+                max-height: none !important;
                 overflow: visible !important;
                 word-wrap: break-word !important;
                 overflow-wrap: break-word !important;
                 box-sizing: border-box !important;
+                display: flex !important;
+                flex-direction: column !important;
+                flex-grow: 1 !important;
             " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'">
                 <h3 style="
                     color: ${isError ? '#f44336' : '#1976D2'} !important; 
@@ -712,8 +720,12 @@ function displayResultsClean(ideas) {
                     overflow-wrap: break-word !important;
                     white-space: pre-line !important;
                     max-width: 100% !important;
+                    min-height: fit-content !important;
+                    height: auto !important;
                     overflow: visible !important;
                     hyphens: auto !important;
+                    flex-grow: 1 !important;
+                    display: block !important;
                 ">${idea.content}</p>
                 
                 ${idea.visualPrompt ? `
