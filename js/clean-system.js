@@ -1,5 +1,8 @@
 // =========================================
-// SISTEMA LIMPIO - COPYWRITING CON IA REAL
+// SISTEMA LIMPIO - COPYWRITING CO    console.log(`[DEEPSEEK] 📏 OPTIMIZADO 2025: ${maxTokens} tokens para ${platform} (≈${Math.round(maxTokens * 0.7)} palabras máximo)`);
+    
+    // Mostrar límite actualizado en la interfaz
+    showPlatformWordLimit(platform, Math.round(maxTokens * 0.7)); IA REAL
 // =========================================
 
 console.log('🚀 [CLEAN-SYSTEM] Iniciando sistema limpio...');
@@ -64,86 +67,122 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
     const DEEPSEEK_API_KEY = 'sk-195d3e74fc904857a632ee7b22b174ff';
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
     
-    // Configuración de tokens específica por plataforma
+    // Configuración de tokens optimizada para atención reducida (2025)
     const platformTokens = {
-        'X / Twitter': 150,      // ~100 palabras - Tweets largos pero concisos
-        'TikTok': 250,          // ~180 palabras - Para videos cortos
-        'Instagram': 450,       // ~320 palabras - Posts engagement óptimo
-        'WhatsApp': 300,        // ~220 palabras - Mensajes directos
-        'Facebook': 550,        // ~400 palabras - Posts con buen alcance
-        'LinkedIn': 700,        // ~500 palabras - Contenido profesional
-        'YouTube': 900,         // ~650 palabras - Descripciones completas
-        'Telegram': 400         // ~280 palabras - Canales y grupos
+        'X / Twitter': 85,       // ~60 palabras - Lectura en 8-10 segundos
+        'TikTok': 115,          // ~80 palabras - Atención visual, no textual
+        'Instagram': 215,       // ~150 palabras - Stories de 5-7 segundos
+        'WhatsApp': 170,        // ~120 palabras - Mensajes directos rápidos
+        'Facebook': 285,        // ~200 palabras - Feed scroll rápido
+        'LinkedIn': 360,        // ~250 palabras - Profesional pero conciso
+        'YouTube': 430,         // ~300 palabras - Descripciones escaneables
+        'Telegram': 200         // ~140 palabras - Lectura móvil rápida
     };
     
-    const maxTokens = platformTokens[platform] || 450; // Instagram como default
+    const maxTokens = platformTokens[platform] || 215; // Instagram como default (optimizado)
     
-    console.log(`[DEEPSEEK] 📏 Configurando ${maxTokens} tokens para ${platform} (≈${Math.round(maxTokens * 0.7)} palabras)`);
+    console.log(`[DEEPSEEK] 📏 OPTIMIZADO 2025: ${maxTokens} tokens para ${platform} (≈${Math.round(maxTokens * 0.7)} palabras máximo)`);
     
-    // System prompt base con instrucciones de longitud
-    const systemPrompt = `Eres un copywriter experto y filósofo del comportamiento humano especializado en ${platform}. 
+    // Mostrar límite actualizado en la interfaz
+    if (typeof showPlatformWordLimit === 'function') {
+        showPlatformWordLimit(platform, Math.round(maxTokens * 0.7));
+    }
+    
+    // System prompt optimizado para máximo impacto en mínimas palabras
+    const systemPrompt = `Eres un copywriter experto en capturar atención ultra-rápida especializado en ${platform}. 
 
-IMPORTANTE: 
+REGLAS CRÍTICAS: 
 - Responde SIEMPRE en español
-- Ajusta la longitud específicamente para ${platform}
-- Máximo ${Math.round(maxTokens * 0.7)} palabras aproximadamente
-- Tu especialidad es crear contenido que provoca reflexión profunda, desafía creencias limitantes y genera insights transformadores
-- El contenido debe ser PERFECTO para ${platform} en longitud y formato`;
+- MÁXIMO ${Math.round(maxTokens * 0.7)} palabras para ${platform}
+- Cada palabra debe ser IMPRESCINDIBLE
+- Estructura: Hook (1 línea) + Insight (2 líneas) + CTA (1 línea)
+- Elimina TODAS las palabras de relleno
+- Usa números específicos, no generalidades
+- Provoca reacción emocional inmediata en primeras 5 palabras`;
     
     // User prompts específicos con instrucciones de longitud
     let userPrompt = '';
     
     if (type === 'Informativo y educativo') {
-        userPrompt = `Crea un copy educativo profundo para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+        userPrompt = `Crea copy educativo ULTRA-CONCISO para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
 
-LONGITUD ESPECÍFICA PARA ${platform}: Máximo ${Math.round(maxTokens * 0.7)} palabras.
+LÍMITE ESTRICTO: MÁXIMO ${Math.round(maxTokens * 0.7)} palabras para ${platform}.
 
-CRITERIOS OBLIGATORIOS:
-- Ofrece insights específicos y contradictorios a lo que normalmente se piensa
-- Incluye preguntas que obliguen a cuestionar creencias actuales  
-- Presenta un ángulo que el 95% no ha considerado
-- Ofrece una idea accionable implementable HOY
-- Conecta con aspiraciones profundas de crecimiento
+ESTRUCTURA OBLIGATORIA:
+❌ [Creencia/error común en 5-7 palabras]
+✅ [Insight contraintuitivo específico en 15-20 palabras]
+💡 [Acción concreta implementable HOY en 8-12 palabras]
 
-${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a la acción natural y específica para la plataforma que motive a la audiencia a interactuar, comentar, compartir o realizar una acción específica.' : 'NO incluyas call-to-action al final.'}
+PROHIBIDO: 
+- Palabras de relleno ("realmente", "básicamente", "en general")
+- Explicaciones largas
+- Teoría sin acción
+- Frases cliché
 
-PROHIBIDO: Frases cliché, consejos obvios, información genérica
+${includeCTA ? 'CTA INTEGRADO: Incluye llamada a la acción EN LA ESTRUCTURA, no como anexo.' : 'SIN CTA final.'}
 
-RESPONDE EN ESPAÑOL con contenido genuinamente valioso, AJUSTADO PERFECTAMENTE a la longitud de ${platform}.`;
+EJEMPLO DE CONCISIÓN:
+❌ NO: "Muchas personas piensan que para ser exitoso necesitan trabajar muchísimas horas"
+✅ SÍ: "Trabajar 12+ horas = menos productividad"
+
+RESPONDE en español, MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
     } else if (type === 'Venta directa y persuasivo') {
-        userPrompt = `Crea un copy persuasivo poderoso para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+        userPrompt = `Crea copy de venta ULTRA-PERSUASIVO para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
 
-LONGITUD ESPECÍFICA PARA ${platform}: Máximo ${Math.round(maxTokens * 0.7)} palabras.
+LÍMITE ESTRICTO: MÁXIMO ${Math.round(maxTokens * 0.7)} palabras para ${platform}.
 
-CRITERIOS OBLIGATORIOS:
-- Describe una frustración específica y visceral
-- Muestra consecuencias reales calculables de NO actuar
-- Presenta una solución contraintuitiva
-- Incluye prueba específica o resultado real
-- Crea urgencia auténtica basada en factores reales
+ESTRUCTURA DE CONVERSIÓN:
+🔥 [Frustración específica en 5-8 palabras]
+⚡ [Solución + beneficio cuantificado en 15-20 palabras]
+🎯 [CTA directo + urgencia real en 8-12 palabras]
 
-${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a la acción poderosa y directa que impulse a la compra, registro o acción específica, integrada naturalmente en el texto.' : 'NO incluyas call-to-action al final.'}
+REGLAS DE PERSUASIÓN:
+- Usa números específicos, no "muchos" o "varios"
+- Menciona consecuencia CALCULABLE de no actuar
+- Incluye prueba social concreta (no genérica)
+- Crea urgencia auténtica (fecha, cantidad, tiempo)
 
-PROHIBIDO: Promesas vagas, urgencia falsa
+PROHIBIDO:
+- Promesas vagas ("cambiar tu vida")
+- Urgencia falsa ("solo por hoy")
+- Superlativos sin prueba ("el mejor", "único")
 
-RESPONDE EN ESPAÑOL siendo persuasivo pero ético, AJUSTADO PERFECTAMENTE a la longitud de ${platform}.`;
+${includeCTA ? 'CTA INTEGRADO: La llamada a la acción es PARTE de la estructura, no extra.' : 'SIN CTA adicional.'}
+
+EJEMPLO:
+🔥 NO: "¿Te cuesta conseguir clientes?" 
+🔥 SÍ: "3 meses sin clientes nuevos"
+
+RESPONDE en español, MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
     } else if (type === 'Posicionamiento y branding') {
-        userPrompt = `Crea un copy de branding y autoridad para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
+        userPrompt = `Crea copy de autoridad ULTRA-CONCISO para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}` : ''}
 
-LONGITUD ESPECÍFICA PARA ${platform}: Máximo ${Math.round(maxTokens * 0.7)} palabras.
+LÍMITE ESTRICTO: MÁXIMO ${Math.round(maxTokens * 0.7)} palabras para ${platform}.
 
-CRITERIOS OBLIGATORIOS:
-- Demuestra experiencia real con ejemplo concreto
-- Presenta filosofía única que te distingue
-- Ofrece predicción o insight sobre el futuro
-- Comparte framework o metodología específica
-- Define claramente para quién ERES y para quién NO
+ESTRUCTURA DE AUTORIDAD:
+💭 [Creencia común que desafías en 5-8 palabras]
+🎪 [Tu filosofía única + ejemplo específico en 15-20 palabras]
+🚀 [Para quién eres + resultado en 8-12 palabras]
 
-${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a la acción que refuerce tu autoridad e invite a seguirte, conectar contigo o conocer más sobre tu trabajo, integrada de forma natural.' : 'NO incluyas call-to-action al final.'}
+CRITERIOS DE POSICIONAMIENTO:
+- Demuestra experiencia con caso específico, no genérico
+- Define claramente para quién NO eres (exclusividad)
+- Presenta metodología/framework propio
+- Usa datos concretos de tu experiencia
 
-PROHIBIDO: Lenguaje corporativo vacío, afirmaciones sin respaldo
+PROHIBIDO:
+- Lenguaje corporativo vacío
+- Afirmaciones sin respaldo específico
+- "Ayudo a empresas" (muy genérico)
+- "Años de experiencia" sin especificar
 
-RESPONDE EN ESPAÑOL posicionando como verdadero experto, AJUSTADO PERFECTAMENTE a la longitud de ${platform}.`;
+${includeCTA ? 'CTA INTEGRADO: Llamada a la acción ES PARTE de la estructura de autoridad.' : 'SIN CTA adicional.'}
+
+EJEMPLO:
+💭 NO: "El networking es clave para el éxito"
+💭 SÍ: "Eventos networking = pérdida de tiempo"
+
+RESPONDE en español, MÁXIMO ${Math.round(maxTokens * 0.7)} palabras.`;
     }
     
     const requestBody = {
@@ -783,7 +822,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('[INIT] ✅ Formulario configurado');
     }
     
-    showNotification('¡Sistema IA listo para generar contenido!', 'success');
+    showNotification('🚀 Sistema IA optimizado 2025 - Copys ultra-concisos para máximo impacto!', 'success');
     
     // Inicializar el sistema de historial
     if (typeof window.historyManager !== 'undefined') {
@@ -793,5 +832,46 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('[INIT] ⚠️ Sistema de historial no disponible');
     }
 });
+
+// Función para mostrar límite de palabras por plataforma
+function showPlatformWordLimit(platform, wordLimit) {
+    try {
+        // Buscar contenedor donde mostrar la información
+        const formSection = document.querySelector('#copywritingForm');
+        if (!formSection) return;
+        
+        // Remover indicador anterior si existe
+        const existingIndicator = document.querySelector('.optimization-notice');
+        if (existingIndicator) {
+            existingIndicator.remove();
+        }
+        
+        // Crear nuevo indicador
+        const limitIndicator = document.createElement('div');
+        limitIndicator.className = 'optimization-notice';
+        limitIndicator.innerHTML = `
+            <h4><span class="optimization-icon">⚡</span> Optimización 2025 Activada</h4>
+            <p><strong>${platform}:</strong> Máximo <span class="platform-word-limit">${wordLimit} palabras</span> para capturar atención ultra-rápida</p>
+        `;
+        
+        // Insertar antes del formulario
+        formSection.parentNode.insertBefore(limitIndicator, formSection);
+        
+        // Auto-remover después de 8 segundos
+        setTimeout(() => {
+            if (limitIndicator.parentNode) {
+                limitIndicator.style.animation = 'slideOutOptimization 0.5s ease';
+                setTimeout(() => {
+                    if (limitIndicator.parentNode) {
+                        limitIndicator.parentNode.removeChild(limitIndicator);
+                    }
+                }, 500);
+            }
+        }, 8000);
+        
+    } catch (error) {
+        console.log('[PLATFORM-LIMIT] Error al mostrar límite:', error);
+    }
+}
 
 console.log('✅ [CLEAN-SYSTEM] Sistema cargado completamente');
