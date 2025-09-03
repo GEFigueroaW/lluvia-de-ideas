@@ -502,13 +502,14 @@ function displayResultsClean(ideas) {
         resultsContainer = document.createElement('div');
         resultsContainer.id = 'results';
         resultsContainer.style.cssText = `
-            margin-top: 30px;
-            padding: 30px;
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255,255,255,0.2);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            margin-top: 30px !important;
+            padding: 30px !important;
+            background: #f8f9fa !important;
+            border-radius: 20px !important;
+            border: 2px solid #e9ecef !important;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1) !important;
+            max-width: 100% !important;
+            width: 100% !important;
         `;
         
         // Insertar después del formulario
@@ -529,55 +530,94 @@ function displayResultsClean(ideas) {
     
     if (ideaKeys.length === 0) {
         console.log('[CLEAN-SYSTEM] No hay ideas para mostrar');
-        resultsContainer.innerHTML = '<p style="color: white; text-align: center;">No hay ideas para mostrar.</p>';
+        resultsContainer.innerHTML = '<p style="color: #333; text-align: center; font-size: 16px; font-weight: bold;">No hay ideas para mostrar.</p>';
         return;
     }
+
+    console.log('[CLEAN-SYSTEM] Generando HTML para mostrar...');
     
-    let html = '<h2 style="color: #333; margin-bottom: 20px; text-align: center;">💡 Ideas Generadas por IA</h2>';
+    let html = '<h2 style="color: #333 !important; margin-bottom: 20px; text-align: center; font-weight: bold; font-size: 24px;">💡 Ideas Generadas por IA</h2>';
     
     ideaKeys.forEach((key, index) => {
         const idea = ideas[key];
         const isError = idea.content.includes('Error al generar');
         
+        console.log(`[CLEAN-SYSTEM] Procesando idea ${index + 1}:`, idea);
+        
         html += `
             <div style="
-                background: ${isError ? 'rgba(255,68,68,0.1)' : 'rgba(255,255,255,0.9)'};
-                padding: 25px;
-                margin: 20px 0;
-                border-radius: 15px;
-                border-left: 4px solid ${isError ? '#ff4444' : '#007AFF'};
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'">
-                <h3 style="color: ${isError ? '#ff6666' : '#007AFF'}; margin: 0 0 15px 0; display: flex; align-items: center; font-size: 18px; font-weight: bold;">
+                background: ${isError ? '#ffebee !important' : '#ffffff !important'};
+                padding: 25px !important;
+                margin: 20px 0 !important;
+                border-radius: 15px !important;
+                border-left: 4px solid ${isError ? '#f44336' : '#2196F3'} !important;
+                transition: all 0.3s ease !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+                border: 1px solid #e0e0e0 !important;
+            " onmouseover="this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 25px rgba(0,0,0,0.2)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'">
+                <h3 style="
+                    color: ${isError ? '#f44336' : '#1976D2'} !important; 
+                    margin: 0 0 15px 0 !important; 
+                    display: flex !important; 
+                    align-items: center !important; 
+                    font-size: 18px !important; 
+                    font-weight: bold !important;
+                    font-family: Arial, sans-serif !important;
+                ">
                     ${isError ? '❌' : '✨'} ${idea.copyType}
                 </h3>
-                <p style="color: #2c3e50; line-height: 1.8; margin: 0 0 20px 0; font-size: 16px; font-weight: 400;">${idea.content}</p>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid #e0e0e0;">
-                    <p style="color: #7f8c8d; font-style: italic; margin: 0; font-size: 14px;">${idea.hashtags}</p>
+                <p style="
+                    color: #212121 !important; 
+                    line-height: 1.8 !important; 
+                    margin: 0 0 20px 0 !important; 
+                    font-size: 16px !important; 
+                    font-weight: 400 !important;
+                    font-family: Arial, sans-serif !important;
+                    text-align: left !important;
+                ">${idea.content}</p>
+                <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; margin-top: 20px !important; padding-top: 15px !important; border-top: 1px solid #e0e0e0 !important;">
+                    <p style="
+                        color: #666666 !important; 
+                        font-style: italic !important; 
+                        margin: 0 !important; 
+                        font-size: 14px !important;
+                        font-family: Arial, sans-serif !important;
+                    ">${idea.hashtags}</p>
                     ${!isError ? `<button onclick="copyToClipboard('${key}')" style="
-                        background: linear-gradient(45deg, #007AFF, #5856D6);
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 8px;
-                        cursor: pointer;
-                        font-size: 13px;
-                        font-weight: 600;
-                        transition: all 0.2s ease;
-                        box-shadow: 0 2px 8px rgba(0,122,255,0.3);
-                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(0,122,255,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(0,122,255,0.3)'">
+                        background: linear-gradient(45deg, #2196F3, #1976D2) !important;
+                        color: white !important;
+                        border: none !important;
+                        padding: 10px 20px !important;
+                        border-radius: 8px !important;
+                        cursor: pointer !important;
+                        font-size: 13px !important;
+                        font-weight: 600 !important;
+                        transition: all 0.2s ease !important;
+                        box-shadow: 0 2px 8px rgba(33,150,243,0.3) !important;
+                        font-family: Arial, sans-serif !important;
+                    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(33,150,243,0.4)'" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 8px rgba(33,150,243,0.3)'">
                         📋 Copiar Idea
                     </button>` : ''}
                 </div>
             </div>
         `;
     });
-    
+
+    console.log('[CLEAN-SYSTEM] HTML generado:', html.substring(0, 200) + '...');
     resultsContainer.innerHTML = html;
     
+    // Asegurar que el contenedor sea visible
+    resultsContainer.style.display = 'block';
+    resultsContainer.style.visibility = 'visible';
+    resultsContainer.style.opacity = '1';
+    
+    console.log('[CLEAN-SYSTEM] Contenido insertado en el DOM');
+    
     // Scroll a resultados
-    resultsContainer.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+        resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        console.log('[CLEAN-SYSTEM] Scroll a resultados ejecutado');
+    }, 100);
 }
 
 // Manejar selección múltiple de tipos de copy
