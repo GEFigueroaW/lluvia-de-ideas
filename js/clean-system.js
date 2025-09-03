@@ -281,26 +281,34 @@ No sigo tendencias. Creo estrategias que funcionan cuando otros fallan.`;
 async function generateThreeIdeas() {
     console.log('[GENERATE] 🎯 Iniciando generación de 3 ideas...');
     
-    const platform = document.getElementById('platform').value;
-    const keyword = document.getElementById('keyword').value.trim();
-    const context = document.getElementById('context').value.trim();
+    // Obtener datos del formulario con los IDs correctos
+    const platform = getSelectedSocialNetwork ? getSelectedSocialNetwork() : 'Instagram';
+    const keyword = document.getElementById('copyKeyword').value.trim();
+    const context = document.getElementById('copyContext').value.trim();
     const includeCTA = document.getElementById('includeCTA').checked;
+    
+    console.log('[GENERATE] Datos obtenidos:', {platform, keyword, context, includeCTA});
     
     if (!keyword) {
         showNotification('Por favor ingresa una palabra clave', 'warning');
         return;
     }
     
-    // Mostrar loading
-    const resultsDiv = document.getElementById('results');
+    // Mostrar loading en el contenedor correcto
+    const resultsDiv = document.getElementById('ideasContainer');
+    if (!resultsDiv) {
+        showNotification('Error: No se encontró contenedor de resultados', 'error');
+        return;
+    }
+    
     resultsDiv.innerHTML = `
-        <div style="text-align: center; padding: 40px;">
-            <div style="font-size: 2em; margin-bottom: 20px;">🤖</div>
-            <div style="font-size: 1.2em; margin-bottom: 10px;">Generando contenido con IA real...</div>
-            <div style="color: #666;">Esto puede tardar unos segundos</div>
+        <div class="modern-content-card has-text-centered" style="min-height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+            <div style="font-size: 3em; margin-bottom: 20px;">🤖</div>
+            <div style="font-size: 1.5em; margin-bottom: 10px; font-weight: 600;">Generando contenido con IA real...</div>
+            <div style="color: #666; margin-bottom: 20px;">Esto puede tardar unos segundos</div>
+            <div style="width: 40px; height: 40px; border: 3px solid #f3f3f3; border-top: 3px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite;"></div>
         </div>
     `;
-    resultsDiv.style.display = 'block';
     
     const types = [
         'Informativo y educativo',
@@ -327,22 +335,33 @@ async function generateThreeIdeas() {
     } catch (error) {
         console.error('[GENERATE] Error:', error);
         showNotification('Error al generar ideas', 'error');
-        resultsDiv.innerHTML = '<div style="text-align: center; padding: 40px; color: #ff4444;">Error al generar ideas. Intenta de nuevo.</div>';
+        resultsDiv.innerHTML = `
+            <div class="modern-content-card has-text-centered" style="min-height: 300px; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                <div style="font-size: 2em; margin-bottom: 20px; color: #ff4444;">❌</div>
+                <div style="font-size: 1.2em; margin-bottom: 10px; color: #ff4444;">Error al generar ideas</div>
+                <div style="color: #666;">Intenta de nuevo</div>
+            </div>
+        `;
     }
 }
 
 // Función para mostrar resultados
 function displayResults(ideas) {
-    const resultsDiv = document.getElementById('results');
+    const resultsDiv = document.getElementById('ideasContainer');
+    if (!resultsDiv) {
+        console.error('[DISPLAY] No se encontró contenedor de resultados');
+        return;
+    }
     
     let html = `
-        <div style="margin-bottom: 30px; text-align: center;">
-            <h2 style="color: #333; margin-bottom: 10px;">🎯 3 Ideas Generadas</h2>
-            <div style="color: #666; font-size: 0.9em;">
-                Plataforma: <strong>${ideas[0].platform}</strong> | 
-                Palabra clave: <strong>${window.currentIdeas.keyword}</strong>
+        <div class="modern-content-card">
+            <div style="margin-bottom: 30px; text-align: center;">
+                <h2 style="color: #333; margin-bottom: 10px; font-size: 1.8rem; font-weight: 700;">🎯 3 Ideas Generadas</h2>
+                <div style="color: #666; font-size: 0.9em;">
+                    Plataforma: <strong style="color: #667eea;">${ideas[0].platform}</strong> | 
+                    Palabra clave: <strong style="color: #667eea;">${window.currentIdeas.keyword}</strong>
+                </div>
             </div>
-        </div>
     `;
     
     ideas.forEach((idea, index) => {
@@ -413,42 +432,47 @@ function displayResults(ideas) {
                     <em>${idea.visualPrompt}</em>
                 </div>
                 
-                <button onclick="copyToClipboard('${index}', 'content')" style="
-                    background: ${borderColor};
-                    color: white;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    margin-right: 10px;
-                    font-weight: bold;
-                ">📋 Copiar Contenido</button>
-                
-                ${idea.cta ? `
-                    <button onclick="copyToClipboard('${index}', 'cta')" style="
-                        background: rgba(${borderColor === '#2196f3' ? '33,150,243' : borderColor === '#9c27b0' ? '156,39,176' : '76,175,80'},0.8);
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button onclick="copyToClipboard('${index}', 'content')" style="
+                        background: ${borderColor};
                         color: white;
                         border: none;
                         padding: 10px 20px;
                         border-radius: 6px;
                         cursor: pointer;
-                        margin-right: 10px;
                         font-weight: bold;
-                    ">📢 Copiar CTA</button>
-                ` : ''}
-                
-                <button onclick="copyToClipboard('${index}', 'visual')" style="
-                    background: rgba(${borderColor === '#2196f3' ? '33,150,243' : borderColor === '#9c27b0' ? '156,39,176' : '76,175,80'},0.6);
-                    color: white;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    font-weight: bold;
-                ">🎨 Copiar Prompt Visual</button>
+                        font-size: 0.9em;
+                    ">📋 Copiar Contenido</button>
+                    
+                    ${idea.cta ? `
+                        <button onclick="copyToClipboard('${index}', 'cta')" style="
+                            background: rgba(${borderColor === '#2196f3' ? '33,150,243' : borderColor === '#9c27b0' ? '156,39,176' : '76,175,80'},0.8);
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 6px;
+                            cursor: pointer;
+                            font-weight: bold;
+                            font-size: 0.9em;
+                        ">📢 Copiar CTA</button>
+                    ` : ''}
+                    
+                    <button onclick="copyToClipboard('${index}', 'visual')" style="
+                        background: rgba(${borderColor === '#2196f3' ? '33,150,243' : borderColor === '#9c27b0' ? '156,39,176' : '76,175,80'},0.6);
+                        color: white;
+                        border: none;
+                        padding: 10px 20px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        font-size: 0.9em;
+                    ">🎨 Copiar Prompt Visual</button>
+                </div>
             </div>
         `;
     });
+    
+    html += '</div>';
     
     resultsDiv.innerHTML = html;
 }
@@ -489,12 +513,26 @@ function copyToClipboard(index, type) {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('[INIT] 🎯 Página cargada, configurando eventos...');
     
-    const generateBtn = document.getElementById('generate-btn');
+    // Buscar el botón correcto del formulario
+    const generateBtn = document.getElementById('generateCopyBtn');
+    const copyForm = document.getElementById('copywritingForm');
+    
     if (generateBtn) {
-        generateBtn.addEventListener('click', generateThreeIdeas);
+        generateBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            generateThreeIdeas();
+        });
         console.log('[INIT] ✅ Botón de generar configurado');
     } else {
-        console.error('[INIT] ❌ No se encontró el botón generate-btn');
+        console.error('[INIT] ❌ No se encontró el botón generateCopyBtn');
+    }
+    
+    if (copyForm) {
+        copyForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            generateThreeIdeas();
+        });
+        console.log('[INIT] ✅ Formulario configurado');
     }
     
     showNotification('¡Sistema IA listo para generar contenido!', 'success');
