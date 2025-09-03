@@ -170,14 +170,141 @@ RESPONDE EN ESPAÑOL posicionando como verdadero experto.`;
     };
 }
 
-// Función para generar prompts visuales
+// Función para generar prompts visuales específicos y detallados
 function generateVisualPrompt(platform, keyword, type, content) {
     const isVideo = platform === 'TikTok' || platform === 'YouTube';
     
+    // Obtener formato y dimensiones específicas por plataforma
+    const platformSpecs = {
+        'Instagram': {
+            format: 'imagen cuadrada 1080x1080px',
+            aspectRatio: '1:1',
+            orientation: 'cuadrada'
+        },
+        'Facebook': {
+            format: 'imagen rectangular 1200x630px',
+            aspectRatio: '16:9',
+            orientation: 'horizontal'
+        },
+        'LinkedIn': {
+            format: 'imagen rectangular 1200x627px',
+            aspectRatio: '16:9',
+            orientation: 'horizontal'
+        },
+        'X / Twitter': {
+            format: 'imagen rectangular 1200x675px',
+            aspectRatio: '16:9',
+            orientation: 'horizontal'
+        },
+        'TikTok': {
+            format: 'video vertical 1080x1920px',
+            aspectRatio: '9:16',
+            orientation: 'vertical'
+        },
+        'YouTube': {
+            format: 'video horizontal 1920x1080px o thumbnail 1280x720px',
+            aspectRatio: '16:9',
+            orientation: 'horizontal'
+        },
+        'WhatsApp': {
+            format: 'imagen cuadrada 1080x1080px',
+            aspectRatio: '1:1',
+            orientation: 'cuadrada'
+        },
+        'Telegram': {
+            format: 'imagen rectangular 1280x640px',
+            aspectRatio: '2:1',
+            orientation: 'horizontal'
+        }
+    };
+    
+    const specs = platformSpecs[platform] || platformSpecs['Instagram'];
+    
+    // Extraer palabras clave del contenido para el prompt
+    const mainTheme = keyword;
+    const contentSnippet = content.substring(0, 100).replace(/[^\w\s]/gi, '');
+    
     if (isVideo) {
-        return `Video para ${platform}: Persona explicando "${keyword}" de manera visual. Ambiente profesional pero casual. Incluye elementos gráficos o texto en pantalla que refuerce el mensaje principal. Estilo educativo y atractivo visualmente.`;
+        return `VIDEO PARA ${platform.toUpperCase()}:
+
+ESPECIFICACIONES TÉCNICAS:
+- Formato: ${specs.format}
+- Relación de aspecto: ${specs.aspectRatio}
+- Orientación: ${specs.orientation}
+- Duración: 15-30 segundos para TikTok, 60-90 segundos para YouTube
+- Calidad: HD mínimo, 4K preferible
+
+CONTENIDO VISUAL:
+- Protagonista: Persona profesional de 25-40 años explicando "${mainTheme}" de manera dinámica y educativa
+- Escenario: Fondo limpio y profesional (oficina moderna, estudio, o exterior bien iluminado)
+- Iluminación: Natural o profesional, evitar sombras duras
+- Ángulos: Combinación de plano medio, primer plano y planos detalle
+- Movimiento: Gestos naturales, transiciones suaves, elementos gráficos animados
+
+ELEMENTOS GRÁFICOS SUPERPUESTOS:
+- Título principal en español latino: relacionado con "${mainTheme}"
+- Texto en pantalla: Tipografía sans-serif moderna, alta legibilidad
+- Idioma: ESPAÑOL LATINO exclusivamente, ortografía impecable
+- Tamaño de texto: Mínimo 24pt para legibilidad en móviles
+- Contraste: Alto contraste entre texto y fondo para máxima visibilidad
+- Animaciones: Aparición progresiva de puntos clave, íconos relevantes
+
+ESTILO VISUAL:
+- Paleta de colores: Profesional y moderna (azules, verdes, o colores corporativos)
+- Estética: Limpia, minimalista, enfocada en el mensaje
+- Marca de agua sutil (opcional)
+
+ELEMENTOS DE ENGAGEMENT:
+- Call-to-action visual al final
+- Elementos que inviten a la interacción (flechas, íconos)
+- Subtítulos completos en español latino con ortografía perfecta`;
     } else {
-        return `Imagen para ${platform}: Diseño gráfico minimalista con colores que transmitan confianza. Incluye una frase clave de "${keyword}" con tipografía moderna. Estilo profesional que invite a leer el contenido completo.`;
+        return `IMAGEN PARA ${platform.toUpperCase()}:
+
+ESPECIFICACIONES TÉCNICAS:
+- Formato: ${specs.format}
+- Relación de aspecto: ${specs.aspectRatio}
+- Orientación: ${specs.orientation}
+- Resolución: HD mínimo (300 DPI para impresión)
+- Formato de archivo: PNG o JPG de alta calidad
+
+COMPOSICIÓN VISUAL:
+- Tema central: "${mainTheme}" representado de manera visualmente atractiva
+- Estilo: Diseño gráfico profesional y moderno
+- Layout: Composición equilibrada con jerarquía visual clara
+- Espacio: Suficiente espacio en blanco para respiración visual
+
+ELEMENTOS DE TEXTO:
+- Idioma: ESPAÑOL LATINO exclusivamente
+- Ortografía: Perfecta, sin errores gramaticales ni de acentuación
+- Tipografía: Sans-serif moderna y legible (Arial, Helvetica, Roboto, o similar)
+- Jerarquía tipográfica: Título principal (28-36pt), subtítulo (18-24pt), texto secundario (14-16pt)
+- Contraste: Alto contraste entre texto y fondo para máxima legibilidad
+- Alineación: Centrada o alineada a la izquierda según el diseño
+
+CONTENIDO TEXTUAL SUGERIDO:
+- Título principal: Frase impactante sobre "${mainTheme}"
+- Elementos clave: 2-3 puntos principales del mensaje
+- Call-to-action: Invitación clara a la acción
+- Toda la información debe ser comprensible instantáneamente
+
+PALETA DE COLORES:
+- Primarios: Azules profesionales (#2196F3, #1976D2) o verdes corporativos (#4CAF50, #388E3C)
+- Secundarios: Grises elegantes para texto (#424242, #757575)
+- Acentos: Color vibrante para destacar elementos importantes (#FF5722, #E91E63)
+- Fondo: Blanco o gris muy claro para máximo contraste
+
+ELEMENTOS VISUALES:
+- Íconos: Modernos, minimalistas, relacionados con "${mainTheme}"
+- Formas geométricas: Simples y elegantes para enmarcar contenido
+- Imágenes complementarias: Si se incluyen, que sean de alta calidad y relevantes
+- Efectos: Sutiles sombras o gradientes para profundidad
+
+OPTIMIZACIÓN PARA ${platform}:
+- Legibilidad en dispositivos móviles garantizada
+- Elementos importantes alejados de los bordes (margen de seguridad)
+- Diseño que funcione tanto en feed como en vista completa
+- Consistencia con la estética de la plataforma`;
     }
 }
 
