@@ -104,13 +104,14 @@
         let selected = [];
         let angle = 0;
 
-        // Rotate carousel
+        // Rotate carousel with limits
         function rotateCarousel(direction) {
             angle += direction * 60; // Adjust rotation angle
+            angle = Math.max(Math.min(angle, 180), -180); // Limit rotation
             carousel.style.transform = `rotateX(${angle}deg)`;
         }
 
-        // Handle item selection
+        // Handle item selection with error message
         items.forEach(item => {
             item.addEventListener('click', () => {
                 const copy = item.getAttribute('data-copy');
@@ -122,13 +123,15 @@
                     selected.push(copy);
                     item.style.background = '#007bff';
                     item.style.color = '#fff';
+                } else {
+                    alert('Solo puedes seleccionar hasta 3 tipos de copy.');
                 }
 
                 updateSelected();
             });
         });
 
-        // Update selected container
+        // Update selected container with improved visuals
         function updateSelected() {
             selectedContainer.innerHTML = '<strong>Seleccionados:</strong> ' +
                 selected.map(copy => `<span>${copy}</span>`).join('');
