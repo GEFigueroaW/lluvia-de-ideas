@@ -72,10 +72,11 @@ function showGenerationProgress(platform, typesCount) {
     
     progressDiv.innerHTML = `
         <div style="font-size: 24px; margin-bottom: 15px;">🤖</div>
-        <h3 style="margin: 0 0 10px 0; color: #333;">Generando Ideas...</h3>
+        <h3 style="margin: 0 0 10px 0; color: #333;">Generando Ideas con IA...</h3>
         <p style="margin: 0; color: #666;">Para ${platform} • ${typesCount} tipo${typesCount > 1 ? 's' : ''}</p>
+        <p style="margin: 10px 0 0 0; font-size: 12px; color: #999;">Conectando con DeepSeek API...</p>
         <div style="margin-top: 20px; width: 200px; height: 4px; background: #eee; border-radius: 2px; overflow: hidden;">
-            <div style="width: 0%; height: 100%; background: linear-gradient(45deg, #667eea, #764ba2); transition: width 0.3s; animation: progress 2s ease-in-out infinite;" id="progress-bar"></div>
+            <div style="width: 0%; height: 100%; background: linear-gradient(45deg, #667eea, #764ba2); transition: width 0.3s; animation: progress 3s ease-in-out infinite;" id="progress-bar"></div>
         </div>
     `;
     
@@ -99,6 +100,57 @@ function hideGenerationProgress() {
     if (progressDiv) {
         progressDiv.remove();
     }
+}
+
+// Función para copiar al portapapeles
+function copyToClipboard(ideaKey) {
+    try {
+        const idea = window.currentIdeas[ideaKey];
+        if (!idea) return;
+        
+        const textToCopy = `${idea.content}\n\n${idea.hashtags}`;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                showNotification('✅ Copiado al portapapeles', 'success');
+            }).catch(err => {
+                console.error('Error copiando:', err);
+                fallbackCopyTextToClipboard(textToCopy);
+            });
+        } else {
+            fallbackCopyTextToClipboard(textToCopy);
+        }
+    } catch (error) {
+        console.error('Error en copyToClipboard:', error);
+        showNotification('❌ Error al copiar', 'error');
+    }
+}
+
+// Fallback para copiar texto
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.position = "fixed";
+    
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showNotification('✅ Copiado al portapapeles', 'success');
+        } else {
+            showNotification('❌ Error al copiar', 'error');
+        }
+    } catch (err) {
+        console.error('Fallback: Error al copiar', err);
+        showNotification('❌ Error al copiar', 'error');
+    }
+    
+    document.body.removeChild(textArea);
 }
 
 // Función para obtener red social seleccionada (con fallback robusto)
@@ -190,29 +242,105 @@ async function generateCopywritingClean() {
         // Mostrar progreso
         showGenerationProgress(platform, copyTypes.length);
         
-        // Simular llamada a API (reemplazar con la real)
-        console.log('[CLEAN-SYSTEM] Simulando llamada a API...');
+        // Llamada real a la API de DeepSeek
+        console.log('[CLEAN-SYSTEM] Llamando a la API de DeepSeek...');
         
-        // Para testing, crear ideas simuladas
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Simular delay
+        const apiKey = 'sk-97c8f4c543fa45acabaf02ebcac60f03';
+        const apiUrl = 'https://api.deepseek.com/v1/chat/completions';
         
-        const simulatedIdeas = copyTypes.map((type, index) => ({
-            copyType: type,
-            content: `Esta es una idea simulada de tipo "${type}" para ${platform} sobre "${keyword}". ${userContext ? `Contexto: ${userContext}. ` : ''}${includeCTA ? 'Incluye llamada a la acción específica.' : ''}`,
-            hashtags: `#${keyword.replace(/\s+/g, '')} #${platform} #Marketing`,
-            platform: platform
-        }));
+        // Crear prompt específico para cada tipo de copy
+        const ideas = [];
+        
+        for (const type of copyTypes) {
+            const prompt = `Genera un copywriting para ${platform} sobre "${keyword}" de tipo "${type}".
+${userContext ? `Contexto adicional: ${userContext}` : ''}
+${includeCTA ? 'Debe incluir una llamada a la acción específica.' : ''}
+
+Formato de respuesta:
+- Texto principal del copy (máximo 280 caracteres para Twitter, 125 para LinkedIn, sin límite para Facebook/Instagram)
+- 3-5 hashtags relevantes
+- Que sea atractivo, original y engagement
+
+Responde solo con el copy, sin explicaciones adicionales.`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: [
+                            {
+                                role: 'system',
+                                content: `Eres un experto en copywriting para redes sociales. Creas contenido atractivo, original y optimizado para cada plataforma.`
+                            },
+                            {
+                                role: 'user',
+                                content: prompt
+                            }
+                        ],
+                        max_tokens: 500,
+                        temperature: 0.8
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const content = data.choices[0]?.message?.content || `Copy generado para ${type} sobre ${keyword}`;
+                
+                // Extraer hashtags del contenido si los hay, o generar algunos básicos
+                const hashtags = content.match(/#[\w\u00C0-\u017F]+/g) || 
+                    [`#${keyword.replace(/\s+/g, '')}`, `#${platform}`, '#Marketing'];
+                
+                // Limpiar el contenido de hashtags para separarlo
+                const cleanContent = content.replace(/#[\w\u00C0-\u017F]+/g, '').trim();
+                
+                ideas.push({
+                    copyType: type,
+                    content: cleanContent,
+                    hashtags: hashtags.join(' '),
+                    platform: platform
+                });
+                
+            } catch (error) {
+                console.error(`[CLEAN-SYSTEM] Error generando idea para ${type}:`, error);
+                // Fallback en caso de error
+                ideas.push({
+                    copyType: type,
+                    content: `Error al generar copy para "${type}". Por favor, intenta nuevamente.`,
+                    hashtags: `#${keyword.replace(/\s+/g, '')} #${platform} #Marketing`,
+                    platform: platform
+                });
+            }
+        }
+        
+        const simulatedIdeas = ideas;
         
         // Guardar ideas
         window.currentIdeas = {};
-        simulatedIdeas.forEach((idea, index) => {
+        ideas.forEach((idea, index) => {
             window.currentIdeas[`idea${index + 1}`] = idea;
         });
         
         // Mostrar resultados
         displayResultsClean(window.currentIdeas);
         
-        showNotification(`✅ ${simulatedIdeas.length} ideas generadas para ${platform}`, 'success');
+        const successCount = ideas.filter(idea => !idea.content.includes('Error al generar')).length;
+        const errorCount = ideas.length - successCount;
+        
+        if (errorCount === 0) {
+            showNotification(`✅ ${successCount} ideas generadas exitosamente para ${platform}`, 'success');
+        } else if (successCount > 0) {
+            showNotification(`⚠️ ${successCount} ideas generadas, ${errorCount} con errores`, 'warning');
+        } else {
+            showNotification(`❌ Error generando todas las ideas. Verifica tu conexión.`, 'error');
+        }
         
     } catch (error) {
         console.error('[CLEAN-SYSTEM] Error en generación:', error);
@@ -257,21 +385,40 @@ function displayResultsClean(ideas) {
         return;
     }
     
-    let html = '<h2 style="color: white; margin-bottom: 20px;">💡 Ideas Generadas</h2>';
+    let html = '<h2 style="color: white; margin-bottom: 20px; text-align: center;">💡 Ideas Generadas por IA</h2>';
     
     ideaKeys.forEach((key, index) => {
         const idea = ideas[key];
+        const isError = idea.content.includes('Error al generar');
+        
         html += `
             <div style="
-                background: rgba(255,255,255,0.1);
+                background: ${isError ? 'rgba(255,68,68,0.1)' : 'rgba(255,255,255,0.1)'};
                 padding: 20px;
                 margin: 15px 0;
                 border-radius: 10px;
-                border-left: 4px solid #00ff88;
-            ">
-                <h3 style="color: #00ff88; margin: 0 0 10px 0;">${idea.copyType}</h3>
-                <p style="color: white; line-height: 1.6; margin: 0 0 10px 0;">${idea.content}</p>
-                <p style="color: #aaa; font-style: italic; margin: 0;">${idea.hashtags}</p>
+                border-left: 4px solid ${isError ? '#ff4444' : '#00ff88'};
+                transition: transform 0.2s ease;
+            " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                <h3 style="color: ${isError ? '#ff6666' : '#00ff88'}; margin: 0 0 10px 0; display: flex; align-items: center;">
+                    ${isError ? '❌' : '✨'} ${idea.copyType}
+                </h3>
+                <p style="color: white; line-height: 1.6; margin: 0 0 15px 0; font-size: 16px;">${idea.content}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                    <p style="color: #aaa; font-style: italic; margin: 0; font-size: 14px;">${idea.hashtags}</p>
+                    ${!isError ? `<button onclick="copyToClipboard('${key}')" style="
+                        background: linear-gradient(45deg, #667eea, #764ba2);
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 12px;
+                        transition: transform 0.2s ease;
+                    " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        📋 Copiar
+                    </button>` : ''}
+                </div>
             </div>
         `;
     });
@@ -387,5 +534,6 @@ document.addEventListener('DOMContentLoaded', function() {
 window.showNotification = showNotification;
 window.generateCopywritingClean = generateCopywritingClean;
 window.displayResultsClean = displayResultsClean;
+window.copyToClipboard = copyToClipboard;
 
 console.log('✅ [CLEAN-SYSTEM] Script cargado correctamente');
