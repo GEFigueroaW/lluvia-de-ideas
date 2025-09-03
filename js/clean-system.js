@@ -416,58 +416,108 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
     const platformInfo = platformStructures[platform] || platformStructures['Instagram'];
     
     // Crear prompt específico según el tipo de contenido Y plataforma
-    let systemPrompt = `Eres un experto copywriter especializado en ${platform}. IMPORTANTE: Responde SIEMPRE en español. 
-    Conoces perfectamente las mejores prácticas, algoritmos y formatos específicos de esta plataforma.
-    ${platformInfo.isVideo ? 'Te especializas en crear SCRIPTS para videos que maximizan retención y engagement.' : 'Creas posts que generan máximo engagement y alcance orgánico.'}`;
+    let systemPrompt = `Eres un copywriter experto y filósofo del comportamiento humano especializado en ${platform}. 
+    IMPORTANTE: Responde SIEMPRE en español.
+    
+    Tu especialidad es crear contenido que:
+    - Provoca reflexión profunda y autoconocimiento
+    - Desafía creencias limitantes y paradigmas establecidos
+    - Conecta con las aspiraciones más profundas de las personas
+    - Ofrece perspectivas únicas y contraintuitivas
+    - Genera insights transformadores que cambian la forma de pensar
+    
+    ${platformInfo.isVideo ? 'Creas SCRIPTS que mantienen a la audiencia cautivada mientras aprende algo valioso.' : 'Escribes posts que la gente guarda y comparte porque les cambió la perspectiva.'}`;
     
     let userPrompt = '';
     
     switch(type) {
         case 'Informativo y educativo':
-            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copywriting'} educativo para ${platform} sobre "${keyword}".
+            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copy educativo'} profundo para ${platform} sobre "${keyword}".
             
-            ${userContext ? `CONTEXTO: ${userContext}` : ''}
+            ${userContext ? `CONTEXTO ESPECÍFICO: ${userContext}` : ''}
             
             ESTRUCTURA OBLIGATORIA para ${platform}:
             ${platformInfo.structure}
             
-            ${platformInfo.isVideo ? 'ENFOQUE DE VIDEO:' : 'CARACTERÍSTICAS:'}
+            CRITERIOS DE CALIDAD OBLIGATORIOS:
+            1. PROFUNDIDAD REAL: No uses frases genéricas. Ofrece insights específicos y contradictorios a lo que normalmente se piensa sobre ${keyword}.
+            
+            2. REFLEXIÓN AUTÉNTICA: Incluye al menos 2 preguntas que obliguen a la persona a cuestionar sus creencias actuales sobre ${keyword}.
+            
+            3. PERSPECTIVA ÚNICA: Presenta un ángulo que el 95% de las personas no ha considerado sobre ${keyword}.
+            
+            4. TRANSFORMACIÓN PRÁCTICA: Ofrece una idea específica y accionable que la persona puede implementar HOY para cambiar su relación con ${keyword}.
+            
+            5. CONEXIÓN EMOCIONAL: Conecta ${keyword} con aspiraciones profundas de crecimiento personal, propósito o autorrealización.
+            
             ${platformInfo.isVideo ? 
-                `- Script detallado con timing (ej: "0-3s: mostrar problema", "4-10s: explicar solución")
-                - Indicaciones visuales específicas (ej: "close-up a las manos", "transición rápida")
-                - Elementos de retención (cambios de ritmo, preguntas directas)
-                - Audio y música sugeridos` :
-                `- Ser profundamente reflexivo e invitar a la introspección
-                - Incluir preguntas que hagan pensar
-                - Tener un enfoque educativo y transformador
-                - Incluir emojis estratégicos para ${platform}`}
+                `ELEMENTOS DE VIDEO OBLIGATORIOS:
+                - Hook inicial (0-5s): Una pregunta o declaración que desafíe una creencia común
+                - Desarrollo (5-25s): Explicación del insight contraintuitivo con ejemplo específico
+                - Reflexión (25-35s): Pregunta profunda que personalice el insight
+                - Cierre (35-45s): Acción específica que pueden tomar hoy` :
+                `ELEMENTOS DE COPY OBLIGATORIOS:
+                - Apertura disruptiva que cuestione una creencia común sobre ${keyword}
+                - Desarrollo con un insight específico y sorprendente
+                - Pregunta reflexiva que personalice el concepto
+                - Perspectiva práctica y accionable`}
             
             FORMATO: ${platformInfo.format}
             LÍMITE: ${platformInfo.limits}
             
+            PROHIBIDO:
+            - Frases cliché como "¿Sabías que...", "La mayoría de personas..."
+            - Consejos obvios o genéricos
+            - Información que se puede encontrar en cualquier blog básico
+            
             ${!includeCTA ? 'NO incluyas call-to-action, eso se agregará por separado.' : ''}
             
-            RESPONDE EN ESPAÑOL. NO uses otros idiomas.`;
+            RESPONDE EN ESPAÑOL. Debe ser contenido que genuinamente aporte valor y haga reflexionar.`;
             break;
             
         case 'Venta directa y persuasivo':
-            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copywriting'} persuasivo para ${platform} sobre "${keyword}".
+            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copy persuasivo'} poderoso para ${platform} sobre "${keyword}".
             
-            ${userContext ? `CONTEXTO: ${userContext}` : ''}
+            ${userContext ? `CONTEXTO ESPECÍFICO: ${userContext}` : ''}
             
             ESTRUCTURA OBLIGATORIA para ${platform}:
             ${platformInfo.structure}
             
-            ${platformInfo.isVideo ? 'ENFOQUE DE VIDEO:' : 'CARACTERÍSTICAS:'}
+            CRITERIOS DE PERSUASIÓN AVANZADA:
+            1. IDENTIFICACIÓN DEL DOLOR: Describe una frustración específica y visceral que tu audiencia siente sobre ${keyword} (no genérica).
+            
+            2. AGITACIÓN INTELIGENTE: Muestra las consecuencias reales de NO actuar, usando ejemplos específicos y calculables.
+            
+            3. SOLUCIÓN CONTRAINTUITIVA: Presenta una forma de abordar ${keyword} que va contra lo que "todos hacen".
+            
+            4. PRUEBA ESPECÍFICA: Incluye un resultado específico, número o transformación real relacionada con ${keyword}.
+            
+            5. URGENCIA AUTÉNTICA: Crea sensación de oportunidad limitada basada en factores reales del mercado o situación.
+            
             ${platformInfo.isVideo ? 
-                `- Script con ganchos visuales cada 5-7 segundos
-                - Elementos de prueba social (testimonios, números)
-                - Transiciones que mantienen atención
-                - Timing específico para cada sección` :
-                `- Ser altamente persuasivo y motivador
-                - Crear urgencia y deseo de forma ética
-                - Incluir beneficios claros y específicos
-                - Usar gatillos psicológicos apropiados para ${platform}`}
+                `ELEMENTOS DE VIDEO PERSUASIVO:
+                - Hook (0-3s): Problema específico que duele
+                - Agitación (3-15s): Consecuencias de seguir igual
+                - Solución (15-30s): Enfoque contraintuitivo con prueba
+                - Urgencia (30-40s): Por qué actuar ahora` :
+                `ELEMENTOS DE COPY PERSUASIVO:
+                - Apertura con problema visceral y específico
+                - Desarrollo mostrando el costo real de la inacción
+                - Presentación de la solución contraintuitiva
+                - Elemento de urgencia auténtica`}
+            
+            FORMATO: ${platformInfo.format}
+            LÍMITE: ${platformInfo.limits}
+            
+            PROHIBIDO:
+            - "Compra ahora" o CTAs obvios
+            - Promesas vagas o imposibles de medir
+            - Urgencia falsa ("Solo hoy", sin justificación real)
+            
+            ${!includeCTA ? 'NO incluyas call-to-action, eso se agregará por separado.' : ''}
+            
+            RESPONDE EN ESPAÑOL. Debe ser persuasivo pero ético y basado en valor real.`;
+            break;
             
             FORMATO: ${platformInfo.format}
             LÍMITE: ${platformInfo.limits}
@@ -478,30 +528,47 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
             break;
             
         case 'Posicionamiento y branding':
-            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copywriting'} de branding para ${platform} sobre "${keyword}".
+            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copy de branding'} de autoridad para ${platform} sobre "${keyword}".
             
-            ${userContext ? `CONTEXTO: ${userContext}` : ''}
+            ${userContext ? `CONTEXTO ESPECÍFICO: ${userContext}` : ''}
             
             ESTRUCTURA OBLIGATORIA para ${platform}:
             ${platformInfo.structure}
             
-            ${platformInfo.isVideo ? 'ENFOQUE DE VIDEO:' : 'CARACTERÍSTICAS:'}
+            CRITERIOS DE AUTORIDAD Y POSICIONAMIENTO:
+            1. CREDIBILIDAD ESPECÍFICA: Demuestra experiencia real en ${keyword} con un ejemplo concreto o caso específico (no genérico).
+            
+            2. PERSPECTIVA DIFERENCIADORA: Presenta una filosofía o enfoque sobre ${keyword} que te distingue de otros en el mercado.
+            
+            3. LIDERAZGO DE PENSAMIENTO: Ofrece una predicción, tendencia o insight sobre el futuro de ${keyword} que otros no están viendo.
+            
+            4. VALOR DEMOSTRABLE: Comparte un framework, proceso o metodología específica que usas para ${keyword}.
+            
+            5. POSICIONAMIENTO CLARO: Define explícitamente para quién ERES y para quién NO ERES en el espacio de ${keyword}.
+            
             ${platformInfo.isVideo ? 
-                `- Script que construye autoridad visualmente
-                - Elementos de credibilidad y experiencia
-                - Narrativa de marca consistente
-                - Presentación profesional pero accesible` :
-                `- Posicionar como líder y experto en el tema
-                - Transmitir autoridad y confianza
-                - Diferenciarse claramente de la competencia
-                - Construir marca personal/corporativa`}
+                `ELEMENTOS DE VIDEO DE AUTORIDAD:
+                - Apertura (0-5s): Declaración de posicionamiento contundente
+                - Credibilidad (5-20s): Ejemplo específico o caso de éxito
+                - Diferenciación (20-35s): Tu enfoque único sobre ${keyword}
+                - Autoridad (35-45s): Insight o predicción que demuestre liderazgo` :
+                `ELEMENTOS DE COPY DE AUTORIDAD:
+                - Declaración de posicionamiento clara y diferenciada
+                - Demostración de experiencia con ejemplo específico
+                - Tu metodología o enfoque único sobre ${keyword}
+                - Insight que posicione como líder de pensamiento`}
             
             FORMATO: ${platformInfo.format}
             LÍMITE: ${platformInfo.limits}
             
+            PROHIBIDO:
+            - Lenguaje corporativo vacío o clichés de marketing
+            - Afirmaciones sin respaldo específico
+            - Posicionamiento vago o genérico
+            
             ${!includeCTA ? 'NO incluyas call-to-action, eso se agregará por separado.' : ''}
             
-            RESPONDE EN ESPAÑOL. NO uses otros idiomas.`;
+            RESPONDE EN ESPAÑOL. Debe posicionar como verdadero experto con autoridad real.`;
             break;
     }
     
@@ -517,9 +584,9 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
                 content: userPrompt
             }
         ],
-        temperature: 0.7,
-        max_tokens: 600,
-        top_p: 0.8
+        temperature: 0.9,
+        max_tokens: 800,
+        top_p: 0.9
     };
     
     console.log(`[DEEPSEEK] 📤 Enviando request a API...`);
