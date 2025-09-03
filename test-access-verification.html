@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST ACCESO - Verificación Completa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            margin: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .test-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #00ff88;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .error { border-left-color: #ff4444; background: rgba(255, 68, 68, 0.1); }
+        .success { border-left-color: #00ff88; background: rgba(0, 255, 136, 0.1); }
+        .warning { border-left-color: #ffaa00; background: rgba(255, 170, 0, 0.1); }
+        pre { background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; overflow-x: auto; }
+        .btn {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            color: #003311;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 TEST ACCESO - Verificación Completa</h1>
+        
+        <div class="test-item" id="page-load">
+            <h3>📄 Carga de Página</h3>
+            <div id="page-results">Verificando...</div>
+        </div>
+        
+        <div class="test-item" id="scripts-load">
+            <h3>📋 Carga de Scripts</h3>
+            <div id="scripts-results">Verificando...</div>
+        </div>
+        
+        <div class="test-item" id="auth-status">
+            <h3>🔐 Estado de Autenticación</h3>
+            <div id="auth-results">Verificando...</div>
+        </div>
+        
+        <div class="test-item" id="carousel-status">
+            <h3>🎠 Estado del Carrusel</h3>
+            <div id="carousel-results">Verificando...</div>
+        </div>
+        
+        <div class="test-item" id="form-status">
+            <h3>📝 Estado del Formulario</h3>
+            <div id="form-results">Verificando...</div>
+        </div>
+        
+        <div class="test-item">
+            <h3>🔧 Acciones de Test</h3>
+            <button class="btn" onclick="testDirectAccess()">🚀 Probar Acceso Directo</button>
+            <button class="btn" onclick="testBypass()">🔓 Probar Bypass</button>
+            <button class="btn" onclick="reloadTest()">🔄 Recargar Test</button>
+        </div>
+        
+        <div class="test-item">
+            <h3>📊 Logs del Sistema</h3>
+            <pre id="system-logs">Inicializando...</pre>
+        </div>
+    </div>
+
+    <!-- Cargar scripts en el mismo orden que la página principal -->
+    <script src="simple-bypass.js"></script>
+    <script src="js/auth-minimal.js"></script>
+    <script src="js/simple-social-carousel.js"></script>
+    <script src="js/clean-system.js"></script>
+
+    <script>
+        let logs = [];
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            logs.push(`[${timestamp}] ${type.toUpperCase()}: ${message}`);
+            updateLogs();
+        }
+        
+        function updateLogs() {
+            document.getElementById('system-logs').textContent = logs.slice(-20).join('\n');
+        }
+        
+        function setResult(containerId, status, message) {
+            const container = document.getElementById(containerId);
+            container.className = `test-item ${status}`;
+            container.querySelector('div[id$="-results"]').innerHTML = message;
+        }
+        
+        function testPageLoad() {
+            addLog('Iniciando test de carga de página...');
+            
+            try {
+                const url = window.location.href;
+                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                
+                setResult('page-load', 'success', `
+                    ✅ Página cargada correctamente<br>
+                    📍 URL: ${url}<br>
+                    ⏱️ Tiempo de carga: ${loadTime}ms
+                `);
+                addLog('Página cargada correctamente', 'success');
+            } catch (error) {
+                setResult('page-load', 'error', `❌ Error: ${error.message}`);
+                addLog(`Error en carga de página: ${error.message}`, 'error');
+            }
+        }
+        
+        function testScripts() {
+            addLog('Iniciando test de scripts...');
+            
+            const requiredFunctions = [
+                'forceAdminBypass',
+                'showNotification', 
+                'SimpleSocialCarousel',
+                'getSelectedSocialNetwork',
+                'generateCopywritingClean'
+            ];
+            
+            let loadedCount = 0;
+            let results = '<ul>';
+            
+            requiredFunctions.forEach(func => {
+                const exists = typeof window[func] !== 'undefined';
+                results += `<li>${exists ? '✅' : '❌'} ${func}</li>`;
+                if (exists) loadedCount++;
+            });
+            
+            results += '</ul>';
+            
+            const status = loadedCount === requiredFunctions.length ? 'success' : 'warning';
+            setResult('scripts-load', status, `
+                ${status === 'success' ? '✅' : '⚠️'} Scripts: ${loadedCount}/${requiredFunctions.length} cargados<br>
+                ${results}
+            `);
+            
+            addLog(`Scripts cargados: ${loadedCount}/${requiredFunctions.length}`, status === 'success' ? 'success' : 'warning');
+        }
+        
+        function testAuth() {
+            addLog('Iniciando test de autenticación...');
+            
+            try {
+                const userProfile = window.userProfile || {};
+                const hasForceBypass = typeof window.forceAdminBypass === 'function';
+                
+                setResult('auth-status', 'success', `
+                    ✅ Sistema de autenticación activo<br>
+                    👤 Usuario: ${userProfile.email || 'No autenticado'}<br>
+                    🔧 Bypass disponible: ${hasForceBypass ? 'Sí' : 'No'}<br>
+                    🎫 Premium: ${userProfile.isPremium ? 'Sí' : 'No'}<br>
+                    👑 Admin: ${userProfile.isAdmin ? 'Sí' : 'No'}
+                `);
+                addLog('Sistema de autenticación verificado', 'success');
+            } catch (error) {
+                setResult('auth-status', 'error', `❌ Error: ${error.message}`);
+                addLog(`Error en autenticación: ${error.message}`, 'error');
+            }
+        }
+        
+        function testCarousel() {
+            addLog('Iniciando test de carrusel...');
+            
+            try {
+                const carouselExists = typeof SimpleSocialCarousel !== 'undefined';
+                const getNetworkExists = typeof getSelectedSocialNetwork === 'function';
+                
+                let selectedNetwork = 'No disponible';
+                if (getNetworkExists) {
+                    try {
+                        selectedNetwork = getSelectedSocialNetwork();
+                    } catch (e) {
+                        selectedNetwork = `Error: ${e.message}`;
+                    }
+                }
+                
+                const status = carouselExists && getNetworkExists ? 'success' : 'warning';
+                setResult('carousel-status', status, `
+                    ${carouselExists ? '✅' : '❌'} SimpleSocialCarousel: ${carouselExists ? 'Disponible' : 'No disponible'}<br>
+                    ${getNetworkExists ? '✅' : '❌'} getSelectedSocialNetwork: ${getNetworkExists ? 'Disponible' : 'No disponible'}<br>
+                    🎯 Red seleccionada: ${selectedNetwork}
+                `);
+                
+                addLog(`Carrusel: ${status}`, status);
+            } catch (error) {
+                setResult('carousel-status', 'error', `❌ Error: ${error.message}`);
+                addLog(`Error en carrusel: ${error.message}`, 'error');
+            }
+        }
+        
+        function testForm() {
+            addLog('Iniciando test de formulario...');
+            
+            try {
+                const form = document.getElementById('copywritingForm');
+                const generateBtn = document.getElementById('generateCopyBtn');
+                const keywordField = document.getElementById('copyKeyword');
+                const checkboxes = document.querySelectorAll('input[name="copyTypes"]');
+                
+                setResult('form-status', 'warning', `
+                    ${form ? '✅' : '❌'} Formulario: ${form ? 'Encontrado' : 'No encontrado'}<br>
+                    ${generateBtn ? '✅' : '❌'} Botón generar: ${generateBtn ? 'Encontrado' : 'No encontrado'}<br>
+                    ${keywordField ? '✅' : '❌'} Campo keyword: ${keywordField ? 'Encontrado' : 'No encontrado'}<br>
+                    📝 Checkboxes: ${checkboxes.length} encontrados<br>
+                    ⚠️ <em>Nota: Elementos pueden no estar en esta página de test</em>
+                `);
+                
+                addLog(`Formulario verificado - elementos principales: ${!!form}`, 'info');
+            } catch (error) {
+                setResult('form-status', 'error', `❌ Error: ${error.message}`);
+                addLog(`Error en formulario: ${error.message}`, 'error');
+            }
+        }
+        
+        function testDirectAccess() {
+            addLog('Probando acceso directo...', 'info');
+            window.open('https://lluvia-de-ideas-20b80.web.app/', '_blank');
+        }
+        
+        function testBypass() {
+            addLog('Ejecutando bypass...', 'info');
+            if (typeof window.forceAdminBypass === 'function') {
+                window.forceAdminBypass();
+                setTimeout(() => {
+                    testAuth();
+                    addLog('Bypass ejecutado', 'success');
+                }, 1000);
+            } else {
+                addLog('Función forceAdminBypass no disponible', 'error');
+            }
+        }
+        
+        function reloadTest() {
+            location.reload();
+        }
+        
+        function runAllTests() {
+            addLog('Iniciando batería completa de tests...', 'info');
+            
+            setTimeout(() => testPageLoad(), 100);
+            setTimeout(() => testScripts(), 500);
+            setTimeout(() => testAuth(), 1000);
+            setTimeout(() => testCarousel(), 1500);
+            setTimeout(() => testForm(), 2000);
+        }
+        
+        // Interceptar console para capturar logs
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            if (args[0] && typeof args[0] === 'string') {
+                addLog(args.join(' '));
+            }
+        };
+        
+        // Ejecutar tests al cargar
+        document.addEventListener('DOMContentLoaded', () => {
+            addLog('DOM cargado, iniciando tests...', 'success');
+            runAllTests();
+        });
+        
+        window.addEventListener('load', () => {
+            addLog('Página completamente cargada', 'success');
+        });
+        
+        addLog('Script de test inicializado', 'info');
+    </script>
+</body>
+</html>
