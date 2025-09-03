@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="css/autocorrector.css">
     <link rel="stylesheet" href="css/new-structure.css">
     <link rel="stylesheet" href="css/simple-social-carousel.css">
+    <link rel="stylesheet" href="css/copy-carousel.css">
     
     <!-- Meta tags para SEO -->
     <meta name="description" content="Generador de ideas inteligente impulsado por IA para potenciar tu creatividad">
@@ -265,123 +266,91 @@
                                 </p>
                             </div>
 
-                            <!-- 3. Tipos de Copy (múltiples selecciones) -->
+                            <!-- 3. Tipos de Copy (carrusel vertical) -->
                             <div class="modern-field">
                                 <label class="modern-label">
                                     <i class="fas fa-edit mr-2"></i>
                                     Tipos de Copy (Selecciona 1-3)
                                 </label>
-                                <div class="copy-types-grid">
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Informativo y educativo" checked>
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>📚 Informativo y educativo</h4>
-                                            <p>Comparte conocimiento útil y educa a tu audiencia</p>
+                                
+                                <!-- Carrusel vertical de tipos de copy -->
+                                <div class="copy-carousel-container">
+                                    <div class="copy-carousel-viewport">
+                                        <div class="copy-carousel" id="copyCarousel">
+                                            <div class="copy-carousel-item" data-copy="Informativo y educativo">
+                                                <span class="copy-emoji">📚</span>
+                                                <div class="copy-content">
+                                                    <h4>Informativo y educativo</h4>
+                                                    <p>Comparte conocimiento útil y educa a tu audiencia</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="copy-carousel-item" data-copy="Venta directa y persuasivo">
+                                                <span class="copy-emoji">💰</span>
+                                                <div class="copy-content">
+                                                    <h4>Venta directa y persuasivo</h4>
+                                                    <p>Impulsa ventas con llamadas a la acción directas</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="copy-carousel-item" data-copy="Posicionamiento y branding">
+                                                <span class="copy-emoji">🏆</span>
+                                                <div class="copy-content">
+                                                    <h4>Posicionamiento y branding</h4>
+                                                    <p>Fortalece tu marca y construye autoridad</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="copy-carousel-item" data-copy="Urgencia y escasez">
+                                                <span class="copy-emoji">⚡</span>
+                                                <div class="copy-content">
+                                                    <h4>Urgencia y escasez</h4>
+                                                    <p>Crea FOMO y acelera decisiones de compra</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="copy-carousel-item" data-copy="De beneficio o solución">
+                                                <span class="copy-emoji">💡</span>
+                                                <div class="copy-content">
+                                                    <h4>De beneficio o solución</h4>
+                                                    <p>Cómo el producto mejora la vida del cliente</p>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="copy-carousel-item" data-copy="De novedad o lanzamiento">
+                                                <span class="copy-emoji">🚀</span>
+                                                <div class="copy-content">
+                                                    <h4>De novedad o lanzamiento</h4>
+                                                    <p>Anuncia algo nuevo para atraer atención inmediata</p>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </label>
+                                    </div>
                                     
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Venta directa y persuasivo">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>💰 Venta directa y persuasivo</h4>
-                                            <p>Impulsa ventas con llamadas a la acción directas</p>
-                                        </div>
-                                    </label>
+                                    <!-- Controles del carrusel -->
+                                    <div class="copy-carousel-controls">
+                                        <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(-1)">
+                                            <i class="fas fa-chevron-up"></i>
+                                        </button>
+                                        <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(1)">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                    </div>
                                     
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Posicionamiento y branding">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>🏆 Posicionamiento y branding</h4>
-                                            <p>Fortalece tu marca y construye autoridad</p>
+                                    <!-- Selecciones actuales -->
+                                    <div class="copy-selections" id="copySelections">
+                                        <div class="selections-header">
+                                            <span class="selections-title">Seleccionados:</span>
+                                            <span class="selections-count" id="selectionsCount">0/3</span>
                                         </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Urgencia y escasez">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>⚡ Urgencia y escasez</h4>
-                                            <p>Crea FOMO y acelera decisiones de compra</p>
+                                        <div class="selections-list" id="selectionsList">
+                                            <span class="no-selections">Ningún tipo seleccionado</span>
                                         </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="De beneficio o solución">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>✨ De beneficio o solución</h4>
-                                            <p>Cómo el producto mejora la vida del cliente</p>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="De novedad o lanzamiento">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>🚀 De novedad o lanzamiento</h4>
-                                            <p>Anuncia algo nuevo para atraer atención inmediata</p>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="De interacción o pregunta">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>💬 De interacción o pregunta</h4>
-                                            <p>Diseñado para generar respuestas de la audiencia</p>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Llamada a la acción (CTA)">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>👆 Llamada a la acción (CTA)</h4>
-                                            <p>Motiva acción directa (comprar, registrarse)</p>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Narrativo o storytelling">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>📖 Narrativo o storytelling</h4>
-                                            <p>Cuenta una historia emocional</p>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Testimonio o prueba social">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>⭐ Testimonio o prueba social</h4>
-                                            <p>Muestra experiencias positivas de otros usuarios</p>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Técnico o profesional">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>🔬 Técnico o profesional</h4>
-                                            <p>Información especializada o técnica</p>
-                                        </div>
-                                    </label>
-                                    
-                                    <label class="copy-type-checkbox">
-                                        <input type="checkbox" name="copyTypes" value="Informal">
-                                        <span class="checkbox-custom"></span>
-                                        <div class="copy-type-content">
-                                            <h4>😎 Informal</h4>
-                                            <p>Tono casual, cercano</p>
-                                        </div>
-                                    </label>
+                                    </div>
                                 </div>
+                                
                                 <p class="field-note">
-                                    🎯 Selecciona máximo 3 tipos. Si eliges 3, obtendrás 1 idea de cada tipo.
+                                    🎯 Rota el carrusel y haz clic para seleccionar hasta 3 tipos de copy
                                 </p>
                             </div>
 
@@ -540,6 +509,7 @@
     <script src="simple-bypass.js"></script>
     <script src="js/auth-minimal.js"></script>
     <script src="js/simple-social-carousel.js"></script>
+    <script src="js/copy-carousel.js"></script>
     <script src="js/clean-system.js"></script>
     <script src="js/force-transition.js"></script>
     
