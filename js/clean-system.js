@@ -375,8 +375,9 @@ async function generateIdeaWithAI(platform, keyword, type, userContext, includeC
         return await generateWithDeepSeek(platform, keyword, type, userContext, includeCTA);
     } catch (error) {
         console.error(`[AI] Error con DeepSeek API:`, error);
-        showNotification('Error con IA - usando sistema de respaldo', 'warning');
-        return await generateFallbackIdea(platform, keyword, type, userContext, includeCTA);
+        showNotification('Error con IA - reintentando...', 'warning');
+        // Forzar reintento en lugar de fallback para mantener enfoque temático
+        return await generateWithDeepSeek(platform, keyword, type, userContext, includeCTA);
     }
 }
 
