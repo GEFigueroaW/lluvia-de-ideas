@@ -80,8 +80,9 @@ CRITERIOS OBLIGATORIOS:
 - Ofrece una idea accionable implementable HOY
 - Conecta con aspiraciones profundas de crecimiento
 
+${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a la acción natural y específica para la plataforma que motive a la audiencia a interactuar, comentar, compartir o realizar una acción específica.' : 'NO incluyas call-to-action al final.'}
+
 PROHIBIDO: Frases cliché, consejos obvios, información genérica
-${!includeCTA ? 'NO incluyas call-to-action.' : ''}
 
 RESPONDE EN ESPAÑOL con contenido genuinamente valioso.`;
     } else if (type === 'Venta directa y persuasivo') {
@@ -94,8 +95,9 @@ CRITERIOS OBLIGATORIOS:
 - Incluye prueba específica o resultado real
 - Crea urgencia auténtica basada en factores reales
 
-PROHIBIDO: Promesas vagas, urgencia falsa, CTAs obvios
-${!includeCTA ? 'NO incluyas call-to-action.' : ''}
+${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a la acción poderosa y directa que impulse a la compra, registro o acción específica, integrada naturalmente en el texto.' : 'NO incluyas call-to-action al final.'}
+
+PROHIBIDO: Promesas vagas, urgencia falsa
 
 RESPONDE EN ESPAÑOL siendo persuasivo pero ético.`;
     } else if (type === 'Posicionamiento y branding') {
@@ -108,8 +110,9 @@ CRITERIOS OBLIGATORIOS:
 - Comparte framework o metodología específica
 - Define claramente para quién ERES y para quién NO
 
+${includeCTA ? 'INCLUIR CALL-TO-ACTION: Al final del copy, incluye una llamada a la acción que refuerce tu autoridad e invite a seguirte, conectar contigo o conocer más sobre tu trabajo, integrada de forma natural.' : 'NO incluyas call-to-action al final.'}
+
 PROHIBIDO: Lenguaje corporativo vacío, afirmaciones sin respaldo
-${!includeCTA ? 'NO incluyas call-to-action.' : ''}
 
 RESPONDE EN ESPAÑOL posicionando como verdadero experto.`;
     }
@@ -150,13 +153,8 @@ RESPONDE EN ESPAÑOL posicionando como verdadero experto.`;
     const content = data.choices[0].message.content.trim();
     const formattedContent = formatContentText(content);
     
-    // Generar prompt visual y CTA
+    // Generar prompt visual
     let visualPrompt = generateVisualPrompt(platform, keyword, type, formattedContent);
-    let ctaContent = null;
-    
-    if (includeCTA) {
-        ctaContent = generateFallbackCTA(platform, type);
-    }
     
     console.log(`[DEEPSEEK] 🎯 Contenido IA generado exitosamente`);
     
@@ -167,7 +165,7 @@ RESPONDE EN ESPAÑOL posicionando como verdadero experto.`;
         generatedBy: '🤖 IA Real (DeepSeek)',
         isRealAI: true,
         visualPrompt: visualPrompt,
-        cta: ctaContent,
+        cta: null, // Ya no se genera por separado
         includeCTA: includeCTA
     };
 }
@@ -232,7 +230,7 @@ Aquí tienes 3 insights que cambiarán tu perspectiva:
 
 ${userContext ? `Aplicado a tu contexto: ${userContext}` : ''}
 
-La pregunta real es: ¿estás dispuesto a cuestionar lo que creías saber?`;
+La pregunta real es: ¿estás dispuesto a cuestionar lo que creías saber?${includeCTA ? '\n\n💬 Cuéntame en los comentarios: ¿cuál de estos insights te sorprendió más?' : ''}`;
     } else if (type === 'Venta directa y persuasivo') {
         content = `🚨 REALIDAD BRUTAL sobre ${keyword}
 
@@ -247,7 +245,7 @@ ${keyword} no es lo que te han vendido. Es más complejo, pero también más pod
 
 ${userContext ? `En tu caso específico: ${userContext}` : ''}
 
-La diferencia entre éxito y fracaso está en los próximos 30 días.`;
+La diferencia entre éxito y fracaso está en los próximos 30 días.${includeCTA ? '\n\n🔥 ¿Listo para cambiar tu enfoque? Escríbeme "SÍ" en los comentarios.' : ''}`;
     } else {
         content = `💡 Mi enfoque contrario sobre ${keyword}
 
@@ -262,7 +260,7 @@ Mi metodología es diferente:
 
 ${userContext ? `Para tu contexto: ${userContext}` : ''}
 
-No sigo tendencias. Creo estrategias que funcionan cuando otros fallan.`;
+No sigo tendencias. Creo estrategias que funcionan cuando otros fallan.${includeCTA ? '\n\n👑 Sígueme para más insights contraintuitivos que realmente funcionan.' : ''}`;
     }
     
     return {
@@ -272,7 +270,7 @@ No sigo tendencias. Creo estrategias que funcionan cuando otros fallan.`;
         generatedBy: '🔄 Sistema de Respaldo',
         isRealAI: false,
         visualPrompt: generateVisualPrompt(platform, keyword, type, content),
-        cta: includeCTA ? generateFallbackCTA(platform, type) : null,
+        cta: null, // Ya no se genera por separado
         includeCTA: includeCTA
     };
 }
@@ -409,19 +407,6 @@ function displayResults(ideas) {
                     line-height: 1.6;
                 ">${idea.content}</div>
                 
-                ${idea.cta ? `
-                    <div style="
-                        background: rgba(255,255,255,0.7);
-                        padding: 15px;
-                        border-radius: 8px;
-                        margin-bottom: 15px;
-                        border: 1px dashed ${borderColor};
-                    ">
-                        <strong style="color: ${borderColor};">📢 Call-to-Action:</strong><br>
-                        ${idea.cta}
-                    </div>
-                ` : ''}
-                
                 <div style="
                     background: rgba(255,255,255,0.7);
                     padding: 15px;
@@ -443,19 +428,6 @@ function displayResults(ideas) {
                         font-weight: bold;
                         font-size: 0.9em;
                     ">📋 Copiar Contenido</button>
-                    
-                    ${idea.cta ? `
-                        <button onclick="copyToClipboard('${index}', 'cta')" style="
-                            background: rgba(${borderColor === '#2196f3' ? '33,150,243' : borderColor === '#9c27b0' ? '156,39,176' : '76,175,80'},0.8);
-                            color: white;
-                            border: none;
-                            padding: 10px 20px;
-                            border-radius: 6px;
-                            cursor: pointer;
-                            font-weight: bold;
-                            font-size: 0.9em;
-                        ">📢 Copiar CTA</button>
-                    ` : ''}
                     
                     <button onclick="copyToClipboard('${index}', 'visual')" style="
                         background: rgba(${borderColor === '#2196f3' ? '33,150,243' : borderColor === '#9c27b0' ? '156,39,176' : '76,175,80'},0.6);
@@ -484,15 +456,14 @@ function copyToClipboard(index, type) {
     
     if (type === 'content') {
         textToCopy = idea.content;
-    } else if (type === 'cta') {
-        textToCopy = idea.cta || '';
     } else if (type === 'visual') {
         textToCopy = idea.visualPrompt;
     }
     
     if (navigator.clipboard) {
         navigator.clipboard.writeText(textToCopy).then(() => {
-            showNotification('¡Copiado al portapapeles!', 'success');
+            const typeText = type === 'content' ? 'Contenido' : 'Prompt Visual';
+            showNotification(`¡${typeText} copiado al portapapeles!`, 'success');
         }).catch(err => {
             console.error('Error al copiar:', err);
             showNotification('Error al copiar', 'error');
@@ -505,7 +476,8 @@ function copyToClipboard(index, type) {
         textArea.select();
         document.execCommand('copy');
         document.body.removeChild(textArea);
-        showNotification('¡Copiado al portapapeles!', 'success');
+        const typeText = type === 'content' ? 'Contenido' : 'Prompt Visual';
+        showNotification(`¡${typeText} copiado al portapapeles!`, 'success');
     }
 }
 
