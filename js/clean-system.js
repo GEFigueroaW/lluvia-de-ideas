@@ -307,20 +307,30 @@ async function generateVisualPromptWithAI(platform, keyword, type, content) {
     const DEEPSEEK_API_KEY = 'sk-195d3e74fc904857a632ee7b22b174ff';
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
     
-    const systemPrompt = `Eres un experto en prompts para generación de imágenes y videos con IA. Creas prompts específicos y detallados para cada plataforma social.`;
+    const systemPrompt = `Eres un experto en prompts para generación de imágenes y videos con IA. IMPORTANTE: Responde SIEMPRE en español.
+    Creas prompts específicos y detallados para cada plataforma social, optimizados para herramientas como Midjourney, DALL-E, Stable Diffusion, o Runway.`;
     
-    const userPrompt = `Basándote en este copywriting: "${content.substring(0, 200)}..."
+    const userPrompt = `Basándote en este copywriting: "${content.substring(0, 300)}..."
     
-    Genera un prompt específico para crear contenido visual en ${platform} sobre "${keyword}" de tipo "${type}".
+    Genera un prompt específico en ESPAÑOL para crear contenido visual complementario en ${platform} sobre "${keyword}" de tipo "${type}".
     
-    El prompt debe:
-    - Ser específico para ${platform} (formato, estilo, dimensiones)
-    - Describir elementos visuales que complementen el copy
-    - Incluir estilo fotográfico/artístico apropiado
-    - Ser claro y detallado para IA de imágenes/video
-    - Tener entre 100-150 palabras
+    ESPECIFICACIONES TÉCNICAS para ${platform}:
+    ${platform === 'Instagram' ? '- Formato: Imagen cuadrada 1080x1080px, estilo feed moderno y atractivo' : ''}
+    ${platform === 'TikTok' ? '- Formato: Video vertical 9:16 (1080x1920px), dinámico y llamativo para audiencia joven' : ''}
+    ${platform === 'LinkedIn' ? '- Formato: Imagen horizontal 1200x628px, estilo profesional y corporativo' : ''}
+    ${platform === 'Facebook' ? '- Formato: Imagen 1200x630px, estilo familiar y accesible' : ''}
+    ${platform === 'Twitter' ? '- Formato: Imagen 1200x675px, impactante y memorable' : ''}
+    ${platform === 'YouTube' ? '- Formato: Miniatura 1280x720px, llamativa y clara para thumbnails' : ''}
     
-    Responde SOLO con el prompt, sin explicaciones adicionales.`;
+    El prompt debe incluir:
+    - Descripción visual específica que complemente el copywriting
+    - Estilo fotográfico/artístico apropiado para ${platform}
+    - Colores, iluminación y composición
+    - Elementos visuales que refuercen el mensaje
+    - Aspectos técnicos (calidad, resolución, estilo)
+    
+    RESPONDE SOLO CON EL PROMPT en español, sin explicaciones adicionales.
+    Longitud: 80-120 palabras.`;
     
     const requestBody = {
         model: "deepseek-chat",
@@ -328,8 +338,8 @@ async function generateVisualPromptWithAI(platform, keyword, type, content) {
             { role: "system", content: systemPrompt },
             { role: "user", content: userPrompt }
         ],
-        temperature: 0.7,
-        max_tokens: 300,
+        temperature: 0.6,
+        max_tokens: 250,
         top_p: 0.8
     };
     
@@ -352,7 +362,7 @@ async function generateVisualPromptWithAI(platform, keyword, type, content) {
         throw new Error('Respuesta inválida de DeepSeek Visual API');
     }
     
-    console.log(`[DEEPSEEK-VISUAL] ✅ Prompt visual IA generado`);
+    console.log(`[DEEPSEEK-VISUAL] ✅ Prompt visual IA generado en español`);
     return data.choices[0].message.content.trim();
 }
 
@@ -363,48 +373,135 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
     const DEEPSEEK_API_KEY = 'sk-195d3e74fc904857a632ee7b22b174ff';
     const API_URL = 'https://api.deepseek.com/v1/chat/completions';
     
-    // Crear prompt específico según el tipo de contenido
-    let systemPrompt = '';
+    // Definir estructura específica por plataforma
+    const platformStructures = {
+        'Instagram': {
+            isVideo: false,
+            structure: '1. GANCHO inicial llamativo, 2. DESARROLLO del concepto, 3. STORYTELLING personal, 4. HASHTAGS relevantes',
+            format: 'Post cuadrado 1080x1080, texto directo y visual',
+            limits: '400-500 caracteres máximo'
+        },
+        'TikTok': {
+            isVideo: true,
+            structure: '1. HOOK primeros 3 segundos, 2. DESARROLLO visual dinámico, 3. CLIMAX impactante, 4. CIERRE memorable',
+            format: 'Video vertical 9:16, duración 15-60 segundos',
+            limits: 'Script para 30-45 segundos de video'
+        },
+        'LinkedIn': {
+            isVideo: false,
+            structure: '1. DECLARACIÓN profesional, 2. CONTEXTO relevante, 3. INSIGHT valioso, 4. REFLEXIÓN final',
+            format: 'Post profesional, tono corporativo pero humano',
+            limits: '600-800 caracteres recomendado'
+        },
+        'Facebook': {
+            isVideo: false,
+            structure: '1. CONEXIÓN emocional, 2. HISTORIA relatable, 3. VALOR compartible, 4. CONVERSACIÓN abierta',
+            format: 'Post familiar y cercano, fomenta interacción',
+            limits: '500-700 caracteres óptimo'
+        },
+        'Twitter': {
+            isVideo: false,
+            structure: '1. DECLARACIÓN impactante, 2. ARGUMENTO conciso, 3. DATO relevante, 4. THREAD si es necesario',
+            format: 'Tweet directo y punzante',
+            limits: '280 caracteres máximo por tweet'
+        },
+        'YouTube': {
+            isVideo: true,
+            structure: '1. INTRO cautivadora (0-15s), 2. DESARROLLO estructurado, 3. ENGAGEMENT constante, 4. OUTRO con CTA',
+            format: 'Video horizontal 16:9, guión completo',
+            limits: 'Script para 5-10 minutos de contenido'
+        }
+    };
+    
+    const platformInfo = platformStructures[platform] || platformStructures['Instagram'];
+    
+    // Crear prompt específico según el tipo de contenido Y plataforma
+    let systemPrompt = `Eres un experto copywriter especializado en ${platform}. IMPORTANTE: Responde SIEMPRE en español. 
+    Conoces perfectamente las mejores prácticas, algoritmos y formatos específicos de esta plataforma.
+    ${platformInfo.isVideo ? 'Te especializas en crear SCRIPTS para videos que maximizan retención y engagement.' : 'Creas posts que generan máximo engagement y alcance orgánico.'}`;
+    
     let userPrompt = '';
     
     switch(type) {
         case 'Informativo y educativo':
-            systemPrompt = `Eres un experto en copywriting educativo para redes sociales. Generas contenido reflexivo, educativo y que invita a pensar profundamente sobre el tema.`;
-            userPrompt = `Crea un copywriting educativo para ${platform} sobre "${keyword}". 
-            ${userContext ? `Contexto adicional: ${userContext}` : ''}
-            El contenido debe:
-            - Ser profundamente reflexivo e invitar a la introspección
-            - Incluir preguntas que hagan pensar
-            - Tener un enfoque educativo y transformador
-            - Ser original y único (NO usar plantillas)
-            - Tener entre 150-250 palabras
-            ${includeCTA ? '- Incluir un call-to-action natural' : ''}`;
+            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copywriting'} educativo para ${platform} sobre "${keyword}".
+            
+            ${userContext ? `CONTEXTO: ${userContext}` : ''}
+            
+            ESTRUCTURA OBLIGATORIA para ${platform}:
+            ${platformInfo.structure}
+            
+            ${platformInfo.isVideo ? 'ENFOQUE DE VIDEO:' : 'CARACTERÍSTICAS:'}
+            ${platformInfo.isVideo ? 
+                `- Script detallado con timing (ej: "0-3s: mostrar problema", "4-10s: explicar solución")
+                - Indicaciones visuales específicas (ej: "close-up a las manos", "transición rápida")
+                - Elementos de retención (cambios de ritmo, preguntas directas)
+                - Audio y música sugeridos` :
+                `- Ser profundamente reflexivo e invitar a la introspección
+                - Incluir preguntas que hagan pensar
+                - Tener un enfoque educativo y transformador
+                - Incluir emojis estratégicos para ${platform}`}
+            
+            FORMATO: ${platformInfo.format}
+            LÍMITE: ${platformInfo.limits}
+            
+            ${!includeCTA ? 'NO incluyas call-to-action, eso se agregará por separado.' : ''}
+            
+            RESPONDE EN ESPAÑOL. NO uses otros idiomas.`;
             break;
             
         case 'Venta directa y persuasivo':
-            systemPrompt = `Eres un experto en copywriting persuasivo y ventas. Generas contenido que motiva a la acción de manera ética y efectiva.`;
-            userPrompt = `Crea un copywriting persuasivo para ${platform} sobre "${keyword}".
-            ${userContext ? `Contexto adicional: ${userContext}` : ''}
-            El contenido debe:
-            - Ser altamente persuasivo y motivador
-            - Crear urgencia y deseo
-            - Incluir beneficios claros y específicos
-            - Ser original y único (NO usar plantillas)
-            - Tener entre 120-200 palabras
-            ${includeCTA ? '- Incluir un call-to-action fuerte y directo' : ''}`;
+            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copywriting'} persuasivo para ${platform} sobre "${keyword}".
+            
+            ${userContext ? `CONTEXTO: ${userContext}` : ''}
+            
+            ESTRUCTURA OBLIGATORIA para ${platform}:
+            ${platformInfo.structure}
+            
+            ${platformInfo.isVideo ? 'ENFOQUE DE VIDEO:' : 'CARACTERÍSTICAS:'}
+            ${platformInfo.isVideo ? 
+                `- Script con ganchos visuales cada 5-7 segundos
+                - Elementos de prueba social (testimonios, números)
+                - Transiciones que mantienen atención
+                - Timing específico para cada sección` :
+                `- Ser altamente persuasivo y motivador
+                - Crear urgencia y deseo de forma ética
+                - Incluir beneficios claros y específicos
+                - Usar gatillos psicológicos apropiados para ${platform}`}
+            
+            FORMATO: ${platformInfo.format}
+            LÍMITE: ${platformInfo.limits}
+            
+            ${!includeCTA ? 'NO incluyas call-to-action, eso se agregará por separado.' : ''}
+            
+            RESPONDE EN ESPAÑOL. NO uses otros idiomas.`;
             break;
             
         case 'Posicionamiento y branding':
-            systemPrompt = `Eres un experto en branding y posicionamiento de marca. Generas contenido que construye autoridad y confianza.`;
-            userPrompt = `Crea un copywriting de branding para ${platform} sobre "${keyword}".
-            ${userContext ? `Contexto adicional: ${userContext}` : ''}
-            El contenido debe:
-            - Posicionar como líder y experto
-            - Transmitir autoridad y confianza
-            - Diferenciarse de la competencia
-            - Ser original y único (NO usar plantillas)
-            - Tener entre 130-220 palabras
-            ${includeCTA ? '- Incluir un call-to-action que refuerce el posicionamiento' : ''}`;
+            userPrompt = `Crea un ${platformInfo.isVideo ? 'SCRIPT DE VIDEO' : 'copywriting'} de branding para ${platform} sobre "${keyword}".
+            
+            ${userContext ? `CONTEXTO: ${userContext}` : ''}
+            
+            ESTRUCTURA OBLIGATORIA para ${platform}:
+            ${platformInfo.structure}
+            
+            ${platformInfo.isVideo ? 'ENFOQUE DE VIDEO:' : 'CARACTERÍSTICAS:'}
+            ${platformInfo.isVideo ? 
+                `- Script que construye autoridad visualmente
+                - Elementos de credibilidad y experiencia
+                - Narrativa de marca consistente
+                - Presentación profesional pero accesible` :
+                `- Posicionar como líder y experto en el tema
+                - Transmitir autoridad y confianza
+                - Diferenciarse claramente de la competencia
+                - Construir marca personal/corporativa`}
+            
+            FORMATO: ${platformInfo.format}
+            LÍMITE: ${platformInfo.limits}
+            
+            ${!includeCTA ? 'NO incluyas call-to-action, eso se agregará por separado.' : ''}
+            
+            RESPONDE EN ESPAÑOL. NO uses otros idiomas.`;
             break;
     }
     
@@ -420,9 +517,9 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
                 content: userPrompt
             }
         ],
-        temperature: 0.8,
-        max_tokens: 500,
-        top_p: 0.9
+        temperature: 0.7,
+        max_tokens: 600,
+        top_p: 0.8
     };
     
     console.log(`[DEEPSEEK] 📤 Enviando request a API...`);
@@ -461,6 +558,15 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
         visualPrompt = generateVisualPrompt(platform, keyword, type, formattedContent);
     }
     
+    // Generar CTA específico con IA real
+    let ctaContent;
+    try {
+        ctaContent = await generateCTAWithAI(platform, keyword, type, formattedContent);
+    } catch (error) {
+        console.log(`[DEEPSEEK] Error generando CTA, usando fallback`);
+        ctaContent = generateFallbackCTA(platform, type);
+    }
+    
     console.log(`[DEEPSEEK] 🎯 Contenido IA generado exitosamente`);
     
     return {
@@ -469,8 +575,118 @@ async function generateWithDeepSeek(platform, keyword, type, userContext, includ
         copyType: type,
         generatedBy: '🤖 IA Real (DeepSeek)',
         isRealAI: true,
-        visualPrompt: visualPrompt
+        visualPrompt: visualPrompt,
+        cta: ctaContent
     };
+}
+
+// Función para generar CTA específico con IA real
+async function generateCTAWithAI(platform, keyword, type, content) {
+    console.log(`[DEEPSEEK-CTA] 🚀 Generando CTA con IA real...`);
+    
+    const DEEPSEEK_API_KEY = 'sk-195d3e74fc904857a632ee7b22b174ff';
+    const API_URL = 'https://api.deepseek.com/v1/chat/completions';
+    
+    const systemPrompt = `Eres un experto en calls-to-action para redes sociales. IMPORTANTE: Responde SIEMPRE en español.
+    Creas CTAs que maximizan conversión y engagement específicos para cada plataforma.`;
+    
+    const userPrompt = `Basándote en este contenido: "${content.substring(0, 200)}..."
+    
+    Genera UN call-to-action específico para ${platform} sobre "${keyword}" de tipo "${type}".
+    
+    CARACTERÍSTICAS para ${platform}:
+    ${platform === 'Instagram' ? '- Invite a comentar, compartir stories, guardar post, o seguir' : ''}
+    ${platform === 'TikTok' ? '- Motive a comentar, seguir, o hacer dueto/remix' : ''}
+    ${platform === 'LinkedIn' ? '- Invite a conectar, compartir con red profesional, o comentar' : ''}
+    ${platform === 'Facebook' ? '- Fomente conversación, shares, o reacciones' : ''}
+    ${platform === 'Twitter' ? '- Invite a retweet, comentar, o seguir el hilo' : ''}
+    ${platform === 'YouTube' ? '- Motive a suscribirse, comentar, o activar notificaciones' : ''}
+    
+    El CTA debe:
+    - Ser natural y coherente con el contenido
+    - Específico para las funciones de ${platform}
+    - Crear sensación de comunidad o valor añadido
+    - Máximo 30-40 palabras
+    
+    RESPONDE SOLO CON EL CTA en español, sin explicaciones.`;
+    
+    const requestBody = {
+        model: "deepseek-chat",
+        messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt }
+        ],
+        temperature: 0.6,
+        max_tokens: 100,
+        top_p: 0.8
+    };
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_API_KEY}`
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+        if (!response.ok) {
+            throw new Error(`DeepSeek CTA API Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+            throw new Error('Respuesta inválida de DeepSeek CTA API');
+        }
+        
+        console.log(`[DEEPSEEK-CTA] ✅ CTA IA generado en español`);
+        return data.choices[0].message.content.trim();
+        
+    } catch (error) {
+        console.log(`[DEEPSEEK-CTA] Error, usando CTA fallback:`, error);
+        return generateFallbackCTA(platform, type);
+    }
+}
+
+// Función para generar CTA de respaldo
+function generateFallbackCTA(platform, type) {
+    const fallbackCTAs = {
+        'Instagram': [
+            '¿Qué opinas? Cuéntamelo en los comentarios 👇',
+            'Guarda este post si te sirvió y compártelo en tus stories ✨',
+            'Sígueme para más contenido como este 🚀'
+        ],
+        'TikTok': [
+            'Comenta si te identificas 💭',
+            'Sígueme para más tips como este 🔥',
+            '¿Harías un dueto con tu opinión? 🎤'
+        ],
+        'LinkedIn': [
+            '¿Cuál ha sido tu experiencia? Me encantaría leer tu perspectiva',
+            'Comparte si crees que puede ayudar a tu red profesional',
+            'Conectemos para seguir intercambiando ideas'
+        ],
+        'Facebook': [
+            'Comparte tu experiencia en los comentarios',
+            'Etiqueta a alguien que necesite ver esto',
+            '¿Qué agregarías a esta reflexión?'
+        ],
+        'Twitter': [
+            'RT si estás de acuerdo 🔄',
+            '¿Tu experiencia? Cuéntamela en los replies',
+            'Hilo sobre esto próximamente... sígueme para no perdértelo'
+        ],
+        'YouTube': [
+            'Suscríbete si quieres más contenido así',
+            'Deja tu opinión en los comentarios',
+            'Activa la campanita para no perderte nada'
+        ]
+    };
+    
+    const ctas = fallbackCTAs[platform] || fallbackCTAs['Instagram'];
+    return ctas[Math.floor(Math.random() * ctas.length)];
 }
 
 // Función para generar ideas con IA REAL usando DeepSeek
@@ -927,6 +1143,33 @@ function displayResultsClean(ideas) {
                         font-family: Arial, sans-serif !important;
                         white-space: pre-line !important;
                     ">${idea.visualPrompt}</p>
+                </div>
+                ` : ''}
+                
+                ${idea.cta ? `
+                <div style="
+                    background: linear-gradient(135deg, #fff3cd, #ffeaa7) !important;
+                    padding: 15px !important;
+                    border-radius: 10px !important;
+                    border-left: 3px solid #ff6348 !important;
+                    margin: 15px 0 !important;
+                ">
+                    <h4 style="
+                        color: #ff6348 !important;
+                        margin: 0 0 10px 0 !important;
+                        font-size: 14px !important;
+                        font-weight: bold !important;
+                        font-family: Arial, sans-serif !important;
+                    ">🚀 Llamada a la Acción (CTA):</h4>
+                    <p style="
+                        color: #d63031 !important;
+                        font-size: 14px !important;
+                        font-weight: 500 !important;
+                        line-height: 1.6 !important;
+                        margin: 0 !important;
+                        font-family: Arial, sans-serif !important;
+                        white-space: pre-line !important;
+                    ">${idea.cta}</p>
                 </div>
                 ` : ''}
                 
