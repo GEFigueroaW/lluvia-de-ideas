@@ -195,38 +195,22 @@ function getSelectedSocialNetworkSafe() {
 
 // Función para generar ideas con IA (múltiples alternativas)
 async function generateIdeaWithAI(platform, keyword, type, userContext, includeCTA) {
-    const providers = [
-        {
-            name: 'Hugging Face',
-            url: 'https://api-inference.huggingface.co/models/microsoft/DialoGPT-medium',
-            headers: {},
-            free: true
-        },
-        {
-            name: 'Local Generation',
-            local: true
-        }
-    ];
+    console.log(`[AI] Generando idea para ${type}...`);
     
-    for (const provider of providers) {
-        try {
-            if (provider.local) {
-                return await generateLocalIdea(platform, keyword, type, userContext, includeCTA);
-            } else {
-                return await callExternalAPI(provider, platform, keyword, type, userContext, includeCTA);
-            }
-        } catch (error) {
-            console.log(`[AI] ${provider.name} falló, probando siguiente...`);
-            continue;
-        }
+    // Usar generación local inteligente directamente
+    try {
+        return await generateLocalIdea(platform, keyword, type, userContext, includeCTA);
+    } catch (error) {
+        console.error(`[AI] Error en generación local:`, error);
+        return await generateFallbackIdea(platform, keyword, type, userContext, includeCTA);
     }
-    
-    // Si todos fallan, usar generación local inteligente
-    return await generateFallbackIdea(platform, keyword, type, userContext, includeCTA);
 }
 
 // Función para generar ideas localmente con lógica inteligente
 async function generateLocalIdea(platform, keyword, type, userContext, includeCTA) {
+    console.log(`[LOCAL-AI] Iniciando generación para ${type} en ${platform}`);
+    console.log(`[LOCAL-AI] Keyword: "${keyword}", Context: "${userContext}", CTA: ${includeCTA}`);
+    
     // Simular delay de procesamiento
     await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
     
@@ -235,21 +219,26 @@ async function generateLocalIdea(platform, keyword, type, userContext, includeCT
             `¿Sabías que ${keyword} puede transformar tu día a día? Descubre cómo aplicarlo paso a paso.`,
             `5 datos fascinantes sobre ${keyword} que cambiarán tu perspectiva.`,
             `La guía completa de ${keyword}: todo lo que necesitas saber en un solo lugar.`,
-            `Mitos vs. realidades sobre ${keyword}. ¡La #3 te sorprenderá!`
+            `Mitos vs. realidades sobre ${keyword}. ¡La #3 te sorprenderá!`,
+            `Todo lo que necesitas saber sobre ${keyword} explicado de forma simple y práctica.`
         ],
         'Venta directa y persuasivo': [
             `🔥 ¡Últimas 24 horas! Aprovecha esta oportunidad única con ${keyword}.`,
             `¿Cansado de buscar resultados? ${keyword} es la solución que estabas esperando.`,
             `Más de 10,000 personas ya cambiaron su vida con ${keyword}. ¿Serás el próximo?`,
-            `No pierdas más tiempo. Comienza hoy mismo con ${keyword} y ve la diferencia.`
+            `No pierdas más tiempo. Comienza hoy mismo con ${keyword} y ve la diferencia.`,
+            `Oferta especial: Descubre cómo ${keyword} puede revolucionar tu negocio hoy mismo.`
         ],
         'Posicionamiento y branding': [
             `En el mundo de ${keyword}, nosotros marcamos la diferencia.`,
             `Cuando pienses en ${keyword}, piensa en calidad. Piensa en nosotros.`,
             `15 años liderando el mercado de ${keyword}. La experiencia habla por sí sola.`,
-            `${keyword} + innovación = nuestra fórmula del éxito.`
+            `${keyword} + innovación = nuestra fórmula del éxito.`,
+            `Somos la referencia en ${keyword}. Nuestra reputación nos precede.`
         ]
     };
+    
+    console.log(`[LOCAL-AI] Templates disponibles:`, Object.keys(templates));
     
     const platformLimits = {
         'Twitter': 240,
@@ -260,11 +249,15 @@ async function generateLocalIdea(platform, keyword, type, userContext, includeCT
     };
     
     const baseTemplates = templates[type] || templates['Informativo y educativo'];
+    console.log(`[LOCAL-AI] Usando templates para tipo: ${type}, cantidad: ${baseTemplates.length}`);
+    
     let content = baseTemplates[Math.floor(Math.random() * baseTemplates.length)];
+    console.log(`[LOCAL-AI] Template base seleccionado: "${content}"`);
     
     // Agregar contexto si existe
-    if (userContext) {
-        content += ` ${userContext}`;
+    if (userContext && userContext.trim()) {
+        content += ` ${userContext.trim()}`;
+        console.log(`[LOCAL-AI] Agregado contexto: "${userContext}"`);
     }
     
     // Agregar CTA si se solicita
@@ -273,26 +266,34 @@ async function generateLocalIdea(platform, keyword, type, userContext, includeCT
             '¡Comparte tu experiencia en los comentarios!',
             '¿Qué opinas? ¡Déjanos tu comentario!',
             'Dale like si te gustó y comparte con tus amigos.',
-            '¡Síguenos para más contenido como este!'
+            '¡Síguenos para más contenido como este!',
+            '¿Te ha sido útil? ¡Compártelo!'
         ];
-        content += ` ${ctas[Math.floor(Math.random() * ctas.length)]}`;
+        const selectedCTA = ctas[Math.floor(Math.random() * ctas.length)];
+        content += ` ${selectedCTA}`;
+        console.log(`[LOCAL-AI] Agregado CTA: "${selectedCTA}"`);
     }
     
     // Limitar según la plataforma
     const limit = platformLimits[platform] || 400;
     if (content.length > limit) {
         content = content.substring(0, limit - 3) + '...';
+        console.log(`[LOCAL-AI] Contenido limitado a ${limit} caracteres`);
     }
     
     // Generar hashtags relevantes
     const hashtags = generateSmartHashtags(keyword, platform, type);
+    console.log(`[LOCAL-AI] Hashtags generados: "${hashtags}"`);
     
-    return {
+    const result = {
         copyType: type,
         content: content,
         hashtags: hashtags,
         platform: platform
     };
+    
+    console.log(`[LOCAL-AI] Idea generada exitosamente:`, result);
+    return result;
 }
 
 // Función para generar hashtags inteligentes
@@ -411,20 +412,28 @@ async function generateCopywritingClean() {
         
         // Llamada a API de IA - Sistema robusto con múltiples alternativas
         console.log('[CLEAN-SYSTEM] Generando ideas con IA...');
+        console.log('[CLEAN-SYSTEM] Tipos de copy a generar:', copyTypes);
         
         const generatedIdeas = [];
         
-        for (const type of copyTypes) {
+        for (let i = 0; i < copyTypes.length; i++) {
+            const type = copyTypes[i];
+            console.log(`[CLEAN-SYSTEM] Procesando tipo ${i + 1}/${copyTypes.length}: "${type}"`);
+            
             try {
                 const idea = await generateIdeaWithAI(platform, keyword, type, userContext, includeCTA);
+                console.log(`[CLEAN-SYSTEM] Idea generada para "${type}":`, idea);
                 generatedIdeas.push(idea);
             } catch (error) {
                 console.error(`[CLEAN-SYSTEM] Error generando idea para ${type}:`, error);
                 // Fallback con idea creativa
-                generatedIdeas.push(await generateFallbackIdea(platform, keyword, type, userContext, includeCTA));
+                const fallbackIdea = await generateFallbackIdea(platform, keyword, type, userContext, includeCTA);
+                console.log(`[CLEAN-SYSTEM] Idea fallback para "${type}":`, fallbackIdea);
+                generatedIdeas.push(fallbackIdea);
             }
         }
         
+        console.log('[CLEAN-SYSTEM] Todas las ideas generadas:', generatedIdeas);
         const ideas = generatedIdeas;
         
         // Guardar ideas
@@ -460,10 +469,14 @@ async function generateCopywritingClean() {
 
 // Función para mostrar resultados
 function displayResultsClean(ideas) {
-    console.log('[CLEAN-SYSTEM] Mostrando resultados:', ideas);
+    console.log('[CLEAN-SYSTEM] === MOSTRANDO RESULTADOS ===');
+    console.log('[CLEAN-SYSTEM] Ideas recibidas:', ideas);
+    console.log('[CLEAN-SYSTEM] Tipo de ideas:', typeof ideas);
+    console.log('[CLEAN-SYSTEM] Cantidad de ideas:', Object.keys(ideas).length);
     
     let resultsContainer = document.getElementById('results');
     if (!resultsContainer) {
+        console.log('[CLEAN-SYSTEM] Creando contenedor de resultados...');
         // Crear contenedor de resultados si no existe
         resultsContainer = document.createElement('div');
         resultsContainer.id = 'results';
@@ -479,14 +492,21 @@ function displayResultsClean(ideas) {
         const form = document.getElementById('copywritingForm') || document.querySelector('form');
         if (form && form.parentNode) {
             form.parentNode.insertBefore(resultsContainer, form.nextSibling);
+            console.log('[CLEAN-SYSTEM] Contenedor insertado después del formulario');
         } else {
             document.body.appendChild(resultsContainer);
+            console.log('[CLEAN-SYSTEM] Contenedor agregado al body');
         }
+    } else {
+        console.log('[CLEAN-SYSTEM] Usando contenedor existente');
     }
     
     const ideaKeys = Object.keys(ideas);
+    console.log('[CLEAN-SYSTEM] Claves de ideas:', ideaKeys);
+    
     if (ideaKeys.length === 0) {
-        resultsContainer.innerHTML = '<p>No hay ideas para mostrar.</p>';
+        console.log('[CLEAN-SYSTEM] No hay ideas para mostrar');
+        resultsContainer.innerHTML = '<p style="color: white; text-align: center;">No hay ideas para mostrar.</p>';
         return;
     }
     
