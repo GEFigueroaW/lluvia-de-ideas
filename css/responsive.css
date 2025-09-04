@@ -56,12 +56,13 @@ body {
     margin-bottom: 0 !important;
 }
 
-/* Carrusel responsivo - VERSIÓN MEJORADA */
+/* Carrusel responsivo - BOTONES INTEGRADOS */
 .copy-carousel-container {
     width: 100%;
-    overflow: visible; /* Cambiado para mostrar botones */
+    overflow: visible; /* Permitir que los botones internos sean visibles */
     padding: 0.5rem 0;
     position: relative;
+    margin-right: 0; /* Sin margen extra - botones están dentro */
 }
 
 .copy-carousel-viewport {

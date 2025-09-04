@@ -18,6 +18,12 @@
     border: 2px solid rgba(102, 126, 234, 0.1);
     width: 100%;
     box-sizing: border-box;
+    /* Fondo más oscuro para contrastar con botones */
+    background: linear-gradient(135deg, 
+        rgba(102, 126, 234, 0.1), 
+        rgba(247, 148, 164, 0.1),
+        rgba(255, 255, 255, 0.9)
+    );
 }
 
 .copy-carousel {
@@ -184,136 +190,124 @@
     line-clamp: 2; /* Estándar moderno */
 }
 
-/* Controles del carrusel - SÚPER VISIBLES E INTUITIVOS */
+/* Controles del carrusel - DENTRO DEL CARRUSEL PARA SER OBVIOS */
 .copy-carousel-controls {
     display: flex;
     flex-direction: column;
     position: absolute;
-    right: -15px; /* MUY cerca del carrusel para ser obvio */
+    right: 10px; /* DENTRO del carrusel, no fuera */
     top: 50%;
     transform: translateY(-50%);
-    gap: 8px;
+    gap: 12px;
     z-index: 2000;
     pointer-events: auto;
-    /* Animación de entrada MUY llamativa */
-    animation: superVisible 3s ease-out infinite;
+    /* Sombra para destacar sobre el fondo */
+    filter: drop-shadow(0 4px 15px rgba(0,0,0,0.5));
 }
 
-/* Animación súper llamativa para que NO se pueda ignorar */
-@keyframes superVisible {
-    0%, 100% {
-        opacity: 1;
-        transform: translateY(-50%) scale(1);
-    }
-    25% {
-        opacity: 0.7;
-        transform: translateY(-50%) scale(1.1);
-    }
-    50% {
-        opacity: 1;
-        transform: translateY(-50%) scale(1.15);
-        filter: brightness(1.3);
-    }
-    75% {
-        opacity: 0.7;
-        transform: translateY(-50%) scale(1.1);
-    }
-}
+/* Animación súper llamativa eliminada - ya no necesaria */
 
-/* Etiqueta GRANDE y visible */
+/* Etiqueta DENTRO del carrusel - MUY clara */
 .copy-carousel-controls::before {
-    content: "👆 NAVEGAR 👇";
+    content: "� CAMBIAR TIPO";
     position: absolute;
-    top: -35px;
+    top: -40px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: #ff4757;
-    background: linear-gradient(45deg, #ffef1f, #ff6b35);
-    padding: 4px 8px;
-    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #fff;
+    background: linear-gradient(45deg, #2c3e50, #34495e);
+    padding: 8px 12px;
+    border-radius: 20px;
     box-shadow: 
-        0 4px 15px rgba(255, 107, 53, 0.4),
-        0 0 20px rgba(255, 239, 31, 0.3);
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        0 0 0 3px rgba(255, 255, 255, 0.9);
     white-space: nowrap;
     text-align: center;
-    border: 2px solid #ff4757;
-    animation: labelPulse 2s ease-in-out infinite;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    animation: labelGlow 2s ease-in-out infinite;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    letter-spacing: 0.5px;
 }
 
-@keyframes labelPulse {
+@keyframes labelGlow {
     0%, 100% {
-        transform: translateX(-50%) scale(1);
         box-shadow: 
-            0 4px 15px rgba(255, 107, 53, 0.4),
-            0 0 20px rgba(255, 239, 31, 0.3);
+            0 4px 15px rgba(0, 0, 0, 0.3),
+            0 0 0 3px rgba(255, 255, 255, 0.9);
+        background: linear-gradient(45deg, #2c3e50, #34495e);
     }
     50% {
-        transform: translateX(-50%) scale(1.1);
         box-shadow: 
-            0 6px 20px rgba(255, 107, 53, 0.6),
-            0 0 30px rgba(255, 239, 31, 0.5);
+            0 6px 20px rgba(0, 0, 0, 0.4),
+            0 0 0 4px rgba(255, 255, 255, 1),
+            0 0 20px rgba(255, 255, 255, 0.5);
+        background: linear-gradient(45deg, #34495e, #2c3e50);
     }
 }
 
 .copy-carousel-btn {
-    width: 65px !important;
-    height: 65px !important;
-    background: linear-gradient(145deg, #ff4757, #ff3742);
+    width: 60px !important;
+    height: 60px !important;
+    background: linear-gradient(145deg, #2c3e50, #34495e);
     color: white;
-    border: 4px solid #ffef1f;
-    border-radius: 15px;
+    border: 4px solid #ecf0f1;
+    border-radius: 50%; /* Circular para que se vea claramente como botón */
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.8rem !important;
+    font-size: 1.6rem !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 
-        0 8px 25px rgba(255, 71, 87, 0.6),
-        0 4px 15px rgba(0,0,0,0.2),
-        inset 0 2px 4px rgba(255,255,255,0.3);
+        0 8px 25px rgba(44, 62, 80, 0.4),
+        0 4px 15px rgba(0,0,0,0.3),
+        inset 0 2px 4px rgba(255,255,255,0.2);
     font-weight: 900;
     position: relative;
-    backdrop-filter: blur(10px);
-    /* Outline muy visible */
-    outline: 3px solid rgba(255, 239, 31, 0.8);
+    /* Doble borde para máximo contraste */
+    outline: 2px solid #fff;
     outline-offset: 2px;
-    /* Sombra interior para efecto 3D */
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    /* Animación suave para llamar atención */
+    animation: gentlePulse 3s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 
+            0 8px 25px rgba(44, 62, 80, 0.4),
+            0 4px 15px rgba(0,0,0,0.3),
+            inset 0 2px 4px rgba(255,255,255,0.2);
+    }
+    50% {
+        transform: scale(1.05);
+        box-shadow: 
+            0 10px 30px rgba(44, 62, 80, 0.5),
+            0 6px 20px rgba(0,0,0,0.4),
+            inset 0 3px 6px rgba(255,255,255,0.3);
+    }
 }
 
 .copy-carousel-btn:hover {
-    transform: scale(1.2) translateY(-4px) !important;
+    transform: scale(1.15) !important;
     box-shadow: 
-        0 12px 35px rgba(255, 71, 87, 0.8),
-        0 6px 20px rgba(0,0,0,0.3),
+        0 12px 35px rgba(44, 62, 80, 0.6),
+        0 6px 20px rgba(0,0,0,0.4),
         inset 0 3px 6px rgba(255,255,255,0.4);
-    background: linear-gradient(145deg, #ff3742, #ff2d39);
-    border-color: #fff700;
-    outline-color: #fff700;
-    outline-width: 4px;
-    /* Efecto súper brillante */
-    filter: brightness(1.3) contrast(1.1);
-    /* Vibración para llamar la atención */
-    animation: vibrateHover 0.1s ease-in-out infinite;
-}
-
-@keyframes vibrateHover {
-    0%, 100% { transform: scale(1.2) translateY(-4px) rotate(0deg); }
-    25% { transform: scale(1.2) translateY(-4px) rotate(0.5deg); }
-    50% { transform: scale(1.2) translateY(-4px) rotate(0deg); }
-    75% { transform: scale(1.2) translateY(-4px) rotate(-0.5deg); }
+    background: linear-gradient(145deg, #34495e, #2c3e50);
+    border-color: #bdc3c7;
+    outline-color: #fff;
+    outline-width: 3px;
+    animation: none; /* Parar la animación al hacer hover */
 }
 
 .copy-carousel-btn:active {
-    transform: scale(1.1) translateY(-1px) !important;
+    transform: scale(1.05) !important;
     box-shadow: 
-        0 6px 20px rgba(255, 71, 87, 0.6),
+        0 6px 20px rgba(44, 62, 80, 0.4),
         0 3px 12px rgba(0,0,0,0.2);
-    animation: none;
 }
 
 /* Iconos MUY grandes y visibles */
@@ -324,54 +318,39 @@
     font-size: 1.8rem !important;
 }
 
-/* Tooltips SÚPER visibles */
+/* Tooltips más claros y cercanos */
 .copy-carousel-btn::after {
     content: attr(title);
     position: absolute;
-    left: -140px;
+    left: -80px;
     top: 50%;
     transform: translateY(-50%);
-    background: linear-gradient(45deg, #ff4757, #ff3742);
+    background: linear-gradient(45deg, #2c3e50, #34495e);
     color: white;
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 8px;
-    font-size: 0.8rem;
-    font-weight: 700;
+    font-size: 0.7rem;
+    font-weight: 600;
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
     z-index: 1000;
     box-shadow: 
-        0 6px 20px rgba(255, 71, 87, 0.4),
-        0 0 15px rgba(255, 71, 87, 0.3);
-    border: 2px solid #ffef1f;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        0 4px 15px rgba(44, 62, 80, 0.4),
+        0 0 0 2px rgba(255, 255, 255, 0.9);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
 
 .copy-carousel-btn:hover::after {
     opacity: 1;
     visibility: visible;
-    transform: translateY(-50%) translateX(-10px) scale(1.05);
-    animation: tooltipPulse 1s ease-in-out infinite;
+    transform: translateY(-50%) translateX(-5px);
 }
 
-@keyframes tooltipPulse {
-    0%, 100% {
-        box-shadow: 
-            0 6px 20px rgba(255, 71, 87, 0.4),
-            0 0 15px rgba(255, 71, 87, 0.3);
-    }
-    50% {
-        box-shadow: 
-            0 8px 25px rgba(255, 71, 87, 0.6),
-            0 0 25px rgba(255, 71, 87, 0.5);
-    }
-}
-
-/* Espaciado para los botones SÚPER visibles */
+/* Espaciado normal - botones DENTRO del carrusel */
 .copy-carousel-container {
-    margin-right: 85px; /* Espacio para botones súper visibles */
+    margin-right: 0; /* Sin espacio extra - botones están dentro */
     position: relative;
     overflow: visible;
 }
@@ -449,43 +428,17 @@
     background: rgba(255, 255, 255, 0.5);
 }
 
-/* Responsive adjustments - BOTONES SÚPER VISIBLES */
+/* Responsive adjustments - BOTONES DENTRO DEL CARRUSEL */
 @media (max-width: 768px) {
     .copy-carousel-controls {
-        right: -10px; /* AÚN MÁS cerca en móvil */
-        gap: 6px;
+        right: 8px; /* Dentro del carrusel en móvil */
+        gap: 10px;
     }
     
     .copy-carousel-controls::before {
-        font-size: 0.7rem;
-        top: -30px;
-        padding: 3px 6px;
-    }
-    
-    .copy-carousel-btn {
-        width: 55px !important;
-        height: 55px !important;
-        font-size: 1.5rem !important;
-        border-width: 3px;
-        border-radius: 12px;
-    }
-    
-    .copy-carousel-btn::after {
-        left: -120px;
-        font-size: 0.7rem;
-        padding: 6px 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .copy-carousel-controls {
-        right: -8px; /* SÚPER cerca en móvil pequeño */
-        gap: 5px;
-    }
-    
-    .copy-carousel-controls::before {
-        font-size: 0.6rem;
-        top: -25px;
+        font-size: 0.65rem;
+        top: -35px;
+        padding: 6px 8px;
     }
     
     .copy-carousel-btn {
@@ -493,39 +446,62 @@
         height: 50px !important;
         font-size: 1.3rem !important;
         border-width: 3px;
-        border-radius: 10px;
     }
     
     .copy-carousel-btn::after {
-        left: -110px;
+        left: -70px;
         font-size: 0.65rem;
+        padding: 4px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .copy-carousel-controls {
+        right: 6px; /* Muy cerca del borde en móvil pequeño */
+        gap: 8px;
+    }
+    
+    .copy-carousel-controls::before {
+        font-size: 0.6rem;
+        top: -30px;
+    }
+    
+    .copy-carousel-btn {
+        width: 45px !important;
+        height: 45px !important;
+        font-size: 1.2rem !important;
+        border-width: 2px;
+    }
+    
+    .copy-carousel-btn::after {
+        left: -65px;
+        font-size: 0.6rem;
     }
 }
 
 @media (min-width: 1024px) {
     .copy-carousel-controls {
-        right: -20px; /* Cerca pero con más espacio en desktop */
-        gap: 10px;
+        right: 15px; /* Más separado del borde en desktop */
+        gap: 15px;
     }
     
     .copy-carousel-controls::before {
-        font-size: 0.9rem;
-        top: -40px;
-        padding: 5px 10px;
+        font-size: 0.8rem;
+        top: -45px;
+        padding: 10px 14px;
     }
     
     .copy-carousel-btn {
-        width: 75px !important;
-        height: 75px !important;
-        font-size: 2rem !important;
-        border-width: 5px;
-        border-radius: 18px;
+        width: 70px !important;
+        height: 70px !important;
+        font-size: 1.8rem !important;
+        border-width: 4px;
     }
     
     .copy-carousel-btn::after {
-        left: -160px;
-        font-size: 0.9rem;
-        padding: 10px 15px;
+        left: -90px;
+        font-size: 0.75rem;
+        padding: 8px 12px;
     }
 }
 
