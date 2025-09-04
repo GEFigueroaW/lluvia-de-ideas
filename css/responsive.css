@@ -110,9 +110,9 @@ body {
     border-color: #ffd700;
 }
 
-/* Espaciado para los botones y indicadores mejorados */
+/* Espaciado para los botones SÚPER visibles */
 .copy-carousel-container {
-    margin-right: 75px; /* Espacio para botones e indicador */
+    margin-right: 85px; /* Espacio para botones súper visibles */
 }
 
 /* Formulario responsivo */
@@ -231,7 +231,7 @@ body {
     
     /* Carrusel en tablet */
     .copy-carousel-container {
-        margin-right: 85px;
+        margin-right: 75px;
     }
     
     .copy-carousel-controls {
@@ -305,7 +305,7 @@ body {
     
     /* Carrusel en desktop */
     .copy-carousel-container {
-        margin-right: 100px;
+        margin-right: 95px;
     }
     
     .copy-carousel-controls {
@@ -451,9 +451,9 @@ body {
         border-radius: 10px;
     }
     
-    /* Carrusel móvil mejorado */
+    /* Carrusel móvil súper visible */
     .copy-carousel-container {
-        margin-right: 70px; /* Espacio para botones e indicador */
+        margin-right: 60px; /* Espacio para botones súper visibles */
         padding: 0.25rem 0;
     }
     
