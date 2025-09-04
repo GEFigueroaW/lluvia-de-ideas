@@ -3,6 +3,8 @@
     position: relative;
     width: 100%;
     margin: 1rem 0;
+    max-width: 100%;
+    overflow: hidden;
 }
 
 .copy-carousel-viewport {
@@ -13,6 +15,8 @@
     border-radius: 15px;
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(247, 148, 164, 0.05));
     border: 2px solid rgba(102, 126, 234, 0.1);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .copy-carousel {
@@ -41,6 +45,22 @@
     user-select: none;
     top: 50%;
     transform: translateY(-50%);
+    box-sizing: border-box;
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 767px) {
+    .copy-carousel-viewport {
+        height: 250px;
+    }
+    
+    .copy-carousel-item {
+        width: 95%;
+        left: 2.5%;
+        height: 90px;
+        padding: 0.75rem 1rem;
+        gap: 0.75rem;
+    }
 }
 
 .copy-carousel-item:hover {
@@ -204,13 +224,13 @@
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .copy-carousel-controls {
-        right: -35px;
+        right: -30px;
     }
     
     .copy-carousel-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 0.9rem;
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
     }
     
     .copy-carousel-item {
@@ -219,14 +239,49 @@
     }
     
     .copy-emoji {
-        width: 50px;
-        height: 50px;
-        font-size: 1.5rem;
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
     }
     
     .copy-content h4 {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .copy-carousel-controls {
+        right: -25px;
+    }
+    
+    .copy-carousel-btn {
+        width: 25px;
+        height: 25px;
+        font-size: 0.7rem;
+    }
+    
+    .copy-carousel-item {
+        padding: 0.5rem 0.75rem;
+        height: 80px;
+        gap: 0.5rem;
+    }
+    
+    .copy-emoji {
+        width: 35px;
+        height: 35px;
         font-size: 1rem;
     }
+    
+    .copy-content h4 {
+        font-size: 0.85rem;
+        line-height: 1.2;
+    }
+    
+    .copy-content p {
+        font-size: 0.75rem;
+        line-height: 1.3;
+    }
+}
     
     .copy-content p {
         font-size: 0.8rem;
