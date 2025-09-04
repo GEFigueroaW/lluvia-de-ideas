@@ -179,12 +179,22 @@
    ========================================= */
 @media (min-width: 1024px) {
     .container {
-        padding: 0 3rem;
-        max-width: 1400px;
+        padding: 0 2rem;
+        max-width: 1600px;
     }
     
     .columns {
         gap: 3rem;
+    }
+    
+    .column.is-5 {
+        flex: 0 0 40%;
+        max-width: 40%;
+    }
+    
+    .column.is-7 {
+        flex: 0 0 60%;
+        max-width: 60%;
     }
     
     .copy-type {
@@ -198,6 +208,21 @@
     
     .idea-card {
         padding: 1.5rem;
+    }
+    
+    /* Asegurar que los botones del carrusel sean visibles */
+    .copy-carousel-container {
+        margin-right: 80px; /* Espacio para los botones */
+    }
+    
+    .copy-carousel-controls {
+        right: -70px;
+    }
+    
+    .copy-carousel-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
     }
 }
 
