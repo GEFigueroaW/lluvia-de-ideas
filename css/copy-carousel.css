@@ -4,7 +4,7 @@
     width: 100%;
     margin: 1rem 0;
     max-width: 100%;
-    overflow: visible; /* Permitir que los botones sean visibles */
+    overflow: visible; /* Permitir    content: "▲▼";que los botones sean visibles */
     padding-right: 0; /* Se manejará desde responsive.css */
 }
 
@@ -190,19 +190,19 @@
     line-clamp: 2; /* Estándar moderno */
 }
 
-/* Controles del carrusel - DENTRO DEL CARRUSEL PARA SER OBVIOS */
+/* Controles del carrusel - PEQUEÑOS Y DISCRETOS PERO VISIBLES */
 .copy-carousel-controls {
     display: flex;
     flex-direction: column;
     position: absolute;
-    right: 10px; /* DENTRO del carrusel, no fuera */
+    right: 5px; /* MUY pegado al borde derecho DENTRO del carrusel */
     top: 50%;
     transform: translateY(-50%);
-    gap: 12px;
+    gap: 5px;
     z-index: 2000;
     pointer-events: auto;
-    /* Sombra para destacar sobre el fondo */
-    filter: drop-shadow(0 4px 15px rgba(0,0,0,0.5));
+    /* Sombra para destacar sobre cualquier fondo */
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7));
 }
 
 /* Animación súper llamativa eliminada - ya no necesaria */
@@ -211,103 +211,65 @@
 .copy-carousel-controls::before {
     content: "� CAMBIAR TIPO";
     position: absolute;
-    top: -40px;
+    top: -25px;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 0.75rem;
-    font-weight: 800;
+    font-size: 0.6rem;
+    font-weight: 900;
     color: #fff;
-    background: linear-gradient(45deg, #2c3e50, #34495e);
-    padding: 8px 12px;
-    border-radius: 20px;
-    box-shadow: 
-        0 4px 15px rgba(0, 0, 0, 0.3),
-        0 0 0 3px rgba(255, 255, 255, 0.9);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 4px 6px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
     white-space: nowrap;
     text-align: center;
-    animation: labelGlow 2s ease-in-out infinite;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 
-@keyframes labelGlow {
-    0%, 100% {
-        box-shadow: 
-            0 4px 15px rgba(0, 0, 0, 0.3),
-            0 0 0 3px rgba(255, 255, 255, 0.9);
-        background: linear-gradient(45deg, #2c3e50, #34495e);
-    }
-    50% {
-        box-shadow: 
-            0 6px 20px rgba(0, 0, 0, 0.4),
-            0 0 0 4px rgba(255, 255, 255, 1),
-            0 0 20px rgba(255, 255, 255, 0.5);
-        background: linear-gradient(45deg, #34495e, #2c3e50);
-    }
-}
+/* Animación labelGlow eliminada - etiqueta ahora es simple */
 
 .copy-carousel-btn {
-    width: 60px !important;
-    height: 60px !important;
-    background: linear-gradient(145deg, #2c3e50, #34495e);
+    width: 35px !important;
+    height: 35px !important;
+    background: linear-gradient(145deg, #e74c3c, #c0392b);
     color: white;
-    border: 4px solid #ecf0f1;
-    border-radius: 50%; /* Circular para que se vea claramente como botón */
+    border: 2px solid #fff;
+    border-radius: 50%; /* Circular para máximo contraste */
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.6rem !important;
+    font-size: 1rem !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 
-        0 8px 25px rgba(44, 62, 80, 0.4),
-        0 4px 15px rgba(0,0,0,0.3),
-        inset 0 2px 4px rgba(255,255,255,0.2);
+        0 4px 12px rgba(231, 76, 60, 0.4),
+        0 2px 8px rgba(0,0,0,0.3);
     font-weight: 900;
     position: relative;
-    /* Doble borde para máximo contraste */
-    outline: 2px solid #fff;
-    outline-offset: 2px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    /* Animación suave para llamar atención */
-    animation: gentlePulse 3s ease-in-out infinite;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    /* Borde adicional para máximo contraste */
+    outline: 1px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 1px;
 }
 
-@keyframes gentlePulse {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 
-            0 8px 25px rgba(44, 62, 80, 0.4),
-            0 4px 15px rgba(0,0,0,0.3),
-            inset 0 2px 4px rgba(255,255,255,0.2);
-    }
-    50% {
-        transform: scale(1.05);
-        box-shadow: 
-            0 10px 30px rgba(44, 62, 80, 0.5),
-            0 6px 20px rgba(0,0,0,0.4),
-            inset 0 3px 6px rgba(255,255,255,0.3);
-    }
-}
+/* Animación gentlePulse eliminada - botones ahora son pequeños y directos */
 
 .copy-carousel-btn:hover {
-    transform: scale(1.15) !important;
+    transform: scale(1.2) !important;
     box-shadow: 
-        0 12px 35px rgba(44, 62, 80, 0.6),
-        0 6px 20px rgba(0,0,0,0.4),
-        inset 0 3px 6px rgba(255,255,255,0.4);
-    background: linear-gradient(145deg, #34495e, #2c3e50);
-    border-color: #bdc3c7;
+        0 6px 18px rgba(231, 76, 60, 0.6),
+        0 3px 12px rgba(0,0,0,0.4);
+    background: linear-gradient(145deg, #c0392b, #a93226);
+    border-color: #fff;
     outline-color: #fff;
-    outline-width: 3px;
-    animation: none; /* Parar la animación al hacer hover */
+    outline-width: 2px;
 }
 
 .copy-carousel-btn:active {
-    transform: scale(1.05) !important;
+    transform: scale(1.1) !important;
     box-shadow: 
-        0 6px 20px rgba(44, 62, 80, 0.4),
-        0 3px 12px rgba(0,0,0,0.2);
+        0 3px 10px rgba(231, 76, 60, 0.4),
+        0 2px 6px rgba(0,0,0,0.2);
 }
 
 /* Iconos MUY grandes y visibles */
@@ -318,34 +280,31 @@
     font-size: 1.8rem !important;
 }
 
-/* Tooltips más claros y cercanos */
+/* Tooltips pequeños y discretos */
 .copy-carousel-btn::after {
     content: attr(title);
     position: absolute;
-    left: -80px;
+    left: -50px;
     top: 50%;
     transform: translateY(-50%);
-    background: linear-gradient(45deg, #2c3e50, #34495e);
+    background: rgba(0, 0, 0, 0.9);
     color: white;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 0.7rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.6rem;
     font-weight: 600;
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
     z-index: 1000;
-    box-shadow: 
-        0 4px 15px rgba(44, 62, 80, 0.4),
-        0 0 0 2px rgba(255, 255, 255, 0.9);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .copy-carousel-btn:hover::after {
     opacity: 1;
     visibility: visible;
-    transform: translateY(-50%) translateX(-5px);
+    transform: translateY(-50%) translateX(-3px);
 }
 
 /* Espaciado normal - botones DENTRO del carrusel */
@@ -428,80 +387,80 @@
     background: rgba(255, 255, 255, 0.5);
 }
 
-/* Responsive adjustments - BOTONES DENTRO DEL CARRUSEL */
+/* Responsive adjustments - BOTONES PEQUEÑOS */
 @media (max-width: 768px) {
     .copy-carousel-controls {
-        right: 8px; /* Dentro del carrusel en móvil */
-        gap: 10px;
+        right: 4px; /* Muy pegado en móvil */
+        gap: 4px;
     }
     
     .copy-carousel-controls::before {
-        font-size: 0.65rem;
-        top: -35px;
-        padding: 6px 8px;
+        font-size: 0.5rem;
+        top: -20px;
+        padding: 3px 5px;
     }
     
     .copy-carousel-btn {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 1.3rem !important;
-        border-width: 3px;
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 0.8rem !important;
+        border-width: 2px;
     }
     
     .copy-carousel-btn::after {
-        left: -70px;
-        font-size: 0.65rem;
-        padding: 4px 8px;
+        left: -45px;
+        font-size: 0.55rem;
+        padding: 3px 6px;
     }
 }
 
 @media (max-width: 480px) {
     .copy-carousel-controls {
-        right: 6px; /* Muy cerca del borde en móvil pequeño */
-        gap: 8px;
+        right: 3px; /* Súper pegado en móvil pequeño */
+        gap: 3px;
     }
     
     .copy-carousel-controls::before {
-        font-size: 0.6rem;
-        top: -30px;
+        font-size: 0.45rem;
+        top: -18px;
     }
     
     .copy-carousel-btn {
-        width: 45px !important;
-        height: 45px !important;
-        font-size: 1.2rem !important;
-        border-width: 2px;
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.75rem !important;
+        border-width: 1px;
     }
     
     .copy-carousel-btn::after {
-        left: -65px;
-        font-size: 0.6rem;
+        left: -40px;
+        font-size: 0.5rem;
     }
 }
 
 @media (min-width: 1024px) {
     .copy-carousel-controls {
-        right: 15px; /* Más separado del borde en desktop */
-        gap: 15px;
+        right: 8px; /* Espacio adecuado en desktop */
+        gap: 6px;
     }
     
     .copy-carousel-controls::before {
-        font-size: 0.8rem;
-        top: -45px;
-        padding: 10px 14px;
+        font-size: 0.65rem;
+        top: -28px;
+        padding: 5px 7px;
     }
     
     .copy-carousel-btn {
-        width: 70px !important;
-        height: 70px !important;
-        font-size: 1.8rem !important;
-        border-width: 4px;
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 1.1rem !important;
+        border-width: 2px;
     }
     
     .copy-carousel-btn::after {
-        left: -90px;
-        font-size: 0.75rem;
-        padding: 8px 12px;
+        left: -55px;
+        font-size: 0.65rem;
+        padding: 5px 9px;
     }
 }
 
