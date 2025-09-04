@@ -32,10 +32,12 @@ class OptimizedCopyCarousel {
         }
         
         this.ensureControlsExist();
+        this.createProgressIndicator();
         this.setupEventListeners();
         this.updatePositions();
         this.selectDefaultTypes();
         this.updateSelections();
+        this.updateProgressIndicator();
         this.isInitialized = true;
         
         console.log('✅ [CAROUSEL] Inicializado con', this.items.length, 'elementos');
@@ -48,12 +50,15 @@ class OptimizedCopyCarousel {
             
             const controlsHTML = `
                 <div class="copy-carousel-controls">
-                    <button type="button" class="copy-carousel-btn" onclick="optimizedCarousel.rotate(-1)" title="Anterior">
+                    <button type="button" class="copy-carousel-btn" onclick="optimizedCarousel.rotate(-1)" title="Ver tipos anteriores">
                         <i class="fas fa-chevron-up"></i>
                     </button>
-                    <button type="button" class="copy-carousel-btn" onclick="optimizedCarousel.rotate(1)" title="Siguiente">
+                    <button type="button" class="copy-carousel-btn" onclick="optimizedCarousel.rotate(1)" title="Ver más tipos">
                         <i class="fas fa-chevron-down"></i>
                     </button>
+                </div>
+                <div class="copy-carousel-progress" id="carouselProgress">
+                    <!-- Los dots se generarán automáticamente -->
                 </div>
             `;
             
@@ -99,6 +104,39 @@ class OptimizedCopyCarousel {
             
             console.log('✅ [CAROUSEL] Event listeners agregados a los botones');
         }
+    }
+    
+    createProgressIndicator() {
+        const progressContainer = this.container?.querySelector('#carouselProgress');
+        if (!progressContainer) return;
+        
+        progressContainer.innerHTML = '';
+        
+        this.items.forEach((_, index) => {
+            const dot = document.createElement('div');
+            dot.className = 'copy-carousel-progress-dot';
+            dot.addEventListener('click', () => {
+                this.currentIndex = index;
+                this.updatePositions();
+                this.updateProgressIndicator();
+            });
+            progressContainer.appendChild(dot);
+        });
+        
+        console.log('✅ [CAROUSEL] Indicador de progreso creado');
+    }
+    
+    updateProgressIndicator() {
+        const dots = this.container?.querySelectorAll('.copy-carousel-progress-dot');
+        if (!dots) return;
+        
+        dots.forEach((dot, index) => {
+            if (index === this.currentIndex) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
+            }
+        });
     }
     
     setupEventListeners() {
@@ -167,6 +205,7 @@ class OptimizedCopyCarousel {
         }
         
         this.updatePositions();
+        this.updateProgressIndicator();
         console.log('🔄 [CAROUSEL] Rotado, nuevo índice:', this.currentIndex);
         
         // Feedback visual

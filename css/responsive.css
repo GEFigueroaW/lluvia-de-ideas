@@ -110,9 +110,9 @@ body {
     border-color: #ffd700;
 }
 
-/* Espaciado para los botones */
+/* Espaciado para los botones y indicadores mejorados */
 .copy-carousel-container {
-    margin-right: 60px; /* Espacio para los botones */
+    margin-right: 75px; /* Espacio para botones e indicador */
 }
 
 /* Formulario responsivo */
@@ -231,7 +231,7 @@ body {
     
     /* Carrusel en tablet */
     .copy-carousel-container {
-        margin-right: 70px;
+        margin-right: 85px;
     }
     
     .copy-carousel-controls {
@@ -305,7 +305,7 @@ body {
     
     /* Carrusel en desktop */
     .copy-carousel-container {
-        margin-right: 80px;
+        margin-right: 100px;
     }
     
     .copy-carousel-controls {
@@ -363,7 +363,7 @@ body {
     
     /* Layout horizontal optimizado */
     .copy-carousel-container {
-        margin-right: 90px;
+        margin-right: 110px;
     }
     
     .copy-carousel-controls {
@@ -453,7 +453,7 @@ body {
     
     /* Carrusel móvil mejorado */
     .copy-carousel-container {
-        margin-right: 55px; /* Espacio para botones */
+        margin-right: 70px; /* Espacio para botones e indicador */
         padding: 0.25rem 0;
     }
     
