@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Botones Carrusel</title>
+    <link rel="stylesheet" href="css/copy-carousel.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+        }
+        
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .test-info {
+            background: #e3f2fd;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        
+        .visible { background: #d4edda; border-color: #28a745; }
+        .hidden { background: #f8d7da; border-color: #dc3545; }
+        
+        .device-test {
+            margin: 1rem 0;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .device-test::before {
+                content: "📱 MÓVIL/TABLET";
+                display: block;
+                font-weight: bold;
+                color: #007bff;
+                margin-bottom: 0.5rem;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .device-test::before {
+                content: "🖥️ ESCRITORIO";
+                display: block;
+                font-weight: bold;
+                color: #28a745;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Test de Botones del Carrusel</h1>
+        
+        <div class="test-info">
+            <h3>Información del Test</h3>
+            <p>Esta página verifica que los botones del carrusel estén visibles y funcionando correctamente en todos los tamaños de pantalla.</p>
+            <p><strong>Instrucciones:</strong> Los botones deben estar visibles a la derecha del carrusel. Haz clic en ellos para probar la funcionalidad.</p>
+        </div>
+        
+        <div class="device-test">
+            <h3>Estado del Dispositivo</h3>
+            <p id="screenInfo">Cargando información de pantalla...</p>
+        </div>
+        
+        <!-- Carrusel de Tipos de Copy -->
+        <div class="copy-carousel-container">
+            <div class="copy-carousel-viewport">
+                <div class="copy-carousel" id="copyCarousel">
+                    <div class="copy-carousel-item" data-copy="Informativo y educativo">
+                        <div class="copy-emoji">📚</div>
+                        <div class="copy-content">
+                            <h4>Informativo y educativo</h4>
+                            <p>Content marketing que enseña y aporta valor</p>
+                        </div>
+                    </div>
+                    <div class="copy-carousel-item" data-copy="Venta directa y persuasivo">
+                        <div class="copy-emoji">🎯</div>
+                        <div class="copy-content">
+                            <h4>Venta directa y persuasivo</h4>
+                            <p>Textos que convierten visitas en ventas</p>
+                        </div>
+                    </div>
+                    <div class="copy-carousel-item" data-copy="Emocional y storytelling">
+                        <div class="copy-emoji">❤️</div>
+                        <div class="copy-content">
+                            <h4>Emocional y storytelling</h4>
+                            <p>Historias que conectan y emocionan</p>
+                        </div>
+                    </div>
+                    <div class="copy-carousel-item" data-copy="Social proof y testimonios">
+                        <div class="copy-emoji">⭐</div>
+                        <div class="copy-content">
+                            <h4>Social proof y testimonios</h4>
+                            <p>Credibilidad a través de experiencias reales</p>
+                        </div>
+                    </div>
+                    <div class="copy-carousel-item" data-copy="Posicionamiento y branding">
+                        <div class="copy-emoji">🏆</div>
+                        <div class="copy-content">
+                            <h4>Posicionamiento y branding</h4>
+                            <p>Construye autoridad y reconocimiento de marca</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Controles del carrusel -->
+            <div class="copy-carousel-controls">
+                <button class="copy-carousel-btn" onclick="rotateCopyCarousel(-1)" title="Anterior">
+                    <i>↑</i>
+                </button>
+                <button class="copy-carousel-btn" onclick="rotateCopyCarousel(1)" title="Siguiente">
+                    <i>↓</i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Estado de los botones -->
+        <div id="buttonStatus" class="status">
+            <h3>Estado de los Botones</h3>
+            <p>Verificando visibilidad...</p>
+        </div>
+        
+        <!-- Selecciones actuales -->
+        <div class="copy-selections">
+            <div class="selections-header">
+                <span class="selections-title">Tipos seleccionados:</span>
+                <span class="selections-count" id="selectionsCount">0/3</span>
+            </div>
+            <div class="selections-list" id="selectionsList">
+                <span class="no-selections">Ningún tipo seleccionado</span>
+            </div>
+        </div>
+        
+        <!-- Log de eventos -->
+        <div class="status" style="margin-top: 1rem;">
+            <h3>Log de Eventos</h3>
+            <div id="eventLog" style="height: 200px; overflow-y: auto; font-family: monospace; font-size: 0.9rem; background: #000; color: #0f0; padding: 1rem; border-radius: 5px;">
+                Iniciando test...<br>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/copy-carousel.js"></script>
+    <script>
+        function log(message) {
+            const logElement = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}<br>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+        
+        function checkButtonVisibility() {
+            const controls = document.querySelector('.copy-carousel-controls');
+            const buttons = document.querySelectorAll('.copy-carousel-btn');
+            const statusElement = document.getElementById('buttonStatus');
+            
+            if (!controls || buttons.length === 0) {
+                statusElement.innerHTML = '<h3>❌ Error</h3><p>No se encontraron los controles del carrusel</p>';
+                statusElement.className = 'status hidden';
+                log('❌ No se encontraron controles del carrusel');
+                return;
+            }
+            
+            const controlsRect = controls.getBoundingClientRect();
+            const isVisible = controlsRect.width > 0 && controlsRect.height > 0;
+            
+            let buttonInfo = '';
+            buttons.forEach((btn, index) => {
+                const rect = btn.getBoundingClientRect();
+                const btnVisible = rect.width > 0 && rect.height > 0;
+                buttonInfo += `<p>Botón ${index + 1}: ${btnVisible ? '✅ Visible' : '❌ Oculto'} (${rect.width}x${rect.height}px, top: ${rect.top}px, right: ${rect.right}px)</p>`;
+                log(`Botón ${index + 1}: ${btnVisible ? 'Visible' : 'Oculto'} - Dimensiones: ${rect.width}x${rect.height}px`);
+            });
+            
+            if (isVisible) {
+                statusElement.innerHTML = `<h3>✅ Botones Visibles</h3>${buttonInfo}<p>Controles: ${controlsRect.width}x${controlsRect.height}px</p>`;
+                statusElement.className = 'status visible';
+                log('✅ Controles del carrusel están visibles');
+            } else {
+                statusElement.innerHTML = `<h3>❌ Botones Ocultos</h3>${buttonInfo}<p>Controles: ${controlsRect.width}x${controlsRect.height}px</p>`;
+                statusElement.className = 'status hidden';
+                log('❌ Controles del carrusel están ocultos');
+            }
+        }
+        
+        function updateScreenInfo() {
+            const screenInfo = document.getElementById('screenInfo');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            
+            let deviceType = '';
+            if (width <= 480) deviceType = '📱 Móvil pequeño';
+            else if (width <= 768) deviceType = '📱 Móvil/Tablet';
+            else if (width <= 1024) deviceType = '💻 Tablet/Laptop';
+            else deviceType = '🖥️ Escritorio';
+            
+            screenInfo.innerHTML = `
+                <strong>${deviceType}</strong><br>
+                Resolución: ${width} x ${height}px<br>
+                Proporción: ${(width/height).toFixed(2)}<br>
+                User Agent: ${navigator.userAgent.includes('Mobile') ? 'Móvil' : 'Escritorio'}
+            `;
+            
+            log(`Información de pantalla actualizada: ${deviceType} (${width}x${height}px)`);
+        }
+        
+        // Interceptar clics en botones del carrusel
+        function rotateCopyCarousel(direction) {
+            log(`🔄 Botón de carrusel presionado: ${direction > 0 ? 'Siguiente (↓)' : 'Anterior (↑)'}`);
+            
+            if (window.copyCarousel) {
+                window.copyCarousel.rotate(direction);
+                log(`✅ Carrusel rotado ${direction > 0 ? 'hacia adelante' : 'hacia atrás'}`);
+            } else {
+                log('❌ window.copyCarousel no está disponible');
+            }
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            log('🚀 DOM cargado, iniciando tests...');
+            updateScreenInfo();
+            
+            // Verificar botones después de que el carrusel se inicialice
+            setTimeout(() => {
+                checkButtonVisibility();
+                log('🧪 Test de visibilidad completado');
+            }, 1000);
+            
+            // Escuchar redimensionamiento de ventana
+            window.addEventListener('resize', () => {
+                log('📐 Ventana redimensionada');
+                updateScreenInfo();
+                setTimeout(checkButtonVisibility, 100);
+            });
+            
+            // Verificar periódicamente
+            setInterval(() => {
+                checkButtonVisibility();
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
