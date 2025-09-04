@@ -1,19 +1,19 @@
-/* Carrusel vertical de tipos de copy */
+/* Carrusel vertical de tipos de copy - VERSIÓN OPTIMIZADA */
 .copy-carousel-container {
     position: relative;
     width: 100%;
     margin: 1rem 0;
     max-width: 100%;
-    overflow: visible; /* Cambiar a visible para los botones */
-    padding-right: 80px; /* Espacio para los botones */
+    overflow: visible; /* Permitir que los botones sean visibles */
+    padding-right: 0; /* Se manejará desde responsive.css */
 }
 
 .copy-carousel-viewport {
     perspective: 1000px;
-    height: 300px;
+    height: 280px;
     overflow: hidden;
     position: relative;
-    border-radius: 15px;
+    border-radius: 12px;
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(247, 148, 164, 0.05));
     border: 2px solid rgba(102, 126, 234, 0.1);
     width: 100%;
@@ -31,15 +31,15 @@
 .copy-carousel-item {
     position: absolute;
     width: 90%;
-    height: 100px;
+    height: 85px;
     left: 5%;
     background: linear-gradient(145deg, #ffffff, #f8f9fa);
     border: 2px solid #e9ecef;
-    border-radius: 12px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
     cursor: pointer;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -49,18 +49,70 @@
     box-sizing: border-box;
 }
 
-/* Responsive adjustments for mobile */
+/* Responsividad optimizada */
 @media (max-width: 767px) {
     .copy-carousel-viewport {
-        height: 250px;
+        height: 260px;
+        border-radius: 10px;
     }
     
     .copy-carousel-item {
         width: 95%;
         left: 2.5%;
+        height: 75px;
+        padding: 0.5rem 0.75rem;
+        gap: 0.5rem;
+        border-radius: 8px;
+    }
+    
+    .copy-emoji {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    .copy-content h4 {
+        font-size: 0.85rem;
+        line-height: 1.1;
+    }
+    
+    .copy-content p {
+        font-size: 0.7rem;
+        line-height: 1.2;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .copy-carousel-viewport {
+        height: 300px;
+    }
+    
+    .copy-carousel-item {
         height: 90px;
         padding: 0.75rem 1rem;
-        gap: 0.75rem;
+    }
+    
+    .copy-emoji {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+}
+
+@media (min-width: 1024px) {
+    .copy-carousel-viewport {
+        height: 320px;
+    }
+    
+    .copy-carousel-item {
+        height: 95px;
+        padding: 1rem 1.25rem;
+    }
+    
+    .copy-emoji {
+        width: 55px;
+        height: 55px;
+        font-size: 1.75rem;
     }
 }
 
@@ -83,74 +135,96 @@
 }
 
 .copy-emoji {
-    font-size: 2rem;
+    font-size: 1.5rem;
     flex-shrink: 0;
-    width: 60px;
-    height: 60px;
+    width: 45px;
+    height: 45px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(102, 126, 234, 0.1);
     border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.copy-carousel-item:hover .copy-emoji {
+    background: rgba(102, 126, 234, 0.2);
+    transform: scale(1.1);
+}
+
+.copy-carousel-item.selected .copy-emoji {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .copy-content {
     flex: 1;
+    min-width: 0; /* Para permitir text-overflow */
 }
 
 .copy-content h4 {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.2rem 0;
     color: #333;
-    line-height: 1.3;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .copy-content p {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #666;
     margin: 0;
-    line-height: 1.4;
+    line-height: 1.3;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2; /* Estándar moderno */
 }
 
+/* Controles del carrusel - POSICIÓN OPTIMIZADA Y VISIBLE */
 .copy-carousel-controls {
     display: flex;
     flex-direction: column;
     position: absolute;
-    right: -70px;
+    right: -55px; /* Posición ajustada */
     top: 50%;
     transform: translateY(-50%);
-    gap: 15px;
+    gap: 12px;
     z-index: 2000;
     pointer-events: auto;
 }
 
 .copy-carousel-btn {
-    width: 60px;
-    height: 60px;
+    width: 45px;
+    height: 45px;
     background: linear-gradient(145deg, #667eea, #764ba2);
     color: white;
-    border: 3px solid white;
+    border: 2px solid rgba(255, 255, 255, 0.9);
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.4rem;
+    font-size: 1.1rem;
     transition: all 0.3s ease;
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
     font-weight: bold;
     position: relative;
+    backdrop-filter: blur(10px);
     /* Asegurar máxima visibilidad */
-    backdrop-filter: blur(5px);
-    border-color: rgba(255, 255, 255, 0.9);
+    outline: 2px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
 }
 
 .copy-carousel-btn:hover {
-    transform: scale(1.2);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.7);
+    transform: scale(1.15);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.7);
     background: linear-gradient(145deg, #5a67d8, #6c63ac);
     border-color: #ffd700;
+    outline-color: #ffd700;
 }
 
 .copy-carousel-btn:active {
@@ -159,6 +233,7 @@
 
 .copy-carousel-btn i {
     pointer-events: none;
+    font-weight: 900;
 }
 
 .copy-selections {
@@ -234,75 +309,51 @@
     background: rgba(255, 255, 255, 0.5);
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments - BOTONES SIEMPRE VISIBLES */
 @media (max-width: 768px) {
-    .copy-carousel-container {
-        padding-right: 70px; /* Espacio para botones en móvil */
-    }
-    
     .copy-carousel-controls {
-        right: -60px;
+        right: -50px;
+        gap: 10px;
     }
     
     .copy-carousel-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 1.1rem;
-        border-width: 2px;
-    }
-    
-    .copy-carousel-item {
-        padding: 0.75rem 1rem;
-        height: 90px;
-    }
-    
-    .copy-emoji {
         width: 40px;
         height: 40px;
-        font-size: 1.25rem;
+        font-size: 1rem;
+        border-width: 2px;
+        outline-width: 1px;
     }
     
-    .copy-content h4 {
-        font-size: 0.9rem;
+    .copy-carousel-btn:hover {
+        transform: scale(1.1);
     }
 }
 
 @media (max-width: 480px) {
-    .copy-carousel-container {
-        padding-right: 60px; /* Espacio para botones en móvil pequeño */
-    }
-    
     .copy-carousel-controls {
-        right: -50px;
+        right: -45px;
+        gap: 8px;
     }
     
     .copy-carousel-btn {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
         border-width: 2px;
     }
-    
-    .copy-carousel-item {
-        padding: 0.5rem 0.75rem;
-        height: 80px;
-        gap: 0.5rem;
+}
+
+@media (min-width: 1024px) {
+    .copy-carousel-controls {
+        right: -65px;
+        gap: 15px;
     }
     
-    .copy-emoji {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-    
-    .copy-content h4 {
-        font-size: 0.85rem;
-        line-height: 1.2;
-    }
-    
-    .copy-content p {
-        font-size: 0.75rem;
-        line-height: 1.3;
+    .copy-carousel-btn {
+        width: 55px;
+        height: 55px;
+        font-size: 1.3rem;
+        border-width: 3px;
     }
 }
 

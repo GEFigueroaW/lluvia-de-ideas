@@ -28,6 +28,7 @@
     <link rel="stylesheet" href="css/copy-carousel.css">
     <link rel="stylesheet" href="css/optimization-2025.css">
     <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/layout-optimized.css">
     
     <!-- Meta tags para SEO -->
     <meta name="description" content="Generador de ideas inteligente impulsado por IA para potenciar tu creatividad">
@@ -229,12 +230,12 @@
         </nav>
 
         <!-- Contenido principal moderno -->
-        <div class="container main-container" id="mainApp" style="padding: 2rem 1rem; max-width: 1400px;">
-            <div class="columns is-gapless" style="min-height: calc(100vh - 200px);">
+        <div class="container main-container" id="mainApp" style="padding: 1rem; max-width: 100%; margin: 0 auto;">
+            <div class="columns is-gapless" style="min-height: calc(100vh - 140px); gap: 1rem;">
                 <!-- Panel izquierdo: Generación e Historial -->
-                <div class="column is-5-widescreen is-4-desktop is-full-tablet is-full-mobile" style="padding-right: 1.5rem;">
+                <div class="column is-4-desktop is-5-widescreen is-full-tablet is-full-mobile">
                     <!-- Panel de generación de copywriting -->
-                    <div class="modern-content-card fade-in-left mb-6">
+                    <div class="modern-content-card fade-in-left mb-4">
                         <h2>
                             <i class="fas fa-pen-fancy" style="color: #667eea;"></i>
                             Generador de Copywriting
@@ -380,10 +381,10 @@
                                     
                                     <!-- Controles del carrusel -->
                                     <div class="copy-carousel-controls">
-                                        <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(-1)">
+                                        <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(-1)" title="Anterior">
                                             <i class="fas fa-chevron-up"></i>
                                         </button>
-                                        <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(1)">
+                                        <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(1)" title="Siguiente">
                                             <i class="fas fa-chevron-down"></i>
                                         </button>
                                     </div>
@@ -466,7 +467,7 @@
                     </div>
 
                 <!-- Panel de resultados moderno -->
-                <div class="column is-7 is-full-mobile" style="padding: 0.5rem;">
+                <div class="column is-8-desktop is-7-widescreen is-full-mobile">
                     <div id="ideasContainer" class="fade-in-right">
                         <!-- Estado inicial moderno -->
                         <div class="modern-content-card has-text-centered" style="min-height: 500px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(247, 148, 164, 0.05));">
@@ -529,7 +530,7 @@
     <script src="simple-bypass.js"></script>
     <script src="js/auth-minimal.js"></script>
     <script src="js/simple-social-carousel.js"></script>
-    <script src="js/copy-carousel.js"></script>
+    <script src="js/optimized-copy-carousel.js"></script>
     <script src="js/clean-system.js"></script>
     <script src="js/force-transition.js"></script>
     
@@ -594,6 +595,45 @@
             
             console.log('🚨 [EMERGENCY] Transición forzada');
         }, 3000);
+        
+        // Función global de respaldo para rotar carrusel
+        window.rotateCopyCarousel = function(direction) {
+            console.log('🔄 [GLOBAL] Intentando rotar carrusel:', direction);
+            
+            // Intentar con carousel optimizado
+            if (window.optimizedCarousel && window.optimizedCarousel.isInitialized) {
+                window.optimizedCarousel.rotate(direction);
+                return;
+            }
+            
+            // Intentar con carousel original
+            if (window.copyCarousel) {
+                window.copyCarousel.rotate(direction);
+                return;
+            }
+            
+            console.warn('⚠️ [GLOBAL] No se encontró carousel inicializado');
+        };
+        
+        // Asegurar inicialización del carrusel
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 [INLINE] DOM cargado, verificando carrusel...');
+            
+            setTimeout(() => {
+                const carousel = document.getElementById('copyCarousel');
+                const controls = document.querySelector('.copy-carousel-controls');
+                
+                console.log('🔍 [DEBUG] Carousel element:', !!carousel);
+                console.log('🔍 [DEBUG] Controls element:', !!controls);
+                
+                if (carousel && !window.optimizedCarousel) {
+                    console.log('🔄 [INLINE] Inicializando carrusel...');
+                    if (typeof OptimizedCopyCarousel !== 'undefined') {
+                        window.optimizedCarousel = new OptimizedCopyCarousel();
+                    }
+                }
+            }, 2000);
+        });
     </script>
     
     <!-- Estilos específicos para ideas y animaciones -->

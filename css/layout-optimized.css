@@ -1,0 +1,444 @@
+/* =========================================
+   LAYOUT OPTIMIZADO - MÁXIMO APROVECHAMIENTO DEL ESPACIO
+   ========================================= */
+
+/* Variables CSS para consistencia */
+:root {
+    --gap-mobile: 0.5rem;
+    --gap-tablet: 1rem;
+    --gap-desktop: 1.5rem;
+    --gap-large: 2rem;
+    
+    --padding-mobile: 0.5rem;
+    --padding-tablet: 1rem;
+    --padding-desktop: 1.5rem;
+    --padding-large: 2rem;
+    
+    --border-radius-small: 8px;
+    --border-radius-medium: 12px;
+    --border-radius-large: 16px;
+}
+
+/* Base: Máximo aprovechamiento en móvil */
+body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+#appSection {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-container {
+    flex: 1;
+    width: 100%;
+    max-width: 100%;
+    padding: var(--padding-mobile);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 80px); /* Altura total menos header */
+}
+
+.columns {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-mobile);
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.column {
+    flex: 1;
+    padding: 0;
+    box-sizing: border-box;
+    min-height: 0; /* Permite shrinking */
+}
+
+/* Optimización del header */
+.modern-navbar {
+    height: 60px;
+    min-height: 60px;
+    padding: 0.5rem 0;
+}
+
+.navbar {
+    min-height: auto;
+    padding: 0.5rem 1rem;
+}
+
+/* Cards optimizadas */
+.modern-content-card {
+    height: 100%;
+    padding: var(--padding-mobile);
+    margin-bottom: 0;
+    border-radius: var(--border-radius-medium);
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+/* Formulario optimizado */
+.modern-field {
+    margin-bottom: 0.75rem;
+}
+
+.modern-field:last-child {
+    margin-bottom: 0;
+}
+
+.modern-input,
+.modern-textarea {
+    padding: 0.6rem;
+    font-size: 14px;
+    border-radius: var(--border-radius-small);
+}
+
+.modern-btn {
+    padding: 0.7rem 1rem;
+    font-size: 14px;
+    border-radius: var(--border-radius-small);
+    width: 100%;
+}
+
+/* Carrusel optimizado */
+.copy-carousel-viewport {
+    height: 240px;
+    border-radius: var(--border-radius-medium);
+}
+
+.copy-carousel-item {
+    height: 70px;
+    padding: 0.5rem;
+    border-radius: var(--border-radius-small);
+}
+
+.copy-emoji {
+    width: 30px;
+    height: 30px;
+    font-size: 0.9rem;
+}
+
+.copy-content h4 {
+    font-size: 0.8rem;
+    margin-bottom: 0.1rem;
+}
+
+.copy-content p {
+    font-size: 0.7rem;
+    line-height: 1.2;
+}
+
+/* =========================================
+   TABLET: 768px+
+   ========================================= */
+@media (min-width: 768px) {
+    body {
+        font-size: 15px;
+    }
+    
+    .main-container {
+        padding: var(--padding-tablet);
+        height: calc(100vh - 100px);
+    }
+    
+    .columns {
+        flex-direction: row;
+        gap: var(--gap-tablet);
+    }
+    
+    .column {
+        flex: initial;
+    }
+    
+    .column.is-4-desktop {
+        flex: 0 0 40%;
+        max-width: 40%;
+    }
+    
+    .column.is-8-desktop {
+        flex: 0 0 60%;
+        max-width: 60%;
+    }
+    
+    .modern-content-card {
+        padding: var(--padding-tablet);
+    }
+    
+    .modern-field {
+        margin-bottom: 1rem;
+    }
+    
+    .modern-btn {
+        width: auto;
+        min-width: 150px;
+    }
+    
+    .copy-carousel-viewport {
+        height: 280px;
+    }
+    
+    .copy-carousel-item {
+        height: 80px;
+        padding: 0.75rem;
+    }
+    
+    .copy-emoji {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+    
+    .copy-content h4 {
+        font-size: 0.9rem;
+    }
+    
+    .copy-content p {
+        font-size: 0.75rem;
+    }
+}
+
+/* =========================================
+   DESKTOP: 1024px+
+   ========================================= */
+@media (min-width: 1024px) {
+    body {
+        font-size: 16px;
+    }
+    
+    .main-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: var(--padding-desktop);
+        height: calc(100vh - 120px);
+    }
+    
+    .columns {
+        gap: var(--gap-desktop);
+    }
+    
+    .column.is-4-desktop {
+        flex: 0 0 35%;
+        max-width: 35%;
+    }
+    
+    .column.is-8-desktop {
+        flex: 0 0 65%;
+        max-width: 65%;
+    }
+    
+    .modern-content-card {
+        padding: var(--padding-desktop);
+    }
+    
+    .copy-carousel-viewport {
+        height: 320px;
+    }
+    
+    .copy-carousel-item {
+        height: 90px;
+        padding: 1rem;
+    }
+    
+    .copy-emoji {
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+    }
+    
+    .copy-content h4 {
+        font-size: 1rem;
+    }
+    
+    .copy-content p {
+        font-size: 0.8rem;
+    }
+}
+
+/* =========================================
+   DESKTOP GRANDE: 1200px+
+   ========================================= */
+@media (min-width: 1200px) {
+    .main-container {
+        max-width: 1600px;
+        padding: var(--gap-large);
+    }
+    
+    .columns {
+        gap: var(--gap-large);
+    }
+    
+    .column.is-5-widescreen {
+        flex: 0 0 32%;
+        max-width: 32%;
+    }
+    
+    .column.is-7-widescreen {
+        flex: 0 0 68%;
+        max-width: 68%;
+    }
+    
+    .modern-content-card {
+        padding: var(--padding-large);
+    }
+    
+    .copy-carousel-viewport {
+        height: 350px;
+    }
+    
+    .copy-carousel-item {
+        height: 100px;
+        padding: 1.25rem;
+    }
+}
+
+/* =========================================
+   ULTRA WIDE: 1600px+
+   ========================================= */
+@media (min-width: 1600px) {
+    .main-container {
+        max-width: 1800px;
+    }
+    
+    .column.is-5-widescreen {
+        flex: 0 0 30%;
+        max-width: 30%;
+    }
+    
+    .column.is-7-widescreen {
+        flex: 0 0 70%;
+        max-width: 70%;
+    }
+}
+
+/* =========================================
+   LANDSCAPE MÓVIL
+   ========================================= */
+@media (max-width: 767px) and (orientation: landscape) {
+    .main-container {
+        height: calc(100vh - 60px);
+    }
+    
+    .modern-navbar {
+        height: 50px;
+        min-height: 50px;
+    }
+    
+    .copy-carousel-viewport {
+        height: 200px;
+    }
+    
+    .copy-carousel-item {
+        height: 60px;
+        padding: 0.4rem;
+    }
+    
+    .copy-emoji {
+        width: 25px;
+        height: 25px;
+        font-size: 0.8rem;
+    }
+    
+    .copy-content h4 {
+        font-size: 0.75rem;
+    }
+    
+    .copy-content p {
+        font-size: 0.65rem;
+    }
+}
+
+/* =========================================
+   OPTIMIZACIONES ESPECÍFICAS
+   ========================================= */
+
+/* Scroll optimizado */
+.modern-content-card {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Evitar desbordamiento */
+* {
+    box-sizing: border-box;
+}
+
+/* Botones del carrusel siempre visibles */
+.copy-carousel-container {
+    position: relative;
+    overflow: visible;
+}
+
+/* Selecciones compactas */
+.copy-selections {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    border-radius: var(--border-radius-small);
+}
+
+/* Resultados optimizados */
+#ideasContainer {
+    height: 100%;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
+
+/* Espaciado vertical optimizado */
+.modern-field:last-of-type {
+    margin-bottom: 0;
+}
+
+/* Texto responsivo */
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+/* Estados de carga responsivos */
+.modern-loading {
+    transform: scale(0.8);
+}
+
+@media (min-width: 768px) {
+    .modern-loading {
+        transform: scale(1);
+    }
+}
+
+/* Utilidades de altura */
+.full-height {
+    height: 100%;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+/* Optimización para pantallas táctiles */
+@media (hover: none) and (pointer: coarse) {
+    .modern-btn,
+    .copy-carousel-btn,
+    .copy-carousel-item {
+        min-height: 44px;
+    }
+    
+    .modern-input,
+    .modern-textarea {
+        font-size: 16px; /* Evita zoom en iOS */
+    }
+}

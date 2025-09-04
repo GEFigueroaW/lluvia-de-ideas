@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test - Carrusel Optimizado y Layout Responsivo</title>
+    
+    <!-- CSS de prueba -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/copy-carousel.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/layout-optimized.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 1rem;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        @media (max-width: 768px) {
+            .test-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .status-ok { background: #28a745; }
+        .status-warning { background: #ffc107; }
+        .status-error { background: #dc3545; }
+        
+        .info-box {
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .carousel-test {
+            border: 2px dashed #667eea;
+            padding: 1rem;
+            border-radius: 10px;
+            background: rgba(102, 126, 234, 0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1><i class="fas fa-cogs"></i> Test: Layout Responsivo y Carrusel</h1>
+            <p>Verificación del funcionamiento optimizado en diferentes dispositivos</p>
+        </div>
+        
+        <!-- Estado de la página -->
+        <div class="test-section">
+            <h2><i class="fas fa-info-circle"></i> Estado del Sistema</h2>
+            <div id="systemStatus">
+                <p><span class="status-indicator status-warning"></span> Verificando...</p>
+            </div>
+        </div>
+        
+        <!-- Test del carrusel -->
+        <div class="test-section">
+            <h2><i class="fas fa-arrows-alt-v"></i> Test del Carrusel de Copy</h2>
+            <div class="carousel-test">
+                <div class="copy-carousel-container">
+                    <div class="copy-carousel-viewport">
+                        <div class="copy-carousel" id="copyCarousel">
+                            <div class="copy-carousel-item" data-copy="Informativo y educativo">
+                                <span class="copy-emoji">📚</span>
+                                <div class="copy-content">
+                                    <h4>Informativo y educativo</h4>
+                                    <p>Comparte conocimiento útil y educa a tu audiencia</p>
+                                </div>
+                            </div>
+                            
+                            <div class="copy-carousel-item" data-copy="Venta directa y persuasivo">
+                                <span class="copy-emoji">💰</span>
+                                <div class="copy-content">
+                                    <h4>Venta directa y persuasivo</h4>
+                                    <p>Impulsa ventas con llamadas a la acción directas</p>
+                                </div>
+                            </div>
+                            
+                            <div class="copy-carousel-item" data-copy="Posicionamiento y branding">
+                                <span class="copy-emoji">🏆</span>
+                                <div class="copy-content">
+                                    <h4>Posicionamiento y branding</h4>
+                                    <p>Fortalece tu marca y construye autoridad</p>
+                                </div>
+                            </div>
+                            
+                            <div class="copy-carousel-item" data-copy="Urgencia y escasez">
+                                <span class="copy-emoji">⚡</span>
+                                <div class="copy-content">
+                                    <h4>Urgencia y escasez</h4>
+                                    <p>Crea FOMO y acelera decisiones de compra</p>
+                                </div>
+                            </div>
+                            
+                            <div class="copy-carousel-item" data-copy="De beneficio o solución">
+                                <span class="copy-emoji">✨</span>
+                                <div class="copy-content">
+                                    <h4>De beneficio o solución</h4>
+                                    <p>Cómo el producto mejora la vida del cliente</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Los controles se crearán automáticamente -->
+                </div>
+                
+                <!-- Selecciones actuales -->
+                <div class="copy-selections" id="copySelections">
+                    <div class="selections-header">
+                        <span class="selections-title">Seleccionados:</span>
+                        <span class="selections-count" id="selectionsCount">0/3</span>
+                    </div>
+                    <div class="selections-list" id="selectionsList">
+                        <span class="no-selections">Ningún tipo seleccionado</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test de responsividad -->
+        <div class="test-section">
+            <h2><i class="fas fa-mobile-alt"></i> Test de Responsividad</h2>
+            <div class="test-grid">
+                <div>
+                    <h3>Información del Dispositivo</h3>
+                    <div class="info-box" id="deviceInfo">
+                        <p><strong>Ancho de pantalla:</strong> <span id="screenWidth">-</span>px</p>
+                        <p><strong>Alto de pantalla:</strong> <span id="screenHeight">-</span>px</p>
+                        <p><strong>Tipo de dispositivo:</strong> <span id="deviceType">-</span></p>
+                        <p><strong>Orientación:</strong> <span id="orientation">-</span></p>
+                    </div>
+                </div>
+                
+                <div>
+                    <h3>Estado del CSS</h3>
+                    <div class="info-box" id="cssStatus">
+                        <p id="layoutStatus">Verificando layout...</p>
+                        <p id="carouselStatus">Verificando carrusel...</p>
+                        <p id="buttonsStatus">Verificando botones...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controles de prueba -->
+        <div class="test-section">
+            <h2><i class="fas fa-gamepad"></i> Controles de Prueba</h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button onclick="testRotateUp()" style="padding: 0.75rem 1rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    <i class="fas fa-chevron-up"></i> Rotar Arriba
+                </button>
+                <button onclick="testRotateDown()" style="padding: 0.75rem 1rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    <i class="fas fa-chevron-down"></i> Rotar Abajo
+                </button>
+                <button onclick="testSelectAll()" style="padding: 0.75rem 1rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    <i class="fas fa-check-all"></i> Seleccionar Primeros 3
+                </button>
+                <button onclick="testClearAll()" style="padding: 0.75rem 1rem; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                    <i class="fas fa-times"></i> Limpiar Selecciones
+                </button>
+            </div>
+        </div>
+        
+        <!-- Log de eventos -->
+        <div class="test-section">
+            <h2><i class="fas fa-list"></i> Log de Eventos</h2>
+            <div id="eventLog" style="background: #000; color: #0f0; padding: 1rem; border-radius: 8px; font-family: monospace; height: 200px; overflow-y: auto;">
+                <!-- Los logs aparecerán aquí -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="js/optimized-copy-carousel.js"></script>
+    
+    <script>
+        // Funciones de prueba
+        function testRotateUp() {
+            log('🔄 Test: Rotando hacia arriba');
+            rotateCopyCarousel(-1);
+        }
+        
+        function testRotateDown() {
+            log('🔄 Test: Rotando hacia abajo');
+            rotateCopyCarousel(1);
+        }
+        
+        function testSelectAll() {
+            log('✅ Test: Seleccionando primeros 3 tipos');
+            if (window.optimizedCarousel) {
+                const types = ['Informativo y educativo', 'Venta directa y persuasivo', 'Posicionamiento y branding'];
+                window.optimizedCarousel.setSelectedTypes(types);
+            }
+        }
+        
+        function testClearAll() {
+            log('❌ Test: Limpiando todas las selecciones');
+            if (window.optimizedCarousel) {
+                window.optimizedCarousel.setSelectedTypes([]);
+            }
+        }
+        
+        function log(message) {
+            const logElement = document.getElementById('eventLog');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.innerHTML += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+        
+        function updateDeviceInfo() {
+            document.getElementById('screenWidth').textContent = window.innerWidth;
+            document.getElementById('screenHeight').textContent = window.innerHeight;
+            
+            let deviceType = 'Desktop';
+            if (window.innerWidth <= 480) deviceType = 'Mobile (Pequeño)';
+            else if (window.innerWidth <= 768) deviceType = 'Mobile';
+            else if (window.innerWidth <= 1024) deviceType = 'Tablet';
+            else if (window.innerWidth <= 1200) deviceType = 'Desktop';
+            else deviceType = 'Desktop (Grande)';
+            
+            document.getElementById('deviceType').textContent = deviceType;
+            document.getElementById('orientation').textContent = window.innerWidth > window.innerHeight ? 'Horizontal' : 'Vertical';
+        }
+        
+        function updateStatus() {
+            const carousel = document.getElementById('copyCarousel');
+            const controls = document.querySelector('.copy-carousel-controls');
+            const buttons = document.querySelectorAll('.copy-carousel-btn');
+            
+            let systemStatus = '';
+            let carouselStatus = '';
+            let buttonsStatus = '';
+            let layoutStatus = '';
+            
+            // Sistema general
+            if (window.optimizedCarousel && window.optimizedCarousel.isInitialized) {
+                systemStatus = '<p><span class="status-indicator status-ok"></span> Sistema funcionando correctamente</p>';
+            } else {
+                systemStatus = '<p><span class="status-indicator status-error"></span> Sistema no inicializado</p>';
+            }
+            
+            // Layout
+            if (carousel && controls) {
+                layoutStatus = '✅ Layout del carrusel correcto';
+            } else {
+                layoutStatus = '❌ Layout del carrusel incorrecto';
+            }
+            
+            // Carrusel
+            if (carousel && carousel.children.length > 0) {
+                carouselStatus = '✅ Carrusel con elementos cargados';
+            } else {
+                carouselStatus = '❌ Carrusel sin elementos';
+            }
+            
+            // Botones
+            if (buttons.length >= 2) {
+                buttonsStatus = '✅ Botones de control presentes';
+            } else {
+                buttonsStatus = '❌ Botones de control faltantes';
+            }
+            
+            document.getElementById('systemStatus').innerHTML = systemStatus;
+            document.getElementById('layoutStatus').textContent = layoutStatus;
+            document.getElementById('carouselStatus').textContent = carouselStatus;
+            document.getElementById('buttonsStatus').textContent = buttonsStatus;
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            log('📄 DOM cargado, iniciando tests...');
+            updateDeviceInfo();
+            updateStatus();
+            
+            // Actualizar cada segundo
+            setInterval(() => {
+                updateDeviceInfo();
+                updateStatus();
+            }, 1000);
+        });
+        
+        // Escuchar cambios de tamaño
+        window.addEventListener('resize', function() {
+            log('📱 Pantalla redimensionada: ' + window.innerWidth + 'x' + window.innerHeight);
+            updateDeviceInfo();
+        });
+        
+        // Interceptar console.log para mostrar en nuestro log
+        const originalLog = console.log;
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            log(args.join(' '));
+        };
+        
+        log('🚀 Test de carrusel iniciado');
+    </script>
+</body>
+</html>
