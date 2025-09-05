@@ -196,15 +196,16 @@
     display: flex;
     flex-direction: column;
     position: absolute;
-    right: 20px; /* Dentro del carrusel, bien visible */
-    top: 50%;
-    transform: translateY(-50%);
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
     gap: 16px;
-    align-items: center;
     z-index: 10;
     pointer-events: auto;
-    height: calc(100% - 40px); /* Ajuste para no salirse del contenedor */
-    justify-content: center;
     filter: drop-shadow(0 2px 8px rgba(0,0,0,0.7));
 }
 
