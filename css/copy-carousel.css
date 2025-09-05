@@ -196,7 +196,7 @@
     display: flex;
     flex-direction: column;
     position: absolute;
-    right: 5px; /* MUY pegado al borde derecho DENTRO del carrusel */
+    right: 30px; /* Más hacia la izquierda para que se vean completos */
     top: 50%;
     transform: translateY(-50%);
     gap: 5px;
