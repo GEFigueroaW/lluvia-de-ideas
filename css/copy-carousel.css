@@ -2,7 +2,7 @@
 .copy-carousel-container {
     position: relative;
     width: 100%;
-    margin: 1rem 0;
+    margin: 2rem 0 3rem 0;
     max-width: 100%;
     overflow: visible; /* Permitir    content: "▲▼";que los botones sean visibles */
     padding-right: 0; /* Se manejará desde responsive.css */
@@ -36,10 +36,10 @@
 
 .copy-carousel-item {
     position: absolute;
-    width: 220px;
-    height: 60px;
+    width: 320px;
+    height: 90px;
     left: 50%;
-    margin-left: -110px;
+    margin-left: -160px;
     background: linear-gradient(145deg, #ffffff, #f8f9fa);
     border: 2px solid #e9ecef;
     border-radius: 12px;
