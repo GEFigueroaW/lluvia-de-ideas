@@ -36,12 +36,13 @@
 
 .copy-carousel-item {
     position: absolute;
-    width: 90%;
-    height: 85px;
-    left: 5%;
+    width: 220px;
+    height: 60px;
+    left: 50%;
+    margin-left: -110px;
     background: linear-gradient(145deg, #ffffff, #f8f9fa);
     border: 2px solid #e9ecef;
-    border-radius: 10px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     gap: 0.75rem;
