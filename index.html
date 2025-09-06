@@ -348,94 +348,102 @@
                                             <div class="copy-carousel-item" data-copy="Narrativo o storytelling">
                                                 <span class="copy-emoji">📖</span>
                                                 <div class="copy-content">
-                                                    <h4>Narrativo o storytelling</h4>
-                                                    <p>Cuenta una historia emocional</p>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="copy-carousel-item" data-copy="Testimonio o prueba social">
-                                                <span class="copy-emoji">⭐</span>
-                                                <div class="copy-content">
-                                                    <h4>Testimonio o prueba social</h4>
-                                                    <p>Muestra experiencias positivas de otros usuarios</p>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="copy-carousel-item" data-copy="Técnico o profesional">
-                                                <span class="copy-emoji">🔬</span>
-                                                <div class="copy-content">
-                                                    <h4>Técnico o profesional</h4>
-                                                    <p>Información especializada o técnica</p>
-                                                </div>
-                                            </div>
-                                            
-                                            <div class="copy-carousel-item" data-copy="Informal">
-                                                <span class="copy-emoji">😎</span>
-                                                <div class="copy-content">
-                                                    <h4>Informal</h4>
-                                                    <p>Tono casual, cercano</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                <p class="field-note">
-                                    🎯 Rota el carrusel y haz clic para seleccionar hasta 3 tipos de copy
-                                </p>
-                            </div>
-
-                            <!-- 4. Opción de Llamada a la Acción -->
-                            <div class="modern-field">
-                                <label class="modern-label">
-                                    <i class="fas fa-bullhorn mr-2"></i>
-                                    🚀 Llamada a la Acción (CTA)
-                                </label>
-                                <div class="cta-toggle-container">
-                                    <label class="cta-toggle">
-                                        <input type="checkbox" id="includeCTA" checked>
-                                        <span class="cta-slider"></span>
-                                        <span class="cta-label">Incluir CTA en el copywriting</span>
-                                    </label>
-                                    <div class="cta-description">
-                                        <small>
-                                            <span class="cta-on-text">✅ El copywriting incluirá una llamada a la acción específica</span>
-                                            <span class="cta-off-text" style="display: none;">💭 Contenido reflexivo sin llamada a la acción</span>
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 5. Contexto adicional -->
-                            <div class="modern-field">
-                                <label class="modern-label">
-                                    <i class="fas fa-info-circle mr-2"></i>
-                                    Contexto Adicional (Opcional)
-                                </label>
-                                <textarea id="copyContext" class="modern-input" rows="3" 
-                                          placeholder="Audiencia objetivo, tono deseado, call-to-action específico..."></textarea>
-                            </div>
-
-                            <div class="modern-field">
-                                <button id="generateCopyBtn" type="submit" class="modern-btn is-primary">
-                                    <i class="fas fa-magic mr-2"></i>
-                                    Generar 3 Ideas de Copywriting
-                                </button>
-                            </div>
-                        </form>
-
-                        <!-- Enlaces rápidos -->
-                        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid var(--border-light);">
-                            <h4 style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem; font-weight: 600;">
-                                ACCESOS RÁPIDOS
-                            </h4>
-                            <div class="buttons are-small">
-                                <button id="diagnosticBtn" class="diagnostic-btn" onclick="runDeepSeekDiagnostic()">
-                                    <i class="fas fa-stethoscope"></i>
-                                    Diagnóstico IA
-                                </button>
-                                <a href="admin.html" class="modern-btn-small" id="adminBtn" style="background: var(--accent-gradient); color: white; text-decoration: none; display: none; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500; transition: var(--transition-smooth);">
-                                    <i class="fas fa-cog"></i>
-                                    Panel Admin
+                                                    <div class="copy-carousel-viewport" style="position: relative; min-height: 320px; display: flex; align-items: center;">
+                                                        <div class="copy-carousel-controls" style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; margin-right: 12px;">
+                                                            <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(-1)" title="⬆️ ANTERIOR" style="background: linear-gradient(145deg, #667eea, #764ba2); color: #fff; box-shadow: 0 2px 8px rgba(102,126,234,0.15);">
+                                                                <i class="fas fa-chevron-up"></i>
+                                                            </button>
+                                                            <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(1)" title="⬇️ SIGUIENTE" style="background: linear-gradient(145deg, #667eea, #764ba2); color: #fff; box-shadow: 0 2px 8px rgba(102,126,234,0.15);">
+                                                                <i class="fas fa-chevron-down"></i>
+                                                            </button>
+                                                        </div>
+                                                        <div class="copy-carousel" id="copyCarousel" style="flex: 1;">
+                                                            <div class="copy-carousel-item" data-copy="Informativo y educativo">
+                                                                <span class="copy-emoji">📚</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Informativo y educativo</h4>
+                                                                    <p>Comparte conocimiento útil y educa a tu audiencia</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="Venta directa y persuasivo">
+                                                                <span class="copy-emoji">�</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Venta directa y persuasivo</h4>
+                                                                    <p>Impulsa ventas con llamadas a la acción directas</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="Posicionamiento y branding">
+                                                                <span class="copy-emoji">🏆</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Posicionamiento y branding</h4>
+                                                                    <p>Fortalece tu marca y construye autoridad</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="Urgencia y escasez">
+                                                                <span class="copy-emoji">⚡</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Urgencia y escasez</h4>
+                                                                    <p>Crea FOMO y acelera decisiones de compra</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="De beneficio o solución">
+                                                                <span class="copy-emoji">✨</span>
+                                                                <div class="copy-content">
+                                                                    <h4>De beneficio o solución</h4>
+                                                                    <p>Cómo el producto mejora la vida del cliente</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="De novedad o lanzamiento">
+                                                                <span class="copy-emoji">🚀</span>
+                                                                <div class="copy-content">
+                                                                    <h4>De novedad o lanzamiento</h4>
+                                                                    <p>Anuncia algo nuevo para atraer atención inmediata</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="De interacción o pregunta">
+                                                                <span class="copy-emoji">💬</span>
+                                                                <div class="copy-content">
+                                                                    <h4>De interacción o pregunta</h4>
+                                                                    <p>Diseñado para generar respuestas de la audiencia</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="Llamada a la acción (CTA)">
+                                                                <span class="copy-emoji">👆</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Llamada a la acción (CTA)</h4>
+                                                                    <p>Motiva acción directa (comprar, registrarse)</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="Narrativo o storytelling">
+                                                                <span class="copy-emoji">📖</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Narrativo o storytelling</h4>
+                                                                    <p>Cuenta una historia emocional</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="Testimonio o prueba social">
+                                                                <span class="copy-emoji">⭐</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Testimonio o prueba social</h4>
+                                                                    <p>Muestra experiencias positivas de otros usuarios</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="Técnico o profesional">
+                                                                <span class="copy-emoji">🔬</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Técnico o profesional</h4>
+                                                                    <p>Información especializada o técnica</p>
+                                                                </div>
+                                                            </div>
+                                                            <div class="copy-carousel-item" data-copy="Informal">
+                                                                <span class="copy-emoji">😎</span>
+                                                                <div class="copy-content">
+                                                                    <h4>Informal</h4>
+                                                                    <p>Tono casual, cercano</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                 </a>
                             </div>
                             
