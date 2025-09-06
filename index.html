@@ -380,27 +380,27 @@
                                     </div>
                                     
                                     <!-- Controles del carrusel SÚPER VISIBLES -->
-                                    <div class="copy-carousel-controls">
-                                        <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(-1)" title="⬆️ ANTERIOR">
-                                            <i class="fas fa-chevron-up"></i>
-                                        </button>
-                                        <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(1)" title="⬇️ SIGUIENTE">
-                                            <i class="fas fa-chevron-down"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <!-- Selecciones actuales -->
-                                    <div class="copy-selections" id="copySelections">
-                                        <div class="selections-header">
-                                            <span class="selections-title">Seleccionados:</span>
-                                            <span class="selections-count" id="selectionsCount">0/3</span>
+                                    <div class="copy-carousel-viewport" style="position: relative;">
+                                        <div class="copy-carousel" id="copyCarousel">
+                                            <div class="copy-carousel-item" data-copy="Informativo y educativo">
+                                                <span class="copy-emoji">📚</span>
+                                                <div class="copy-content">
+                                                    <h4>Informativo y educativo</h4>
+                                                    <p>Comparte conocimiento útil y educa a tu audiencia</p>
+                                                </div>
+                                            </div>
+                                            <!-- ...existing code... -->
                                         </div>
-                                        <div class="selections-list" id="selectionsList">
-                                            <span class="no-selections">Ningún tipo seleccionado</span>
+                                        <!-- Controles del carrusel DENTRO del viewport -->
+                                        <div class="copy-carousel-controls" style="right: 10px; top: 0; height: 100%; position: absolute; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 16px; z-index: 10; pointer-events: auto;">
+                                            <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(-1)" title="⬆️ ANTERIOR">
+                                                <i class="fas fa-chevron-up"></i>
+                                            </button>
+                                            <button type="button" class="copy-carousel-btn" onclick="rotateCopyCarousel(1)" title="⬇️ SIGUIENTE">
+                                                <i class="fas fa-chevron-down"></i>
+                                            </button>
                                         </div>
                                     </div>
-                                </div>
-                                
                                 <p class="field-note">
                                     🎯 Rota el carrusel y haz clic para seleccionar hasta 3 tipos de copy
                                 </p>
